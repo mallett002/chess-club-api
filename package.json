@@ -1,0 +1,18 @@
+{
+  "name": "chess-club-api",
+  "version": "1.0.0",
+  "description": "server side for chess club app",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index"
+  },
+  "keywords": [
+    "chess"
+  ],
+  "author": "William Mallett",
+  "license": "MIT",
+  "dependencies": {
+    "chess.js": "^0.11.0"
+  }
+}
