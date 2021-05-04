@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "server side for chess club app",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
-    "start": "node index"
+    "start": "node --experimental-modules index",
+    "poc": "node --experimental-modules poc"
   },
   "keywords": [
     "chess"
@@ -13,6 +15,7 @@
   "author": "William Mallett",
   "license": "MIT",
   "dependencies": {
+    "@hapi/hapi": "^20.1.2",
     "chess.js": "^0.11.0"
   }
 }
