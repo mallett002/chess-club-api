@@ -1,5 +1,5 @@
-import init from "./src/server";
+import { otherFunc } from './other';
 
-init().then(() => console.log('running!!'));
+console.log({thing: 'the thing works'});
+otherFunc();
 
-console.log('here we goooo');
