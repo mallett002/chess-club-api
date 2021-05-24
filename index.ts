@@ -1,10 +1,16 @@
-import {ApolloServer} from 'apollo-server';
-import {resolvers} from './resolvers';
-import {typeDefs} from './schema';
+import { ApolloServer } from 'apollo-server';
 
-const server = new ApolloServer({ typeDefs, resolvers });
+import { environment } from './environment';
+import { resolvers } from './resolvers';
+import { typeDefs } from './schema';
 
-// The `listen` method launches a web server.
-server.listen().then(({ url }) => {
+const server = new ApolloServer({
+  resolvers,
+  typeDefs,
+  introspection: environment.apollo.introspection,
+  playground: environment.apollo.playground,
+});
+
+server.listen({ port: environment.port }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });

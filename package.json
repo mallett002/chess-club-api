@@ -4,7 +4,8 @@
   "description": "server side for chess club app",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && nodemon dist/index.js",
+    "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",
     "test": "echo no tests set up"
   },
   "repository": {
@@ -19,7 +20,9 @@
   "license": "MIT",
   "dependencies": {
     "apollo-server": "^2.24.1",
+    "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
+    "nodemon": "^2.0.7",
     "typescript": "^4.1.3"
   }
 }
