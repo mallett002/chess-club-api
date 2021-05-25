@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  chess-club-api:
+    build:
+      context: .
+    environment:
+      PORT: 4001
+      APOLLO_INTROSPECTION: "true"
+      APOLLO_PLAYGROUND: "true"
+    ports:
+      - 4001:4001
