@@ -1,16 +1,16 @@
 import { ApolloServer } from 'apollo-server';
 
-import { environment } from './environment';
+import { env } from './environment';
 import { resolvers } from './resolvers';
 import { typeDefs } from './schema';
 
 const server = new ApolloServer({
   resolvers,
   typeDefs,
-  introspection: environment.apollo.introspection,
-  playground: environment.apollo.playground,
+  introspection: env.apollo.introspection,
+  playground: env.apollo.playground,
 });
 
-server.listen({ port: environment.port }).then(({ url }) => {
+server.listen({ port: env.port }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });
