@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN ls -lah
-
 EXPOSE 4001
 
 CMD [ "npm", "start" ]

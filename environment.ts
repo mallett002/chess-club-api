@@ -8,10 +8,10 @@ interface Environment {
   port: number|string;
 }
 
-export const environment: Environment = {
+export const env: Environment = {
   apollo: {
-    introspection: process.env.NODE_ENV === 'production',
-    playground: process.env.NODE_ENV === 'production'
+    introspection: process.env.NODE_ENV !== 'production',
+    playground: process.env.NODE_ENV !== 'production'
   },
   port: process.env.PORT || defaultPort
 };

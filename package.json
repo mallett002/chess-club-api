@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "docker:start": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
     "start": "tsc && nodemon dist/index.js",
     "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",
     "test": "echo no tests set up"

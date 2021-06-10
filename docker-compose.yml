@@ -4,6 +4,7 @@ services:
   chess-club-api:
     build:
       context: .
+    image: chess-club-api
     environment:
       PORT: 4001
       APOLLO_INTROSPECTION: "true"
