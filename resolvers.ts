@@ -9,6 +9,17 @@ export const resolvers = {
   Query: {
     books: () => books,
   },
+  Mutation: {
+    addBook: (parent, args, context) => {
+      const { author, title } = args;
+      const newBook = { author, title };
+
+      pubsub.publish(BOOK_ADDED, { bookAdded: newBook });
+      books.push(newBook);
+
+      return newBook;
+    }
+  },
   Subscription: {
     bookAdded: {
       subscribe: () => pubsub.asyncIterator([BOOK_ADDED])
