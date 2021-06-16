@@ -10,7 +10,7 @@ export const resolvers = {
     books: () => books,
   },
   Mutation: {
-    addBook: (parent, args, context) => {
+    updateBoard: (parent, args, context) => {
       const { author, title } = args;
       const newBook = { author, title };
 
