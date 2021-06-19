@@ -1,8 +1,18 @@
 import { uuid } from 'uuidv4';
 import { Chess } from 'chess.js';
 
-import { persistGame } from '../repository/games';
+import { persistGame, getGameByGameId } from '../repository/games';
 import { indexToRank, indexToFile } from '../helpers/board';
+
+let chess;
+
+const getChessGame = () => {
+  if (!chess) {
+    chess = new Chess();
+  }
+
+  return chess;
+};
 
 const flattenPositions = (positions) => {
   const flattenedPositions = [];
@@ -21,22 +31,51 @@ const flattenPositions = (positions) => {
 };
 
 export const createGame = ({ playerOne, playerTwo }) => {
-  const game = new Chess();
-  const gameId = uuid();
-  const fen = game.fen();
+  chess = getChessGame();
 
-  persistGame(gameId, fen);
+  const gameId = "43ed404d-bbb6-4e7c-9ffb-76be9d54c534";
+  // const gameId = uuid();
+  const fen = chess.fen();
 
-  game.header(
-    'gameId', gameId,
-    'playerOne', playerOne,
-    'playerTwo', playerTwo
-  );
+  persistGame(gameId, {
+    fen,
+    gameId,
+    playerOne,
+    playerTwo
+  });
 
   return {
-    gameHeader: game.header(),
-    moves: game.moves({verbose: true}),
-    positions: flattenPositions(game.board()),
-    turn: game.turn()
+    gameId,
+    moves: chess.moves({verbose: true}),
+    players: [playerOne, playerTwo],
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
   };
+};
+
+export const movePiece = (gameId, moveToCell) => {
+  const game = getGameByGameId(gameId);
+
+  chess = getChessGame();
+  chess.load(game.fen);
+  chess.move(moveToCell);
+
+  const newFen = chess.fen();
+
+  persistGame(gameId, {
+    fen: newFen,
+    gameId,
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo
+  });
+
+  const updatedGame = {
+    gameId,
+    moves: chess.moves({verbose: true}),
+    players: [game.playerOne, game.playerTwo],
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+
+  return updatedGame;
 };

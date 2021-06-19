@@ -16,15 +16,10 @@ export const typeDefs = gql`
     san: String
   }
 
-  type Header {
-    gameId: String!
-    playerOne: String!
-    playerTwo: String!
-  }
-
   type Board {
-    gameHeader: Header
+    gameId: ID!
     moves: [Move]
+    players: [String!]!
     positions: [Cell]!
     turn: String
   }
@@ -37,7 +32,9 @@ export const typeDefs = gql`
 
   type Mutation {
     # addBook(author: String, title: String): Book
-    # updateBoard(Move): String
+    # Takes in a gameId and a cell to move to and returns the board
+    updateBoard(gameId: ID!, cell: String!): Board!
+    # Take in 2 players and return the board
     createGame(playerOne: ID!, playerTwo: ID!): Board!
   }
 
