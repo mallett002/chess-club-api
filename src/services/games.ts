@@ -33,8 +33,7 @@ const flattenPositions = (positions) => {
 export const createGame = ({ playerOne, playerTwo }) => {
   chess = getChessGame();
 
-  const gameId = "43ed404d-bbb6-4e7c-9ffb-76be9d54c534";
-  // const gameId = uuid();
+  const gameId = uuid();
   const fen = chess.fen();
 
   persistGame(gameId, {
@@ -58,7 +57,12 @@ export const movePiece = (gameId, moveToCell) => {
 
   chess = getChessGame();
   chess.load(game.fen);
-  chess.move(moveToCell);
+
+  const move = chess.move(moveToCell);
+
+  if (!move) {
+    throw Error('Not a valid move');
+  }
 
   const newFen = chess.fen();
 

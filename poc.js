@@ -14,15 +14,11 @@ const movesVerbose = chess.moves({verbose: true});
 const moves = chess.moves();
 const turn = chess.turn();
 
-console.log({
-  turn,
-  moves,
-  movesVerbose,
-  positions: chess.board()
-});
+const move1 = chess.move('e6');
+const move2 = chess.move('e6');
+const move3 = chess.move('e6');
 
-const fen = chess.fen();
-console.log({fen});
+console.log({move1, move2, move3});
 
 
 // const moves = chess.moves({square: 'c6', verbose: true}); // can use it's "san" key for standard algebraic notation
