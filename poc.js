@@ -10,12 +10,14 @@ chess.move('d4');
 
 console.log(chess.ascii());
 // console.log(chess.moves({square: 'g8', verbose: true}));
-const moves = chess.moves({verbose: true});
+const movesVerbose = chess.moves({verbose: true});
+const moves = chess.moves();
 const turn = chess.turn();
 
 console.log({
   turn,
   moves,
+  movesVerbose,
   positions: chess.board()
 });
 
