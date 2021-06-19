@@ -73,13 +73,11 @@ export const movePiece = (gameId, moveToCell) => {
     playerTwo: game.playerTwo
   });
 
-  const updatedGame = {
+  return {
     gameId,
     moves: chess.moves({verbose: true}),
     players: [game.playerOne, game.playerTwo],
     positions: flattenPositions(chess.board()),
     turn: chess.turn()
   };
-
-  return updatedGame;
 };

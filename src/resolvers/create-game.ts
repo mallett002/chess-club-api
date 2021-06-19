@@ -5,4 +5,3 @@ export default (parent, args, context) => {
 
   return board;
 };
-
