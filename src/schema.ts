@@ -24,11 +24,11 @@ export const typeDefs = gql`
     turn: String
   }
 
-  # type Subscription {
-    # Will update Book whenever one is added, pushing "Book" to subscribers
+  type Subscription {
     # bookAdded: Book
-    # Clients will need to know when board is updated in real time
-  # }
+    # Will update Board whenever one is added, pushing "Board" to subscribers
+    boardUpdated: Board!
+  }
 
   type Mutation {
     # addBook(author: String, title: String): Book

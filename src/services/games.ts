@@ -3,6 +3,8 @@ import { Chess } from 'chess.js';
 
 import { persistGame, getGameByGameId } from '../repository/games';
 import { indexToRank, indexToFile } from '../helpers/board';
+import { getPubSub } from './pub-sub';
+import { BOARD_UPDATED } from '../constants';
 
 let chess;
 
@@ -45,7 +47,7 @@ export const createGame = ({ playerOne, playerTwo }) => {
 
   return {
     gameId,
-    moves: chess.moves({verbose: true}),
+    moves: chess.moves({ verbose: true }),
     players: [playerOne, playerTwo],
     positions: flattenPositions(chess.board()),
     turn: chess.turn()
@@ -66,6 +68,18 @@ export const movePiece = (gameId, moveToCell) => {
 
   const newFen = chess.fen();
 
+  const newBoard = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    players: [game.playerOne, game.playerTwo],
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+
+  const pubSub = getPubSub();
+
+  pubSub.publish(BOARD_UPDATED, { boardUpdated: newBoard });
+
   persistGame(gameId, {
     fen: newFen,
     gameId,
@@ -73,11 +87,5 @@ export const movePiece = (gameId, moveToCell) => {
     playerTwo: game.playerTwo
   });
 
-  return {
-    gameId,
-    moves: chess.moves({verbose: true}),
-    players: [game.playerOne, game.playerTwo],
-    positions: flattenPositions(chess.board()),
-    turn: chess.turn()
-  };
+  return newBoard;
 };
