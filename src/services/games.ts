@@ -8,7 +8,7 @@ import { BOARD_UPDATED } from '../constants';
 
 let chess;
 
-const getChessGame = () => {
+const getChess = () => {
   if (!chess) {
     chess = new Chess();
   }
@@ -32,11 +32,27 @@ const flattenPositions = (positions) => {
   return flattenedPositions;
 };
 
+const publishBoardUpdates = (board) => {
+  const pubSub = getPubSub();
+
+  pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
+};
+
 export const createGame = ({ playerOne, playerTwo }) => {
-  chess = getChessGame();
+  chess = getChess();
 
   const gameId = uuid();
   const fen = chess.fen();
+
+  const board = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    players: [playerOne, playerTwo],
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+
+  publishBoardUpdates(board);
 
   persistGame(gameId, {
     fen,
@@ -45,19 +61,13 @@ export const createGame = ({ playerOne, playerTwo }) => {
     playerTwo
   });
 
-  return {
-    gameId,
-    moves: chess.moves({ verbose: true }),
-    players: [playerOne, playerTwo],
-    positions: flattenPositions(chess.board()),
-    turn: chess.turn()
-  };
+  return board;
 };
 
 export const movePiece = (gameId, moveToCell) => {
   const game = getGameByGameId(gameId);
 
-  chess = getChessGame();
+  chess = getChess();
   chess.load(game.fen);
 
   const move = chess.move(moveToCell);
@@ -65,8 +75,6 @@ export const movePiece = (gameId, moveToCell) => {
   if (!move) {
     throw Error('Not a valid move');
   }
-
-  const newFen = chess.fen();
 
   const newBoard = {
     gameId,
@@ -76,12 +84,10 @@ export const movePiece = (gameId, moveToCell) => {
     turn: chess.turn()
   };
 
-  const pubSub = getPubSub();
-
-  pubSub.publish(BOARD_UPDATED, { boardUpdated: newBoard });
+  publishBoardUpdates(newBoard);
 
   persistGame(gameId, {
-    fen: newFen,
+    fen: chess.fen(),
     gameId,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo

@@ -25,16 +25,11 @@ export const typeDefs = gql`
   }
 
   type Subscription {
-    # bookAdded: Book
-    # Will update Board whenever one is added, pushing "Board" to subscribers
     boardUpdated: Board!
   }
 
   type Mutation {
-    # addBook(author: String, title: String): Book
-    # Takes in a gameId and a cell to move to and returns the board
     updateBoard(gameId: ID!, cell: String!): Board!
-    # Take in 2 players and return the board
     createGame(playerOne: ID!, playerTwo: ID!): Board!
   }
 
