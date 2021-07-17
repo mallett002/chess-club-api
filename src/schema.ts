@@ -25,7 +25,7 @@ export const typeDefs = gql`
   }
 
   type Subscription {
-    boardUpdated: Board!
+    boardUpdated(gameId: ID!): Board!
   }
 
   type Mutation {
