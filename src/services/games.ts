@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import { Chess } from 'chess.js';
 
 import { persistGame, getGameByGameId } from '../repository/games';
@@ -8,8 +8,8 @@ import { BOARD_UPDATED } from '../constants';
 
 let chess;
 
-const getChess = () => {
-  if (!chess) {
+const getChess = (newGame?: boolean) => {
+  if (newGame || !chess) {
     chess = new Chess();
   }
 
@@ -39,9 +39,9 @@ const publishBoardUpdates = (board) => {
 };
 
 export const createGame = ({ playerOne, playerTwo }) => {
-  chess = getChess();
+  chess = getChess(true);
 
-  const gameId = uuid();
+  const gameId = uuidv4();
   const fen = chess.fen();
 
   const board = {
