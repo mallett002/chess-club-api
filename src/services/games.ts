@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Chess } from 'chess.js';
 
-import { persistGame, getGameByGameId } from '../repository/games';
+import { persistGame, getGameByGameId, selectGamesForPlayer } from '../repository/games';
 import { indexToRank, indexToFile } from '../helpers/board';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
@@ -95,3 +95,5 @@ export const movePiece = (gameId, moveToCell) => {
 
   return newBoard;
 };
+
+export const getGamesByPlayerId = (playerId: string) => selectGamesForPlayer(playerId);

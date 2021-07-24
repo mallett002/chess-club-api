@@ -24,6 +24,12 @@ export const typeDefs = gql`
     turn: String
   }
 
+  type Game {
+    gameId: ID!
+    players: [String!]!
+    state: String!
+  }
+
   type Subscription {
     boardUpdated(gameId: ID!): Board!
   }
@@ -34,6 +40,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    getGame: String
+    getGames(playerId: ID!): [Game]!
   }
 `;
