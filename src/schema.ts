@@ -19,15 +19,18 @@ export const typeDefs = gql`
   type Board {
     gameId: ID!
     moves: [Move]
-    players: [String!]!
+    playerOne: String!
+    playerTwo: String!
     positions: [Cell]!
     turn: String
   }
 
   type Game {
+    fen: String!
     gameId: ID!
-    players: [String!]!
-    state: String!
+    playerOne: String!
+    playerTwo: String!
+    turn: String
   }
 
   type Subscription {
@@ -40,6 +43,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    getGames(playerId: ID!): [Game]!
+    getGames(playerId: ID!): [Board]!
   }
 `;

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Chess } from 'chess.js';
 
-import { persistGame, getGameByGameId, selectGamesForPlayer } from '../repository/games';
+import { insertNewGame, getGameByGameId, selectGamesForPlayer, updateGame } from '../repository/games';
 import { indexToRank, indexToFile } from '../helpers/board';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
@@ -43,22 +43,25 @@ export const createGame = ({ playerOne, playerTwo }) => {
 
   const gameId = uuidv4();
   const fen = chess.fen();
+  const turn = chess.turn();
 
   const board = {
     gameId,
     moves: chess.moves({ verbose: true }),
-    players: [playerOne, playerTwo],
+    playerOne,
+    playerTwo,
     positions: flattenPositions(chess.board()),
-    turn: chess.turn()
+    turn
   };
 
   publishBoardUpdates(board);
 
-  persistGame(gameId, {
+  insertNewGame(gameId, {
     fen,
     gameId,
     playerOne,
-    playerTwo
+    playerTwo,
+    turn
   });
 
   return board;
@@ -71,6 +74,7 @@ export const movePiece = (gameId, moveToCell) => {
   chess.load(game.fen);
 
   const move = chess.move(moveToCell);
+  const turn = chess.turn();
 
   if (!move) {
     throw Error('Not a valid move');
@@ -79,18 +83,20 @@ export const movePiece = (gameId, moveToCell) => {
   const newBoard = {
     gameId,
     moves: chess.moves({ verbose: true }),
-    players: [game.playerOne, game.playerTwo],
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
-    turn: chess.turn()
+    turn
   };
 
   publishBoardUpdates(newBoard);
 
-  persistGame(gameId, {
+  updateGame(gameId, {
     fen: chess.fen(),
     gameId,
     playerOne: game.playerOne,
-    playerTwo: game.playerTwo
+    playerTwo: game.playerTwo,
+    turn
   });
 
   return newBoard;
