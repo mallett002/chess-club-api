@@ -38,6 +38,11 @@ const publishBoardUpdates = (board) => {
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
 };
 
+/* 
+  - Will eventually use player's JWT to determine who they are.
+  - Will take in a username to determine who they are inviting.
+  - Look up player by username and send invite.
+*/
 export const createGame = ({ playerOne, playerTwo }) => {
   chess = getChess(true);
 
