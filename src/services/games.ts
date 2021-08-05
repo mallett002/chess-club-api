@@ -2,9 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { Chess } from 'chess.js';
 
 import { insertNewGame, getGameByGameId, selectGamesForPlayer, updateGame } from '../repository/games';
-import { indexToRank, indexToFile } from '../helpers/board';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
+
+import { flattenPositions } from './board';
 
 let chess;
 
@@ -14,22 +15,6 @@ const getChess = (newGame?: boolean) => {
   }
 
   return chess;
-};
-
-const flattenPositions = (positions) => {
-  const flattenedPositions = [];
-
-  for (let rowIndex = 0; rowIndex < positions.length; rowIndex++) {
-    for (let cellIndex = 0; cellIndex < positions.length; cellIndex++) {
-      const label = `${indexToFile[cellIndex]}${indexToRank[rowIndex]}`;
-      flattenedPositions.push({
-        ...positions[rowIndex][cellIndex],
-        label
-      });
-    }
-  }
-
-  return flattenedPositions;
 };
 
 const publishBoardUpdates = (board) => {
@@ -108,3 +93,19 @@ export const movePiece = (gameId, moveToCell) => {
 };
 
 export const getGamesByPlayerId = (playerId: string) => selectGamesForPlayer(playerId);
+
+export const getBoardByGameId = (gameId) => {
+  const game = getGameByGameId(gameId);
+
+  chess = getChess();
+  chess.load(game.fen);
+
+  return {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+};
