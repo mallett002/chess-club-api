@@ -43,6 +43,7 @@ export const typeDefs = gql`
   }
 
   type Query {
+    getBoard(gameId: ID!): Board!
     getGames(playerId: ID!): [Game]!
   }
 `;
