@@ -86,8 +86,8 @@ export const getGamesByPlayerId = (playerId: string) => selectGamesForPlayer(pla
 
 export const getBoardByGameId = (gameId) => {
   const game = getGameByGameId(gameId);
-
   const chess = getChess();
+  
   chess.load(game.fen);
 
   return {
