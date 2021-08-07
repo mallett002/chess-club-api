@@ -100,5 +100,13 @@ describe('games service', () => {
         turn: expectedTurn
       });
     });
+
+    it('should return null if no game is found', () => {
+      mockgetGameByGameId.mockReturnValue(null);
+
+      result = getBoardByGameId(gameId);
+
+      expect(result).toBeNull();
+    });
   });
 });
