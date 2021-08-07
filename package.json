@@ -4,6 +4,7 @@
   "description": "server side for chess club app",
   "main": "dist/index.js",
   "scripts": {
+    "coverage": "npx jest --coverage /test/services/chess.spec.ts",
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose down",
     "start": "tsc && nodemon dist/index.js",
