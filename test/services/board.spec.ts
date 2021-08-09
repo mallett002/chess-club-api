@@ -1,9 +1,6 @@
 import Chance from 'chance';
-import { Chess } from 'chess.js';
 
 import { createMovesByLabel } from '../../src/services/board';
-
-jest.mock('chess.js');
 
 const chance = new Chance();
 
@@ -39,7 +36,7 @@ describe('board service', () => {
         moveThree
       ];
 
-      result = createMovesByLabel();
+      result = createMovesByLabel(movesList);
     });
 
     afterEach(() => {
