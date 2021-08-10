@@ -1,36 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Chess } from 'chess.js';
 
 import { insertNewGame, getGameByGameId, selectGamesForPlayer, updateGame } from '../repository/games';
-import { indexToRank, indexToFile } from '../helpers/board';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 
-let chess;
-
-const getChess = (newGame?: boolean) => {
-  if (newGame || !chess) {
-    chess = new Chess();
-  }
-
-  return chess;
-};
-
-const flattenPositions = (positions) => {
-  const flattenedPositions = [];
-
-  for (let rowIndex = 0; rowIndex < positions.length; rowIndex++) {
-    for (let cellIndex = 0; cellIndex < positions.length; cellIndex++) {
-      const label = `${indexToFile[cellIndex]}${indexToRank[rowIndex]}`;
-      flattenedPositions.push({
-        ...positions[rowIndex][cellIndex],
-        label
-      });
-    }
-  }
-
-  return flattenedPositions;
-};
+import { flattenPositions } from './board';
+import { getChess } from './chess';
 
 const publishBoardUpdates = (board) => {
   const pubSub = getPubSub();
@@ -44,7 +19,7 @@ const publishBoardUpdates = (board) => {
   - Look up player by username and send invite.
 */
 export const createGame = ({ playerOne, playerTwo }) => {
-  chess = getChess(true);
+  const chess = getChess(true);
 
   const gameId = uuidv4();
   const fen = chess.fen();
@@ -75,7 +50,7 @@ export const createGame = ({ playerOne, playerTwo }) => {
 export const movePiece = (gameId, moveToCell) => {
   const game = getGameByGameId(gameId);
 
-  chess = getChess();
+  const chess = getChess();
   chess.load(game.fen);
 
   const move = chess.move(moveToCell);
@@ -108,3 +83,26 @@ export const movePiece = (gameId, moveToCell) => {
 };
 
 export const getGamesByPlayerId = (playerId: string) => selectGamesForPlayer(playerId);
+
+export const getBoardByGameId = (gameId) => {
+  console.log('in service...', {gameId});
+  
+  const game = getGameByGameId(gameId);
+
+  if (!game) {
+    return null;
+  }
+
+  const chess = getChess();
+  
+  chess.load(game.fen);
+
+  return {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+};

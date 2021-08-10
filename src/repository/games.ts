@@ -10,7 +10,7 @@ export const updateGame = (gameId, payload) => {
   games.set(gameId, payload);
 
   return games.get(gameId);
-}
+};
 
 export const selectGamesForPlayer = (playerId) => {
   let gamesForPlayer = [];
