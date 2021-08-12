@@ -1,8 +1,9 @@
 import Chance from 'chance';
+import { v4 as uuidv4 } from 'uuid';
 
 import { getGameByGameId } from '../../src/repository/games';
 import { flattenPositions } from '../../src/services/board';
-import { getBoardByGameId } from '../../src/services/games';
+import { getBoardByGameId, createGame } from '../../src/services/games';
 import { getChess } from '../../src/services/chess';
 
 jest.mock('../../src/repository/games');
@@ -12,10 +13,57 @@ jest.mock('../../src/services/chess');
 describe('games service', () => {
   const chance = new Chance();
 
+  const getChessMock = getChess as jest.MockedFunction<typeof getChess>;
+
+
+  describe('create game', () => {
+    let args,
+      result;
+
+    beforeEach(() => {
+      args = {
+        playerOne: chance.string(),
+        playerTwo: chance.string()
+      };
+      result = createGame(args);
+    });
+
+    afterEach(() => {
+      jest.resetAllMocks();
+    });
+
+    it('should create a new chess instance', () => {
+      expect(getChessMock).toHaveBeenCalledTimes(1);
+      expect(getChessMock).toHaveBeenCalledWith(true);
+    });
+    it('should generate a new gameId', () => {
+
+    });
+
+    it('should get the fen for the game', () => {
+
+    });
+
+    it('should get the turn for the game', () => {
+
+    });
+
+    it('should publish board updates', () => {
+
+    });
+
+    it('should insert the game in to the database', () => {
+
+    });
+
+    it('should return the board object', () => {
+
+    });
+
+  });
   describe('getBoardByGameId', () => {
     const mockgetGameByGameId = getGameByGameId as jest.MockedFunction<typeof getGameByGameId>;
     const flattenPositionsMock = flattenPositions as jest.MockedFunction<typeof flattenPositions>;
-    const getChessMock = getChess as jest.MockedFunction<typeof getChess>;
 
     let gameId,
       result,
@@ -85,7 +133,7 @@ describe('games service', () => {
       expect(flattenPositions).toHaveBeenCalledTimes(1);
       expect(flattenPositions).toHaveBeenCalledWith(expectedBoard);
     });
-    
+
     it('should get the turn', () => {
       expect(chessInstance.turn).toHaveBeenCalledTimes(1);
     });
