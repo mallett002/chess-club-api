@@ -15,5 +15,3 @@ export const flattenPositions = (positions) => {
 
   return flattenedPositions;
 };
-
-export const createMovesByLabel = (movesList) = {};

@@ -85,8 +85,6 @@ export const movePiece = (gameId, moveToCell) => {
 export const getGamesByPlayerId = (playerId: string) => selectGamesForPlayer(playerId);
 
 export const getBoardByGameId = (gameId) => {
-  console.log('in service...', {gameId});
-  
   const game = getGameByGameId(gameId);
 
   if (!game) {
