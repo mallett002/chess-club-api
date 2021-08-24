@@ -21,9 +21,9 @@ const publishBoardUpdates = (board) => {
 export const createGame = ({ playerOne, playerTwo }) => {
   const chess = getChess(true);
 
-  // const gameId = uuidv4();
-  // const fen = chess.fen();
-  // const turn = chess.turn();
+  const gameId = uuidv4();
+  const fen = chess.fen();
+  const turn = chess.turn();
 
   // const board = {
   //   gameId,
