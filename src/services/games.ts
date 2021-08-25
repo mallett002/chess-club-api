@@ -25,26 +25,26 @@ export const createGame = ({ playerOne, playerTwo }) => {
   const fen = chess.fen();
   const turn = chess.turn();
 
-  // const board = {
-  //   gameId,
-  //   moves: chess.moves({ verbose: true }),
-  //   playerOne,
-  //   playerTwo,
-  //   positions: flattenPositions(chess.board()),
-  //   turn
-  // };
+  const board = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne,
+    playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn
+  };
 
-  // publishBoardUpdates(board);
+  publishBoardUpdates(board);
 
-  // insertNewGame(gameId, {
-  //   fen,
-  //   gameId,
-  //   playerOne,
-  //   playerTwo,
-  //   turn
-  // });
+  insertNewGame(gameId, {
+    fen,
+    gameId,
+    playerOne,
+    playerTwo,
+    turn
+  });
 
-  // return board;
+  return board;
 };
 
 export const movePiece = (gameId, moveToCell) => {

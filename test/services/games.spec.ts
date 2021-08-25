@@ -1,7 +1,7 @@
 import Chance from 'chance';
 import { v4 as uuidv4 } from 'uuid';
 
-import { getGameByGameId } from '../../src/repository/games';
+import { getGameByGameId, insertNewGame } from '../../src/repository/games';
 import { flattenPositions } from '../../src/services/board';
 import { getBoardByGameId, createGame } from '../../src/services/games';
 import { getChess } from '../../src/services/chess';
@@ -19,6 +19,8 @@ describe('games service', () => {
   const getChessMock = getChess as jest.MockedFunction<typeof getChess>;
   const uuidv4Mock = uuidv4 as jest.MockedFunction<typeof uuidv4>;
   const getPubSubMock = getPubSub as jest.MockedFunction<typeof getPubSub>;
+  const flattenPositionsMock = flattenPositions as jest.MockedFunction<typeof flattenPositions>;
+  const insertNewGameMock = insertNewGame as jest.MockedFunction<typeof insertNewGame>;
 
   describe('create game', () => {
     let args,
@@ -27,6 +29,9 @@ describe('games service', () => {
       chessInstance,
       expectedTurn,
       pubSub,
+      expectedMoves,
+      expectedPositions,
+      expectedBoard,
       result;
 
     beforeEach(() => {
@@ -37,15 +42,22 @@ describe('games service', () => {
       gameId = chance.guid();
       expectedFen = chance.string();
       expectedTurn = chance.string();
+      expectedMoves = [chance.string(), chance.string()];
+      expectedBoard = [chance.string(), chance.string()];
       chessInstance = {
+        board: jest.fn().mockReturnValue(expectedBoard),
         fen: jest.fn().mockReturnValue(expectedFen),
+        moves: jest.fn().mockReturnValue(expectedMoves),
         turn: jest.fn().mockReturnValue(expectedTurn)
       };
       pubSub = { publish: jest.fn() };
+      expectedPositions = [chance.string(), chance.string()];
 
       uuidv4Mock.mockReturnValue(gameId);
       getChessMock.mockReturnValue(chessInstance);
       getPubSubMock.mockReturnValue(pubSub);
+      flattenPositionsMock.mockReturnValue(expectedPositions);
+
 
       result = createGame(args);
     });
@@ -72,121 +84,145 @@ describe('games service', () => {
     });
 
     it('should publish board updates', () => {
-
-    });
-
-    it('should insert the game in to the database', () => {
+      expect(chessInstance.moves).toHaveBeenCalledTimes(1);
+      expect(chessInstance.moves).toHaveBeenCalledWith({ verbose: true });
+      expect(chessInstance.board).toHaveBeenCalledTimes(1);
+      expect(flattenPositionsMock).toHaveBeenCalledTimes(1);
+      expect(flattenPositionsMock).toHaveBeenCalledWith(expectedBoard);
       expect(getPubSubMock).toHaveBeenCalledTimes(1);
       expect(pubSub.publish).toHaveBeenCalledTimes(1);
       expect(pubSub.publish).toHaveBeenCalledWith('BOARD_UPDATED', {
-        // gameId,
-        // moves: chess.moves({ verbose: true }),
-        // playerOne,
-        // playerTwo,
-        // positions: flattenPositions(chess.board()),
-        // turn 
+        boardUpdated: {
+          gameId,
+          moves: expectedMoves,
+          playerOne: args.playerOne,
+          playerTwo: args.playerTwo,
+          positions: expectedPositions,
+          turn: expectedTurn
+        }
       });
+    });
+
+    it('should insert the game in to the database', () => {
+      expect(insertNewGameMock).toHaveBeenCalledTimes(1);
+      expect(insertNewGameMock).toHaveBeenCalledWith(
+        gameId,
+        {
+          fen: expectedFen,
+          gameId,
+          playerOne: args.playerOne,
+          playerTwo: args.playerTwo,
+          turn: expectedTurn
+        }
+      );
+    });
+
+    it('should return the board object', () => {
+      expect(result).toStrictEqual({
+        gameId,
+        moves: expectedMoves,
+        playerOne: args.playerOne,
+        playerTwo: args.playerTwo,
+        positions: expectedPositions,
+        turn: expectedTurn
+      })
+    });
+
   });
+  describe('getBoardByGameId', () => {
+    const mockgetGameByGameId = getGameByGameId as jest.MockedFunction<typeof getGameByGameId>;
+    const flattenPositionsMock = flattenPositions as jest.MockedFunction<typeof flattenPositions>;
 
-  it('should return the board object', () => {
+    let gameId,
+      result,
+      chessInstance,
+      expectedMoves,
+      expectedPositions,
+      expectedBoard,
+      expectedTurn,
+      game;
 
-  });
+    beforeEach(() => {
+      gameId = chance.guid();
+      game = {
+        fen: chance.string(),
+        gameId: chance.string(),
+        playerOne: chance.string(),
+        playerTwo: chance.string(),
+        turn: chance.string()
+      };
+      expectedMoves = chance.string();
+      expectedBoard = [chance.string(), chance.string()];
+      expectedTurn = chance.string();
+      chessInstance = {
+        load: jest.fn(),
+        moves: jest.fn().mockReturnValue(expectedMoves),
+        board: jest.fn().mockReturnValue(expectedBoard),
+        turn: jest.fn().mockReturnValue(expectedTurn)
+      };
 
-});
-describe('getBoardByGameId', () => {
-  const mockgetGameByGameId = getGameByGameId as jest.MockedFunction<typeof getGameByGameId>;
-  const flattenPositionsMock = flattenPositions as jest.MockedFunction<typeof flattenPositions>;
+      expectedPositions = [chance.string(), chance.string()];
 
-  let gameId,
-    result,
-    chessInstance,
-    expectedMoves,
-    expectedPositions,
-    expectedBoard,
-    expectedTurn,
-    game;
+      mockgetGameByGameId.mockReturnValue(game);
+      flattenPositionsMock.mockReturnValue(expectedPositions);
+      getChessMock.mockReturnValue(chessInstance);
 
-  beforeEach(() => {
-    gameId = chance.guid();
-    game = {
-      fen: chance.string(),
-      gameId: chance.string(),
-      playerOne: chance.string(),
-      playerTwo: chance.string(),
-      turn: chance.string()
-    };
-    expectedMoves = chance.string();
-    expectedBoard = [chance.string(), chance.string()];
-    expectedTurn = chance.string();
-    chessInstance = {
-      load: jest.fn(),
-      moves: jest.fn().mockReturnValue(expectedMoves),
-      board: jest.fn().mockReturnValue(expectedBoard),
-      turn: jest.fn().mockReturnValue(expectedTurn)
-    };
+      result = getBoardByGameId(gameId);
+    });
 
-    expectedPositions = [chance.string(), chance.string()];
+    afterEach(() => {
+      jest.resetAllMocks();
+    })
 
-    mockgetGameByGameId.mockReturnValue(game);
-    flattenPositionsMock.mockReturnValue(expectedPositions);
-    getChessMock.mockReturnValue(chessInstance);
+    it('should get the game by its gameId', () => {
+      expect(mockgetGameByGameId).toHaveBeenCalledTimes(1);
+      expect(mockgetGameByGameId).toHaveBeenCalledWith(gameId);
+    });
 
-    result = getBoardByGameId(gameId);
-  });
+    it('should get the chess instance', () => {
+      expect(getChessMock).toHaveBeenCalledTimes(1);
+    });
 
-  afterEach(() => {
-    jest.resetAllMocks();
-  })
+    it('should load the board by the fen on the game', () => {
+      expect(chessInstance.load).toHaveBeenCalledTimes(1);
+      expect(chessInstance.load).toHaveBeenCalledWith(game.fen);
+    });
 
-  it('should get the game by its gameId', () => {
-    expect(mockgetGameByGameId).toHaveBeenCalledTimes(1);
-    expect(mockgetGameByGameId).toHaveBeenCalledWith(gameId);
-  });
+    it('should get the moves', () => {
+      expect(chessInstance.moves).toHaveBeenCalledTimes(1);
+      expect(chessInstance.moves).toHaveBeenCalledWith({ verbose: true });
+    });
 
-  it('should get the chess instance', () => {
-    expect(getChessMock).toHaveBeenCalledTimes(1);
-  });
+    it('should get the board', () => {
+      expect(chessInstance.board).toHaveBeenCalledTimes(1);
+    });
 
-  it('should load the board by the fen on the game', () => {
-    expect(chessInstance.load).toHaveBeenCalledTimes(1);
-    expect(chessInstance.load).toHaveBeenCalledWith(game.fen);
-  });
+    it('should get the positions', () => {
+      expect(flattenPositions).toHaveBeenCalledTimes(1);
+      expect(flattenPositions).toHaveBeenCalledWith(expectedBoard);
+    });
 
-  it('should get the moves', () => {
-    expect(chessInstance.moves).toHaveBeenCalledTimes(1);
-    expect(chessInstance.moves).toHaveBeenCalledWith({ verbose: true });
-  });
+    it('should get the turn', () => {
+      expect(chessInstance.turn).toHaveBeenCalledTimes(1);
+    });
 
-  it('should get the board', () => {
-    expect(chessInstance.board).toHaveBeenCalledTimes(1);
-  });
+    it('should return the board object', () => {
+      expect(result).toStrictEqual({
+        gameId,
+        moves: expectedMoves,
+        playerOne: game.playerOne,
+        playerTwo: game.playerTwo,
+        positions: expectedPositions,
+        turn: expectedTurn
+      });
+    });
 
-  it('should get the positions', () => {
-    expect(flattenPositions).toHaveBeenCalledTimes(1);
-    expect(flattenPositions).toHaveBeenCalledWith(expectedBoard);
-  });
+    it('should return null if no game is found', () => {
+      mockgetGameByGameId.mockReturnValue(null);
 
-  it('should get the turn', () => {
-    expect(chessInstance.turn).toHaveBeenCalledTimes(1);
-  });
+      result = getBoardByGameId(gameId);
 
-  it('should return the board object', () => {
-    expect(result).toStrictEqual({
-      gameId,
-      moves: expectedMoves,
-      playerOne: game.playerOne,
-      playerTwo: game.playerTwo,
-      positions: expectedPositions,
-      turn: expectedTurn
+      expect(result).toBeNull();
     });
   });
-
-  it('should return null if no game is found', () => {
-    mockgetGameByGameId.mockReturnValue(null);
-
-    result = getBoardByGameId(gameId);
-
-    expect(result).toBeNull();
-  });
-});
 });
