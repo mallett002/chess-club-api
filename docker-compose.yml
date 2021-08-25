@@ -11,3 +11,13 @@ services:
       APOLLO_PLAYGROUND: "true"
     ports:
       - 4001:4001
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13.4-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+
+# todo: network
