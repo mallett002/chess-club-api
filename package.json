@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "coverage": "npx jest --coverage /test/services/chess.spec.ts",
-    "docker:start": "docker-compose up -d",
+    "docker:start": "docker-compose up --build -d",
+    "docker:infra": "docker-compose up --build -d chess-club-db",
     "docker:stop": "docker-compose down",
     "start": "tsc && nodemon dist/index.js",
     "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",

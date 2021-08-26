@@ -1,0 +1,1 @@
+-- Todo: create roles and chess_club database
