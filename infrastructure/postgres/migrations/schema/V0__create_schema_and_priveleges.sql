@@ -1,0 +1,5 @@
+CREATE SCHEMA chess_club;
+
+GRANT USAGE ON SCHEMA chess_club TO chess_club_api;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA chess_club GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO chess_club_api;

@@ -5,9 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "coverage": "npx jest --coverage /test/services/chess.spec.ts",
-    "docker:start": "docker-compose up --build -d",
-    "docker:infra": "docker-compose up --build -d chess-club-db",
+    "docker:start": "docker-compose up --build -d && npm run migrate",
+    "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
     "docker:stop": "docker-compose down",
+    "migrate": "./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon dist/index.js",
     "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",
     "test": "jest"
