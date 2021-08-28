@@ -1,26 +1,38 @@
-const games = new Map();
+import { SQLDataSource } from 'datasource-sql';
 
-export const insertNewGame = (gameId, game) => games.set(gameId, game);
+class ChessClubDatabase extends SQLDataSource {
+  getPlayers() {
+    return this.knex
+      .select('*')
+      .from('chess_club.tbl_players');
+  }
+}
 
-export const getGameByGameId = (gameId) => games.get(gameId);
+export default ChessClubDatabase;
 
-export const deleteAllGames = () => games.clear();
+// const games = new Map();
 
-export const updateGame = (gameId, payload) => {
-  games.set(gameId, payload);
+// export const insertNewGame = (gameId, game) => games.set(gameId, game);
 
-  return games.get(gameId);
-};
+// export const getGameByGameId = (gameId) => games.get(gameId);
 
-export const selectGamesForPlayer = (playerId) => {
-  let gamesForPlayer = [];
+// export const deleteAllGames = () => games.clear();
 
-  games.forEach((game) => {
+// export const updateGame = (gameId, payload) => {
+//   games.set(gameId, payload);
 
-    if (game.playerOne === playerId || game.playerTwo === playerId) {
-      gamesForPlayer.push(game);
-    }
-  });
+//   return games.get(gameId);
+// };
 
-  return gamesForPlayer;
-};
+// export const selectGamesForPlayer = (playerId) => {
+//   let gamesForPlayer = [];
+
+//   games.forEach((game) => {
+
+//     if (game.playerOne === playerId || game.playerTwo === playerId) {
+//       gamesForPlayer.push(game);
+//     }
+//   });
+
+//   return gamesForPlayer;
+// };
