@@ -5,23 +5,24 @@ import { env } from './environment';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 
-// const knexConfig = {
-//   client: 'pg',
-//   connection: {
-//     database: 'chess-club-api',
-//     host : 'localhost',
-//     password: 'chess_club_api_ps',
-//     port: 5432,
-//     user: 'chess_club_api'
-//   }
-// };
+const knexConfig = {
+  client: 'pg',
+  connection: {
+    database: 'chess-club-api',
+    host : 'localhost',
+    password: 'chess_club_api_ps',
+    port: 5432,
+    user: 'chess_club_api'
+  }
+};
 
-// const db = new ChessClubDatabase(knexConfig);
+const db = new ChessClubDatabase(knexConfig);
+
 
 const server = new ApolloServer({
   resolvers,
   typeDefs,
-  // dataSources: () => ({ db }),
+  dataSources: () => ({ db }),
   introspection: env.apollo.introspection,
   playground: env.apollo.playground,
 });
