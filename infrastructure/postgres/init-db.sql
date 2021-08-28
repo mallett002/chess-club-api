@@ -1,0 +1,6 @@
+CREATE ROLE flyway LOGIN PASSWORD 'flyway_ps' CREATEDB CREATEROLE REPLICATION;
+CREATE ROLE chess_club_api LOGIN PASSWORD 'chess_club_api_ps' CREATEDB CREATEROLE INHERIT;
+
+CREATE DATABASE "chess-club-api";
+
+GRANT ALL ON DATABASE "chess-club-api" TO flyway;

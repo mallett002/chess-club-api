@@ -11,3 +11,34 @@ services:
       APOLLO_PLAYGROUND: "true"
     ports:
       - 4001:4001
+    depends_on:
+      - chess-club-db
+    networks:
+      chess-club:
+        ipv4_address: 10.128.30.10
+
+  chess-club-db:
+    container_name: chess-club-db
+    image: chess-club-db
+    build:
+      context: infrastructure/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flyway"]
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: chess_club_ps
+    networks:
+      chess-club:
+        ipv4_address: 10.128.30.2
+
+networks:
+  chess-club:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.128.30.0/24
