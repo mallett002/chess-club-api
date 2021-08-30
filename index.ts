@@ -18,7 +18,6 @@ const knexConfig = {
 
 const db = new ChessClubDatabase(knexConfig);
 
-
 const server = new ApolloServer({
   resolvers,
   typeDefs,
