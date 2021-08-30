@@ -19,30 +19,27 @@ const publishBoardUpdates = (board) => {
   - Look up player by username and send invite.
 */
 export const createGame = ({ playerOne, playerTwo }) => {
-  // const chess = getChess(true);
+  const chess = getChess(true);
 
   // const gameId = uuidv4();
-  // const fen = chess.fen();
-  // const turn = chess.turn();
+  const fen = chess.fen();
+  const turn = chess.turn();
 
-  // const board = {
-  //   gameId,
-  //   moves: chess.moves({ verbose: true }),
-  //   playerOne,
-  //   playerTwo,
-  //   positions: flattenPositions(chess.board()),
-  //   turn
-  // };
+  insertNewGame({
+      playerOne,
+      playerTwo,
+      fen
+    });
+  const board = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne,
+    playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn
+  };
 
-  // publishBoardUpdates(board);
-
-  // insertNewGame(gameId, {
-  //   fen,
-  //   gameId,
-  //   playerOne,
-  //   playerTwo,
-  //   turn
-  // });
+  publishBoardUpdates(board);
 
   // return board;
 };

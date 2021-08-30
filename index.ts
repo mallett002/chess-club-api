@@ -16,12 +16,12 @@ const knexConfig = {
   }
 };
 
-const db = new ChessClubDatabase(knexConfig);
+const chessClubDatabase = new ChessClubDatabase(knexConfig);
 
 const server = new ApolloServer({
   resolvers,
   typeDefs,
-  dataSources: () => ({ db }),
+  dataSources: () => ({ chessClubDatabase }),
   introspection: env.apollo.introspection,
   playground: env.apollo.playground,
 });

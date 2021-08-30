@@ -1,10 +1,24 @@
 import { SQLDataSource } from 'datasource-sql';
 
 class ChessClubDatabase extends SQLDataSource {
-  getPlayers() {
-    return this.knex
-      .select('*')
-      .from('chess_club.tbl_players');
+  // getPlayers() {
+  //   return this.knex
+  //     .select('*')
+  //     .from('chess_club.tbl_player');
+  // }
+
+  insertNewGame(fen: string, playerOne: string, playerTwo: string) {
+    this.knex('chess_club.tbl_game').insert({
+      fen,
+      player_one: playerOne,
+      player_two: playerTwo
+    });
+    
+    // TODO: figure out who is what color
+    this.knex('chess_club.tbl_players_games').insert({
+      player_id: playerOne,
+      color: 
+    });
   }
 }
 
