@@ -6,6 +6,7 @@ import { BOARD_UPDATED } from '../constants';
 
 import { flattenPositions } from './board';
 import { getChess } from './chess';
+import ChessClubDatabase from '../repository/games';
 
 const publishBoardUpdates = (board) => {
   const pubSub = getPubSub();
@@ -18,18 +19,18 @@ const publishBoardUpdates = (board) => {
   - Will take in a username to determine who they are inviting.
   - Look up player by username and send invite.
 */
-export const createGame = ({ playerOne, playerTwo }) => {
+export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase) => {
   const chess = getChess(true);
-
   // const gameId = uuidv4();
   const fen = chess.fen();
   const turn = chess.turn();
 
-  insertNewGame({
-      playerOne,
-      playerTwo,
-      fen
-    });
+  const [gameId] = await db.insertNewGame(
+    fen,
+    playerOne,
+    playerTwo,
+  );
+
   const board = {
     gameId,
     moves: chess.moves({ verbose: true }),
@@ -41,7 +42,7 @@ export const createGame = ({ playerOne, playerTwo }) => {
 
   publishBoardUpdates(board);
 
-  // return board;
+  return board;
 };
 
 export const movePiece = (gameId, moveToCell) => {

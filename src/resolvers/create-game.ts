@@ -2,7 +2,7 @@ import { ValidationError } from 'apollo-server';
 
 import { createGame } from '../services/games';
 
-export default (parent, args, { dataSources }) => {
+export default async (parent, args, { dataSources }) => {
   const { playerOne, playerTwo } = args;
 
   if (!playerOne || !playerTwo) {
@@ -13,7 +13,7 @@ export default (parent, args, { dataSources }) => {
   // dataSources.chessClubDatabase.insertNewGame()
   // https://www.apollographql.com/docs/apollo-server/data/data-sources/#adding-data-sources-to-apollo-server
 
-  const board = createGame(args);
+  const board = await createGame(args, dataSources.chessClubDatabase);
 
   return board;
 };
