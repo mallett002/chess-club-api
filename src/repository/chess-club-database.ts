@@ -14,14 +14,14 @@ class ChessClubDatabase extends SQLDataSource {
         player_one: playerOne,
         player_two: playerTwo
       }).returning('game_id'),
-      await this.knex('chess_club.tbl_players_games').insert({
-        player_id: playerOne,
-        player_color: 'w'
-      }),
-      await this.knex('chess_club.tbl_players_games').insert({
-        player_id: playerTwo,
-        player_color: 'b'
-      })
+      // await this.knex('chess_club.tbl_players_games').insert({
+      //   player_id: playerOne,
+      //   player_color: 'w'
+      // }),
+      // await this.knex('chess_club.tbl_players_games').insert({
+      //   player_id: playerTwo,
+      //   player_color: 'b'
+      // })
     ]);
   
     return gameId;

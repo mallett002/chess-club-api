@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server';
 
-import ChessClubDatabase from './src/repository/games';
+import ChessClubDatabase from './src/repository/chess-club-database';
 import { env } from './environment';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';

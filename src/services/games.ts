@@ -6,7 +6,7 @@ import { BOARD_UPDATED } from '../constants';
 
 import { flattenPositions } from './board';
 import { getChess } from './chess';
-import ChessClubDatabase from '../repository/games';
+import ChessClubDatabase from '../repository/chess-club-database';
 
 const publishBoardUpdates = (board) => {
   const pubSub = getPubSub();
