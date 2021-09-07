@@ -3,27 +3,26 @@ import Chance from 'chance';
 
 import ChessClubDatabase from '../../src/repository/chess-club-database';
 
-class KnexMock {
-  insert = jest.fn()
-}
+const mockInsert = jest.fn();
+const mockKnex = jest.fn().mockReturnValue({
+  insert: mockInsert
+});
 
 jest.mock('datasource-sql', () => {
-  class MockSqlataSource {
-      knex = new KnexMock();
+  class MockDataSource {
+    knex = mockKnex
   }
 
   return {
-    SQLDataSource: MockSqlataSource,
+    SQLDataSource: MockDataSource
   }
 });
 
 const chance = new Chance();
 
 describe('ChessClubDatabase', () => {
-  const dataSourceMock = SQLDataSource as jest.MockedClass<typeof SQLDataSource>;
-
-  const db = new ChessClubDatabase({[chance.guid()]: chance.string()});
-  // const dataSourceMock = new SQLDataSource(knexConfig);
+  const fakeConnection = {[chance.guid()]: chance.string()};
+  const db = new ChessClubDatabase(fakeConnection);
 
   describe('insertNewGame', () => {
     let fen,
@@ -31,8 +30,6 @@ describe('ChessClubDatabase', () => {
       playerTwo;
 
     beforeEach(async () => {
-      // dataSourceMock.mockClear();
-
       fen = chance.string();
       playerOne = chance.guid();
       playerTwo = chance.guid();
@@ -41,9 +38,13 @@ describe('ChessClubDatabase', () => {
     });
 
     it('insert the game for the players', () => {
-      expect(dataSourceMock.knex.insert).toHaveBeenCalledTimes(1);
-      expect(dataSourceMock.knex.insert).toHaveBeenCalledWith({
-
+      expect(mockKnex).toHaveBeenCalledTimes(1);
+      expect(mockKnex).toHaveBeenCalledWith('chess_club.tbl_game');
+      expect(mockInsert).toHaveBeenCalledTimes(1);
+      expect(mockInsert).toHaveBeenCalledWith({
+        fen,
+        player_one: playerOne,
+        player_two: playerTwo
       });
     });
 

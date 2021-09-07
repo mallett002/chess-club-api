@@ -8,23 +8,29 @@ class ChessClubDatabase extends SQLDataSource {
   // }
 
   async insertNewGame(fen: string, playerOne: string, playerTwo: string) {
-    const [gameId] = await Promise.all([
-      this.knex('chess_club.tbl_game').insert({
-        fen,
+    // const [gameId] = await Promise.all([
+    //   this.knex('chess_club.tbl_game').insert({
+    //     fen,
+    //     player_one: playerOne,
+    //     player_two: playerTwo
+    //   }).returning('game_id'),
+    //   await this.knex('chess_club.tbl_players_games').insert({
+    //     player_id: playerOne,
+    //     player_color: 'w'
+    //   }),
+    //   await this.knex('chess_club.tbl_players_games').insert({
+    //     player_id: playerTwo,
+    //     player_color: 'b'
+    //   })
+    // ]);
+
+    this.knex('chess_club.tbl_game').insert({
+      fen,
         player_one: playerOne,
         player_two: playerTwo
-      }).returning('game_id'),
-      await this.knex('chess_club.tbl_players_games').insert({
-        player_id: playerOne,
-        player_color: 'w'
-      }),
-      await this.knex('chess_club.tbl_players_games').insert({
-        player_id: playerTwo,
-        player_color: 'b'
-      })
-    ]);
+    });
   
-    return gameId;
+    // return gameId;
   }
 
 }
