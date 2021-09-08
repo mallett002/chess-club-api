@@ -21,7 +21,6 @@ const publishBoardUpdates = (board) => {
 */
 export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase) => {
   const chess = getChess(true);
-  // const gameId = uuidv4();
   const fen = chess.fen();
   const turn = chess.turn();
 
