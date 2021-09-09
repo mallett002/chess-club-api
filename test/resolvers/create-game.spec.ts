@@ -1,13 +1,19 @@
+import { ValidationError } from 'apollo-server';
 import Chance from 'chance';
-import { FailedDependency } from 'http-errors';
 
 import createGameResolver from '../../src/resolvers/create-game';
+import { createGame } from '../../src/services/games';
+
+jest.mock('../../src/services/games');
 
 const chance = new Chance();
 
 describe('Create Game Resolver', () => {
+  const createGameStub = createGame as jest.MockedFunction<typeof createGame>;
+
   let parent,
     args,
+    board,
     context;
 
   beforeEach(() => {
@@ -20,30 +26,39 @@ describe('Create Game Resolver', () => {
       dataSources: {
         chessClubDatabase: { [chance.string()]: chance.string() }
       }
-    }
+    };
+
+    board = chance.hash();
+
+    createGameStub.mockResolvedValue(board);
   });
 
   it('should throw a validation error if playerOne is missing', async () => {
     delete args.playerOne;
 
-    try {
-      await createGameResolver(parent, args, context);
-      // Todo: figure out how to fail here
-      fail('should have thrown.');
-    } catch (error) {
-      expect(error.message).toStrictEqual('missing or invalid value for playerOne or playerTwo');
-      expect(error.extensions.code).toStrictEqual('GRAPHQL_VALIDATION_FAILED');
-    }
+    await expect(createGameResolver(parent, args, context))
+      .rejects
+      .toThrowError(new ValidationError('missing or invalid value for playerOne or playerTwo'));
   });
 
   it('should throw a validation error if playerTwo is missing', async () => {
     delete args.playerTwo;
 
-    try {
-      await createGameResolver(parent, args, context);
-    } catch (error) {
-      expect(error.message).toStrictEqual('missing or invalid value for playerOne or playerTwo');
-      expect(error.extensions.code).toStrictEqual('GRAPHQL_VALIDATION_FAILED');
-    }
+    await expect(createGameResolver(parent, args, context))
+      .rejects
+      .toThrowError(new ValidationError('missing or invalid value for playerOne or playerTwo'));
+  });
+
+  it('should create the game', async () => {
+    await createGameResolver(parent, args, context);
+
+    expect(createGameStub).toHaveBeenCalledTimes(1);
+    expect(createGameStub).toHaveBeenCalledWith(args, context.dataSources.chessClubDatabase);
+  });
+
+  it('should return the board', async () => {
+    const result = await createGameResolver(parent, args, context);
+
+    expect(result).toStrictEqual(board);
   });
 });
