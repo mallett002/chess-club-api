@@ -1,54 +1,69 @@
 import Chance from 'chance';
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer, gql } from 'apollo-server';
 
+import { env } from '../environment';
 import ChessClubDatabase from '../src/repository/chess-club-database';
-import {resolvers} from '../src/resolvers/resolver-map';
-import {typeDefs} from '../src/schema';
+import { resolvers } from '../src/resolvers/resolver-map';
 
 jest.mock('../src/repository/chess-club-database');
 jest.mock('apollo-server');
-// jest.mock('../src/resolvers/resolver-map');
-// jest.mock('../src/schema');
-
-// TODO: fix the resolver map and schema returning undefined.
-// TODO: test the db instance being the datasources.
 
 const chance = new Chance();
 describe('index', () => {
   const DatabaseMock = ChessClubDatabase as jest.MockedClass<typeof ChessClubDatabase>;
   const ApolloMock = ApolloServer as jest.MockedClass<typeof ApolloServer>;
+  const gqlMock = gql as jest.MockedFunction<typeof gql>;
 
-  let dbInstance;
+  let dbInstance,
+    server,
+    serverUrl,
+    typeDefs;
 
-  beforeEach(() => {
-    dbInstance = {[chance.guid]: chance.string()};
+  beforeAll(() => {
+    dbInstance = { [chance.guid]: chance.string() };
+    typeDefs = chance.string();
+    server = {
+      listen: jest.fn()
+    };
+    serverUrl = chance.url();
+
     DatabaseMock.mockReturnValue(dbInstance);
+    gqlMock.mockReturnValue(typeDefs);
+    ApolloMock.mockReturnValue(server);
+    server.listen.mockResolvedValue({
+      url: serverUrl
+    });
 
     require('../index');
   });
 
-  it('should connect to the database', () => {
+  it('should start the server', () => {
     expect(DatabaseMock).toHaveBeenCalledTimes(1);
     expect(DatabaseMock).toHaveBeenCalledWith({
       client: 'pg',
       connection: {
         database: 'chess-club-api',
-        host : 'localhost',
+        host: 'localhost',
         password: 'chess_club_api_ps',
         port: 5432,
         user: 'chess_club_api'
       }
     });
-  });
-
-  it('should start the server', () => {
     expect(ApolloMock).toHaveBeenCalledTimes(1);
     expect(ApolloMock).toHaveBeenCalledWith({
       resolvers,
       typeDefs,
-      dataSources: () => ({ dbInstance }),
-      // introspection: env.apollo.introspection,
-      // playground: env.apollo.playground,
+      dataSources: expect.any(Function),
+      introspection: true,
+      playground: true,
     });
+
+    const dataSources = ApolloMock.mock.calls[0][0].dataSources;
+    const result = dataSources();
+
+    expect(result).toStrictEqual({chessClubDatabase: dbInstance});
+
+    expect(server.listen).toHaveBeenCalledTimes(1);
+    expect(server.listen).toHaveBeenCalledWith({port: env.port});
   });
 });

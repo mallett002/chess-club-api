@@ -22,10 +22,10 @@ const server = new ApolloServer({
   resolvers,
   typeDefs,
   dataSources: () => ({ chessClubDatabase }),
-  // introspection: env.apollo.introspection,
-  // playground: env.apollo.playground,
+  introspection: env.apollo.introspection,
+  playground: env.apollo.playground,
 });
 
-// server.listen({ port: env.port }).then(({ url }) => {
-//   console.log(`🚀  Server ready at ${url}`);
-// });
+server.listen({ port: env.port }).then(({ url }) => {
+  console.log(`🚀  Server ready at ${url}`);
+});
