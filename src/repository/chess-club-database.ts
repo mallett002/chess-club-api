@@ -26,6 +26,16 @@ class ChessClubDatabase extends SQLDataSource {
 
     return gameId;
   }
+
+  async updateGame(gameId, fen) {
+    /*
+      knex('books')
+        .where({ id: 42 })
+        .update({ title: "The Hitchhiker's Guide to the Galaxy" }, ['id', 'title'])
+      Outputs:
+      update `books` set `title` = 'The Hitchhiker\'s Guide to the Galaxy' where `id` = 42
+    */
+  }
 }
 
 export default ChessClubDatabase;
