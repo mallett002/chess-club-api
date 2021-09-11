@@ -5,11 +5,17 @@ import ChessClubDatabase from '../../src/repository/chess-club-database';
 const chance = new Chance();
 
 const gameId = chance.guid();
+const game = {
+  game_id: gameId,
+  fen: chance.string(),
+  player_one: chance.string(),
+  player_two: chance.string()
+};
 const mockReturning = jest.fn().mockResolvedValue(gameId);
 const mockInsert = jest.fn().mockReturnValue({
   returning: mockReturning
 });
-const mockWhere = jest.fn();
+const mockWhere = jest.fn().mockReturnValue([game]);
 const mockKnex = jest.fn().mockReturnValue({
   insert: mockInsert,
   where: mockWhere
@@ -117,6 +123,17 @@ describe('ChessClubDatabase', () => {
 
       expect(mockKnex).toHaveBeenCalledTimes(1);
       expect(mockKnex).toHaveBeenCalledWith('chess_club.tbl_game');
+    });
+
+    it('should return the game', async () => {
+      const result = await db.getGameByGameId(gameId);
+
+      expect(result).toStrictEqual({
+        gameId: game.game_id,
+        fen: game.fen,
+        playerOne: game.player_one,
+        playerTwo: game.player_two
+      });
     });
   });
 });

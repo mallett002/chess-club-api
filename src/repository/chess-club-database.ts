@@ -3,15 +3,14 @@ import { SQLDataSource } from 'datasource-sql';
 class ChessClubDatabase extends SQLDataSource {
 
   async getGameByGameId(gameId) {
-    // const [game] = 
-    await this.knex('chess_club.tbl_game').where('game_id', gameId);
+    const [game] = await this.knex('chess_club.tbl_game').where('game_id', gameId);
 
-    // return {
-    //   gameId: game.game_id,
-    //   fen: game.fen,
-    //   playerOne: game.player_one,
-    //   playerTwo: game.player_two
-    // };
+    return {
+      gameId: game.game_id,
+      fen: game.fen,
+      playerOne: game.player_one,
+      playerTwo: game.player_two
+    };
   }
 
   async insertNewGame(fen: string, playerOne: string, playerTwo: string): Promise<string> {
