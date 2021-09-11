@@ -9,8 +9,10 @@ const mockReturning = jest.fn().mockResolvedValue(gameId);
 const mockInsert = jest.fn().mockReturnValue({
   returning: mockReturning
 });
+const mockWhere = jest.fn();
 const mockKnex = jest.fn().mockReturnValue({
-  insert: mockInsert
+  insert: mockInsert,
+  where: mockWhere
 });
 
 jest.mock('datasource-sql', () => {
@@ -83,6 +85,38 @@ describe('ChessClubDatabase', () => {
       const result = await db.insertNewGame(fen, playerOne, playerTwo);
 
       expect(result).toStrictEqual(gameId);
+    });
+  });
+
+  // next
+  describe('getGameByGameId', () => {
+    let gameId;
+
+    beforeEach(async () => {
+      gameId = chance.string();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should get the game from the database', async () => {
+      await db.getGameByGameId(gameId);
+
+      expect(mockKnex).toHaveBeenCalledTimes(1);
+      expect(mockKnex).toHaveBeenCalledWith('chess_club.tbl_game');
+      expect(mockWhere).toHaveBeenCalledTimes(1);
+      expect(mockWhere).toHaveBeenCalledWith(
+        'game_id',
+        gameId
+      );
+    });
+
+    it('should select the game by its gameId', async () => {
+      await db.getGameByGameId(gameId);
+
+      expect(mockKnex).toHaveBeenCalledTimes(1);
+      expect(mockKnex).toHaveBeenCalledWith('chess_club.tbl_game');
     });
   });
 });
