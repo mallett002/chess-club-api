@@ -5,9 +5,10 @@ import ChessClubDatabase from '../../src/repository/chess-club-database';
 const chance = new Chance();
 
 const gameId = chance.guid();
+const fen = chance.guid();
 const game = {
   game_id: gameId,
-  fen: chance.string(),
+  fen,
   player_one: chance.string(),
   player_two: chance.string()
 };
@@ -134,6 +135,14 @@ describe('ChessClubDatabase', () => {
         playerOne: game.player_one,
         playerTwo: game.player_two
       });
+    });
+  });
+
+  describe('updateGame', () => {
+    it('should use the game table', async () => {
+      await db.updateGame(gameId, fen);
+
+      expect(mockKnex).toHaveBeenCalledTimes(1);
     });
   });
 });

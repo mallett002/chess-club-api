@@ -34,10 +34,11 @@ class ChessClubDatabase extends SQLDataSource {
   }
 
   async updateGame(gameId, fen) {
-    await this.knex('chess_club.tbl_game')
-      .where({'game_id': gameId})
-      .update({fen}, [fen])
-      .returning('game_id');
+    this.knex();
+    // await this.knex('chess_club.tbl_game')
+    //   .where({'game_id': gameId})
+    //   .update({fen}, [fen])
+    //   .returning('game_id');
   }
 
 }
