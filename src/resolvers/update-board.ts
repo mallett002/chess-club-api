@@ -1,7 +1,7 @@
-import { movePiece } from '../services/games';
+import { updateGame } from '../services/games';
 
-export default (parent, args, context) => {
-  const board = movePiece(args.gameId, args.cell);
+export default async (parent, args, { dataSources }) => {
+  const board = await updateGame(args.gameId, args.cell, dataSources.chessClubDatabase);
 
   return board;
 };

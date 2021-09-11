@@ -1,11 +1,17 @@
 import { SQLDataSource } from 'datasource-sql';
 
 class ChessClubDatabase extends SQLDataSource {
-  // getPlayers() {
-  //   return this.knex
-  //     .select('*')
-  //     .from('chess_club.tbl_player');
-  // }
+
+  async getGameByGameId(gameId) {
+    const [game] = await this.knex('chess_club.tbl_game').where('game_id', gameId);
+
+    return {
+      gameId: game.game_id,
+      fen: game.fen,
+      playerOne: game.player_one,
+      playerTwo: game.player_two
+    };
+  }
 
   async insertNewGame(fen: string, playerOne: string, playerTwo: string): Promise<string> {
     const [gameId]: string[] = await Promise.all([
@@ -28,14 +34,12 @@ class ChessClubDatabase extends SQLDataSource {
   }
 
   async updateGame(gameId, fen) {
-    /*
-      knex('books')
-        .where({ id: 42 })
-        .update({ title: "The Hitchhiker's Guide to the Galaxy" }, ['id', 'title'])
-      Outputs:
-      update `books` set `title` = 'The Hitchhiker\'s Guide to the Galaxy' where `id` = 42
-    */
+    await this.knex('chess_club.tbl_game')
+      .where({'game_id': gameId})
+      .update({fen}, [fen])
+      .returning('game_id');
   }
+
 }
 
 export default ChessClubDatabase;

@@ -4,21 +4,25 @@ const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
-chess.move('a4');
-chess.move('Nc6'); // if special piece, need to prepend its letter
-chess.move('d4');
+chess.load('rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1');
 
-console.log(chess.ascii());
-// console.log(chess.moves({square: 'g8', verbose: true}));
-const movesVerbose = chess.moves({verbose: true});
-const moves = chess.moves();
-const turn = chess.turn();
+console.log(chess.moves());
 
-const move1 = chess.move('e6');
-const move2 = chess.move('e6');
-const move3 = chess.move('e6');
+// chess.move('a4');
+// chess.move('Nc6'); // if special piece, need to prepend its letter
+// chess.move('d4');
 
-console.log({move1, move2, move3});
+// console.log(chess.ascii());
+// // console.log(chess.moves({square: 'g8', verbose: true}));
+// const movesVerbose = chess.moves({verbose: true});
+// const moves = chess.moves();
+// const turn = chess.turn();
+
+// const move1 = chess.move('e6');
+// const move2 = chess.move('e6');
+// const move3 = chess.move('e6');
+
+// console.log({move1, move2, move3});
 
 
 // const moves = chess.moves({square: 'c6', verbose: true}); // can use it's "san" key for standard algebraic notation
