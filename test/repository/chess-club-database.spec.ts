@@ -13,6 +13,7 @@ const game = {
   player_two: chance.string()
 };
 const mockReturning = jest.fn().mockResolvedValue(gameId);
+const mockUpdate = jest.fn().mockReturnValue({mockReturning});
 const mockInsert = jest.fn().mockReturnValue({
   returning: mockReturning
 });
@@ -36,6 +37,10 @@ describe('ChessClubDatabase', () => {
   const fakeConnection = {[chance.guid()]: chance.string()};
   const db = new ChessClubDatabase(fakeConnection);
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('insertNewGame', () => {
     let fen,
       playerOne,
@@ -45,10 +50,6 @@ describe('ChessClubDatabase', () => {
       fen = chance.string();
       playerOne = chance.guid();
       playerTwo = chance.guid();
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
     });
 
     it('insert the game for the players', async () => {
@@ -103,10 +104,6 @@ describe('ChessClubDatabase', () => {
       gameId = chance.string();
     });
 
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
     it('should get the game from the database', async () => {
       await db.getGameByGameId(gameId);
 
@@ -139,10 +136,37 @@ describe('ChessClubDatabase', () => {
   });
 
   describe('updateGame', () => {
+    beforeEach(() => {
+      mockUpdate.mockReturnValue({returning: mockReturning});
+      mockWhere.mockReturnValue({update: mockUpdate});
+    });
     it('should use the game table', async () => {
       await db.updateGame(gameId, fen);
 
       expect(mockKnex).toHaveBeenCalledTimes(1);
+      expect(mockKnex).toHaveBeenCalledWith('chess_club.tbl_game');
+    });
+
+    it('should find the game by its game id', async () => {
+      await db.updateGame(gameId, fen);
+
+      expect(mockWhere).toHaveBeenCalledTimes(1);
+      expect(mockWhere).toHaveBeenCalledWith({'game_id': gameId});
+    });
+
+    it('should update the fen for the game', async () => {
+      await db.updateGame(gameId, fen);
+
+      expect(mockUpdate).toHaveBeenCalledTimes(1);
+      expect(mockUpdate).toHaveBeenCalledWith({fen}, [fen]);
+    });
+
+    it('should return the game id', async () => {
+      const result = await db.updateGame(gameId, fen);
+
+      expect(mockReturning).toHaveBeenCalledTimes(1);
+      expect(mockReturning).toHaveBeenCalledWith('game_id');
+      expect(result).toStrictEqual(gameId);
     });
   });
 });

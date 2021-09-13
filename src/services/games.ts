@@ -44,6 +44,7 @@ export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase
   return board;
 };
 
+// Todo: this is created twice. Dedupe it.
 interface IGame {
   gameId: string
   fen: string

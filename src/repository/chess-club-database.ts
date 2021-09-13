@@ -1,8 +1,15 @@
 import { SQLDataSource } from 'datasource-sql';
 
+interface IGame {
+  gameId: string
+  fen: string
+  playerOne: string
+  playerTwo: string
+}
+
 class ChessClubDatabase extends SQLDataSource {
 
-  async getGameByGameId(gameId) {
+  async getGameByGameId(gameId): Promise<IGame> {
     const [game] = await this.knex('chess_club.tbl_game').where('game_id', gameId);
 
     return {
@@ -33,12 +40,11 @@ class ChessClubDatabase extends SQLDataSource {
     return gameId;
   }
 
-  async updateGame(gameId, fen) {
-    this.knex();
-    // await this.knex('chess_club.tbl_game')
-    //   .where({'game_id': gameId})
-    //   .update({fen}, [fen])
-    //   .returning('game_id');
+  async updateGame(gameId, fen): Promise<string> {
+    return await this.knex('chess_club.tbl_game')
+      .where({ 'game_id': gameId })
+      .update({ fen }, [fen])
+      .returning('game_id');
   }
 
 }
