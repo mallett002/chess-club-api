@@ -9,6 +9,7 @@ services:
       PORT: 4001
       APOLLO_INTROSPECTION: "true"
       APOLLO_PLAYGROUND: "true"
+      POSTGRES_HOST: 10.128.30.2
     ports:
       - 4001:4001
     depends_on:
