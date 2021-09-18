@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import ChessClubDatabase from '../../src/repository/chess-club-database';
 import { flattenPositions } from '../../src/services/board';
-import { getBoardByGameId, createGame } from '../../src/services/games';
+import { getBoardByGameId, createGame, getGamesByPlayerId } from '../../src/services/games';
 import { getChess } from '../../src/services/chess';
 import { getPubSub } from '../../src/services/pub-sub';
 
@@ -119,6 +119,61 @@ describe('games service', () => {
         positions: expectedPositions,
         turn: expectedTurn
       })
+    });
+  });
+
+  describe('getGameByPlayerId', () => {
+    let 
+      expectedFen,
+      chessInstance,
+      expectedTurn,
+      db,
+      playerId,
+      gameOne,
+      gameTwo,
+      expectedGames,
+      result;
+
+    beforeEach(async () => {
+      expectedFen = chance.string();
+      expectedTurn = chance.string();
+      chessInstance = {
+        load: jest.fn(),
+        turn: jest.fn().mockReturnValue(expectedTurn)
+      };
+      playerId = chance.guid();
+      gameOne = {
+        gameId: chance.guid(),
+        fen: expectedFen,
+        playerOne: playerId,
+        playerTwo: chance.guid()
+      };
+      gameTwo = {
+        gameId: chance.guid(),
+        fen: expectedFen,
+        playerOne: chance.guid(),
+        playerTwo: playerId
+      };
+
+      expectedGames = [gameOne, gameTwo];
+      getChessMock.mockReturnValue(chessInstance);
+      db = new mockedDb({});
+      db.selectGamesForPlayer.mockResolvedValue(expectedGames);
+
+      result = await getGamesByPlayerId(playerId, db);
+    });
+
+    afterEach(() => {
+      jest.resetAllMocks();
+    });
+
+    it('should get the games out of the database', () => {
+      expect(db.selectGamesForPlayer).toHaveBeenCalledTimes(1);
+      expect(db.selectGamesForPlayer).toHaveBeenCalledWith(playerId);
+    });
+
+    it('should get the chess instance just one time', () => {
+      expect(getChessMock).toHaveBeenCalledTimes(1);
     });
   });
 
