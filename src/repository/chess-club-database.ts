@@ -7,17 +7,19 @@ interface IGame {
   playerTwo: string
 }
 
+const mapGameDtoToDomain = (gameDto) => ({
+  gameId: gameDto.game_id,
+  fen: gameDto.fen,
+  playerOne: gameDto.player_one,
+  playerTwo: gameDto.player_two
+});
+
 class ChessClubDatabase extends SQLDataSource {
 
   async getGameByGameId(gameId): Promise<IGame> {
     const [game] = await this.knex('chess_club.tbl_game').where('game_id', gameId);
 
-    return {
-      gameId: game.game_id,
-      fen: game.fen,
-      playerOne: game.player_one,
-      playerTwo: game.player_two
-    };
+    return mapGameDtoToDomain(game);
   }
 
   async insertNewGame(fen: string, playerOne: string, playerTwo: string): Promise<string> {
@@ -45,6 +47,14 @@ class ChessClubDatabase extends SQLDataSource {
       .where({ 'game_id': gameId })
       .update({ fen }, [fen])
       .returning('game_id');
+  }
+
+  async selectGamesForPlayer(playerId) {
+    const games = await this.knex('chess_club.tbl_game')
+      .where({ player_one: playerId })
+      .orWhere({ player_two: playerId});
+
+      return games.map(mapGameDtoToDomain);
   }
 
 }

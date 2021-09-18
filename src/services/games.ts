@@ -80,8 +80,21 @@ export const updateGame = async (gameId, moveToCell, db: ChessClubDatabase) => {
   return newBoard;
 };
 
-export const getGamesByPlayerId = (playerId: string) => {
-  // selectGamesForPlayer(playerId);
+export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase) => {
+  const games = await db.selectGamesForPlayer(playerId);
+
+  return games.map((game) => {
+    const chess = getChess();
+
+    chess.load(game.fen);
+
+    const turn = chess.turn();
+
+    return {
+      ...game,
+      turn
+    };
+  });
 };
 
 export const getBoardByGameId = (gameId) => {
