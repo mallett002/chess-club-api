@@ -1,0 +1,109 @@
+{
+  "getGames": {
+    "query": "query GetGames($playerId: ID!){
+      getGames(playerId: $playerId) {
+        fen
+        gameId
+        playerOne
+        playerTwo
+        turn
+      }
+    }",
+    "args": {
+      "playerId": "SOME-RANDOM-GUID-1"
+    }
+  },
+  "getBoard": {
+    "query": "query GetBoard($gameId: ID!){
+      getBoard(gameId: $gameId) {
+        gameId
+        moves {
+          color
+          from
+          to
+          flags
+          piece
+          san
+        }
+        playerOne
+        playerTwo
+        positions{
+          type
+          color
+          label
+        }
+        turn
+      }
+    }",
+    "args": {
+      "gameId": "460d97a8-7717-45b7-a410-54f0bedbf47a"
+    }
+  },
+  "createGame": {
+    "mutation": "mutation createGame($playerOne: ID!, $playerTwo: ID!) {
+      createGame(playerOne: $playerOne, playerTwo: $playerTwo) {
+        gameId
+        playerOne
+        playerTwo
+        turn
+      }
+    }",
+    "args": {
+      "playerOne": "0d77524e-dad3-4ba8-b990-9d1868671a80",
+      "playerTwo": "53f09a87-85bf-4020-8752-682e8f574342"
+    }
+  },
+  "updateBoard": {
+    "mutation": "mutation updateBoard($gameId: ID!, $cell: String!) {
+      updateBoard(gameId: $gameId, cell: $cell) {
+        gameId
+        playerOne
+        playerTwo
+        turn
+        moves {
+          color
+          from
+          to
+          flags
+          piece
+          san
+        }
+        positions {
+          type
+          color
+          label
+        }
+      }
+    }",
+    "args": {
+      "gameId": "ab9db248-0978-415a-91b1-9df7d1a07e8e",
+      "cell": "c6"
+    }
+  },
+  "boardUpdateSubscription": {
+    "subscription": "subscription BoardUpdatedSubscription($gameId: ID!) {
+      boardUpdated(gameId: $gameId) {
+        gameId
+        playerOne
+        playerTwo
+        turn
+        moves {
+          color
+          from
+          to
+          flags
+          piece
+          san
+        }
+        positions {
+          type
+          color
+          label
+        }
+      }
+    }",
+    "args": {
+      "gameId": "b13808b6-108f-490a-84ea-34de476d9041"
+    }
+  }
+}

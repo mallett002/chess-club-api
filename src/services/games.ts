@@ -44,43 +44,56 @@ export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase
   return board;
 };
 
-export const movePiece = (gameId, moveToCell) => {
-  // const game = getGameByGameId(gameId);
+// Todo: this is created twice. Dedupe it.
+interface IGame {
+  gameId: string
+  fen: string
+  playerOne: string
+  playerTwo: string
+}
 
-  // const chess = getChess();
-  // chess.load(game.fen);
+export const updateGame = async (gameId, moveToCell, db: ChessClubDatabase) => {
+  const game: IGame = await db.getGameByGameId(gameId);
+  const chess = getChess();
 
-  // const move = chess.move(moveToCell);
-  // const turn = chess.turn();
+  chess.load(game.fen);
 
-  // if (!move) {
-  //   throw Error('Not a valid move');
-  // }
+  const move = chess.move(moveToCell);
 
-  // const newBoard = {
-  //   gameId,
-  //   moves: chess.moves({ verbose: true }),
-  //   playerOne: game.playerOne,
-  //   playerTwo: game.playerTwo,
-  //   positions: flattenPositions(chess.board()),
-  //   turn
-  // };
+  if (!move) {
+    throw Error('Not a valid move');
+  }
 
-  // publishBoardUpdates(newBoard);
+  db.updateGame(gameId, chess.fen());
 
-  // updateGame(gameId, {
-  //   fen: chess.fen(),
-  //   gameId,
-  //   playerOne: game.playerOne,
-  //   playerTwo: game.playerTwo,
-  //   turn
-  // });
+  const newBoard = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
 
-  // return newBoard;
+  publishBoardUpdates(newBoard);
+
+  return newBoard;
 };
 
-export const getGamesByPlayerId = (playerId: string) => {
-  // selectGamesForPlayer(playerId);
+export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase) => {
+  const games = await db.selectGamesForPlayer(playerId);
+  const chess = getChess(true);
+
+  return games.map((game) => {
+    chess.load(game.fen);
+
+    const turn = chess.turn();
+
+    return {
+      ...game,
+      turn
+    };
+  });
 };
 
 export const getBoardByGameId = (gameId) => {

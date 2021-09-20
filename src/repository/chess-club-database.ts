@@ -1,11 +1,26 @@
 import { SQLDataSource } from 'datasource-sql';
 
+interface IGame {
+  gameId: string
+  fen: string
+  playerOne: string
+  playerTwo: string
+}
+
+const mapGameDtoToDomain = (gameDto) => ({
+  gameId: gameDto.game_id,
+  fen: gameDto.fen,
+  playerOne: gameDto.player_one,
+  playerTwo: gameDto.player_two
+});
+
 class ChessClubDatabase extends SQLDataSource {
-  // getPlayers() {
-  //   return this.knex
-  //     .select('*')
-  //     .from('chess_club.tbl_player');
-  // }
+
+  async getGameByGameId(gameId): Promise<IGame> {
+    const [game] = await this.knex('chess_club.tbl_game').where('game_id', gameId);
+
+    return mapGameDtoToDomain(game);
+  }
 
   async insertNewGame(fen: string, playerOne: string, playerTwo: string): Promise<string> {
     const [gameId]: string[] = await Promise.all([
@@ -26,6 +41,22 @@ class ChessClubDatabase extends SQLDataSource {
 
     return gameId;
   }
+
+  async updateGame(gameId, fen): Promise<string> {
+    return await this.knex('chess_club.tbl_game')
+      .where({ 'game_id': gameId })
+      .update({ fen }, [fen])
+      .returning('game_id');
+  }
+
+  async selectGamesForPlayer(playerId) {
+    const games = await this.knex('chess_club.tbl_game')
+      .where({ player_one: playerId })
+      .orWhere({ player_two: playerId});
+
+      return games.map(mapGameDtoToDomain);
+  }
+
 }
 
 export default ChessClubDatabase;

@@ -9,7 +9,7 @@ const knexConfig = {
   client: 'pg',
   connection: {
     database: 'chess-club-api',
-    host : 'localhost',
+    host : env.postgresHost,
     password: 'chess_club_api_ps',
     port: 5432,
     user: 'chess_club_api'
