@@ -56,7 +56,6 @@ class ChessClubDatabase extends SQLDataSource {
 
       return games.map(mapGameDtoToDomain);
   }
-
 }
 
 export default ChessClubDatabase;

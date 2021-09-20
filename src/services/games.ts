@@ -96,23 +96,23 @@ export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase
   });
 };
 
-export const getBoardByGameId = (gameId) => {
-  // const game = getGameByGameId(gameId);
+export const getBoardByGameId = async (gameId, db: ChessClubDatabase) => {
+  const game = await db.getGameByGameId(gameId);
 
-  // if (!game) {
-  //   return null;
-  // }
+  if (!game) {
+    return null;
+  }
 
-  // const chess = getChess();
+  const chess = getChess();
   
-  // chess.load(game.fen);
+  chess.load(game.fen);
 
-  // return {
-  //   gameId,
-  //   moves: chess.moves({ verbose: true }),
-  //   playerOne: game.playerOne,
-  //   playerTwo: game.playerTwo,
-  //   positions: flattenPositions(chess.board()),
-  //   turn: chess.turn()
-  // };
+  return {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
 };
