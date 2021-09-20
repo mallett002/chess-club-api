@@ -132,14 +132,19 @@ describe('games service', () => {
       gameOne,
       gameTwo,
       expectedGames,
+      expectedTurnOne,
+      expectedTurnTwo,
       result;
 
     beforeEach(async () => {
       expectedFen = chance.string();
-      expectedTurn = chance.string();
+      expectedTurnOne = chance.string();
+      expectedTurnTwo = chance.string();
       chessInstance = {
         load: jest.fn(),
-        turn: jest.fn().mockReturnValue(expectedTurn)
+        turn: jest.fn()
+          .mockReturnValueOnce(expectedTurnOne)
+          .mockReturnValue(expectedTurnTwo)
       };
       playerId = chance.guid();
       gameOne = {
@@ -174,6 +179,32 @@ describe('games service', () => {
 
     it('should get the chess instance just one time', () => {
       expect(getChessMock).toHaveBeenCalledTimes(1);
+      expect(getChessMock).toHaveBeenCalledWith(true);
+    });
+
+    it("should load each game's fen", () => {
+      expect(chessInstance.load).toHaveBeenCalledTimes(expectedGames.length);
+
+      expectedGames.forEach((game) => {
+        expect(chessInstance.load).toHaveBeenCalledWith(game.fen);
+      });
+    });
+
+    it("should get each game's turn", () => {
+      expect(chessInstance.turn).toHaveBeenCalledTimes(expectedGames.length);
+    });
+
+    it('should return a list of the games with the turn on them', () => {
+      expect(result).toStrictEqual([
+        {
+          ...gameOne,
+          turn: expectedTurnOne
+        },
+        {
+          ...gameTwo,
+          turn: expectedTurnTwo
+        }
+      ]);
     });
   });
 
