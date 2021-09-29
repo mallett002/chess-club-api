@@ -1,4 +1,5 @@
 import Chance from 'chance';
+import ChessClubDatabase from '../../src/repository/chess-club-database';
 
 import getBoardResolver from '../../src/resolvers/get-board';
 import { getBoardByGameId } from '../../src/services/games';
@@ -15,13 +16,18 @@ describe('get board resolver', () => {
     args,
     root,
     context,
+    dbInstance,
     result;
 
   beforeEach(() => {
     gameId = chance.guid();
     args = { gameId };
     root = { [chance.string()]: chance.string() };
-    context = { [chance.string()]: chance.string() };
+    dbInstance = { [chance.string()]: chance.string() };
+    context = {
+      [chance.string()]: chance.string(),
+       dataSources: { chessClubDatabase: dbInstance }
+    };
     expectedBoard = { [chance.string()]: chance.string() };
 
     getBoardMock.mockReturnValue(expectedBoard);
@@ -31,7 +37,7 @@ describe('get board resolver', () => {
 
   it('should get the board from the service', () => {
     expect(getBoardMock).toHaveBeenCalledTimes(1);
-    expect(getBoardMock).toHaveBeenCalledWith(gameId);
+    expect(getBoardMock).toHaveBeenCalledWith(gameId, dbInstance);
   });
 
   it('should return the board from the service', () => {
