@@ -6,9 +6,6 @@ services:
       context: .
     image: chess-club-api
     environment:
-      PORT: 4000
-      APOLLO_INTROSPECTION: "true"
-      APOLLO_PLAYGROUND: "true"
       POSTGRES_HOST: 10.128.30.2
       POSTGRES_PORT: 5432
     ports:
