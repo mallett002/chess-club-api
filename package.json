@@ -10,7 +10,6 @@
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon dist/index.js",
-    "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",
     "test": "jest"
   },
   "repository": {

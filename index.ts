@@ -1,20 +1,16 @@
 import { ApolloServer } from 'apollo-server';
+import config from 'config';
 
 import ChessClubDatabase from './src/repository/chess-club-database';
-import { env } from './environment';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 
 const knexConfig = {
   client: 'pg',
-  connection: {
-    database: 'chess-club-api',
-    host : env.postgresHost,
-    password: 'chess_club_api_ps',
-    port: 5432,
-    user: 'chess_club_api'
-  }
+  connection: config.get('chess_club_db')
 };
+const apolloConfig = config.get('apollo');
+const port = config.get('port');
 
 const chessClubDatabase = new ChessClubDatabase(knexConfig);
 
@@ -22,10 +18,10 @@ const server = new ApolloServer({
   resolvers,
   typeDefs,
   dataSources: () => ({ chessClubDatabase }),
-  introspection: env.apollo.introspection,
-  playground: env.apollo.playground,
+  introspection: apolloConfig.introspection,
+  playground: apolloConfig.playground,
 });
 
-server.listen({ port: env.port }).then(({ url }) => {
+server.listen({ port }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });

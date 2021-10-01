@@ -1,0 +1,8 @@
+{
+  "apollo": {
+    "introspection": true,
+    "true": true
+  },
+  "port": "4000",
+  "postgresHost": "5432"
+}
