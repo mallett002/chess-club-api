@@ -1,11 +1,5 @@
 import { SQLDataSource } from 'datasource-sql';
-
-interface IGame {
-  gameId: string
-  fen: string
-  playerOne: string
-  playerTwo: string
-}
+import { IGame } from '../interfaces/game';
 
 const mapGameDtoToDomain = (gameDto) => ({
   gameId: gameDto.game_id,
@@ -59,30 +53,3 @@ class ChessClubDatabase extends SQLDataSource {
 }
 
 export default ChessClubDatabase;
-
-// const games = new Map();
-
-// export const insertNewGame = (gameId, game) => games.set(gameId, game);
-
-// export const getGameByGameId = (gameId) => games.get(gameId);
-
-// export const deleteAllGames = () => games.clear();
-
-// export const updateGame = (gameId, payload) => {
-//   games.set(gameId, payload);
-
-//   return games.get(gameId);
-// };
-
-// export const selectGamesForPlayer = (playerId) => {
-//   let gamesForPlayer = [];
-
-//   games.forEach((game) => {
-
-//     if (game.playerOne === playerId || game.playerTwo === playerId) {
-//       gamesForPlayer.push(game);
-//     }
-//   });
-
-//   return gamesForPlayer;
-// };
