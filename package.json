@@ -10,7 +10,6 @@
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon dist/index.js",
-    "start:env": "tsc && nodemon --require dotenv/config dist/index.js --watch src index.ts",
     "test": "jest"
   },
   "repository": {
@@ -26,6 +25,7 @@
   "dependencies": {
     "apollo-server": "^2.24.1",
     "chess.js": "^0.12.0",
+    "config": "^3.3.6",
     "datasource-sql": "^1.5.0",
     "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
