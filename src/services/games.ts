@@ -7,6 +7,7 @@ import { BOARD_UPDATED } from '../constants';
 import { flattenPositions } from './board';
 import { getChess } from './chess';
 import ChessClubDatabase from '../repository/chess-club-database';
+import { IGame } from '../interfaces/game';
 
 const publishBoardUpdates = (board) => {
   const pubSub = getPubSub();
@@ -44,13 +45,6 @@ export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase
   return board;
 };
 
-// Todo: this is created twice. Dedupe it.
-interface IGame {
-  gameId: string
-  fen: string
-  playerOne: string
-  playerTwo: string
-}
 
 export const updateGame = async (gameId, moveToCell, db: ChessClubDatabase) => {
   const game: IGame = await db.getGameByGameId(gameId);
