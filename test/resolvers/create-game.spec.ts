@@ -1,4 +1,4 @@
-import { ValidationError } from 'apollo-server';
+import { ValidationError } from 'apollo-server-express';
 import Chance from 'chance';
 
 import createGameResolver from '../../src/resolvers/create-game';
