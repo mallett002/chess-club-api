@@ -1,4 +1,4 @@
-import  { withFilter } from 'apollo-server';
+import  { withFilter } from 'graphql-subscriptions';
 
 import createGame from './create-game';
 import getGames from './get-games';
