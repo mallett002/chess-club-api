@@ -1,13 +1,13 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import config from 'config';
-import bodyParser from 'body-parser';
+// import bodyParser from 'body-parser';
 import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
-import { execute, subscribe } from 'graphql';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
-import ws from 'ws';
-import { useServer } from 'graphql-ws/lib/use/ws';
+// import { execute, subscribe } from 'graphql';
+// import { SubscriptionServer } from 'subscriptions-transport-ws';
+// import ws from 'ws';
+// import { useServer } from 'graphql-ws/lib/use/ws';
 
 import ChessClubDatabase from './src/repository/chess-club-database';
 import { resolvers } from './src/resolvers/resolver-map';
@@ -41,9 +41,9 @@ async function startApolloServer(typeDefs, resolvers) {
      path: '/graphql'
   });
 
-  await Promise.resolve(httpServer.listen({ port: 4000 }));
+  await Promise.resolve(httpServer.listen({ port }));
 
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+  console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
 }
 
 startApolloServer(typeDefs, resolvers);
