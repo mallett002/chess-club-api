@@ -1,5 +1,5 @@
 // For production PubSub: https://www.apollographql.com/docs/apollo-server/data/subscriptions/#production-pubsub-libraries
-import { PubSub } from 'apollo-server';
+import { PubSub } from 'graphql-subscriptions';
 
 let pubSub;
 
