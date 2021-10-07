@@ -9,6 +9,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import ChessClubDatabase from './src/repository/chess-club-database';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
+import { applyServerRoutes } from './src/controllers';
 
 const knexConfig = {
   client: 'pg',
@@ -19,10 +20,12 @@ const port = config.get('port');
 
 const chessClubDatabase = new ChessClubDatabase(knexConfig);
 
-async function startApolloServer(typeDefs, resolvers) {
+async function startServer(typeDefs, resolvers) {
   const app = express();
-  const httpServer = http.createServer(app);
+  
+  applyServerRoutes(app);
 
+  const httpServer = http.createServer(app);
   const apolloServer = new ApolloServer({
     dataSources: () => ({ chessClubDatabase }),
     typeDefs,
@@ -50,4 +53,4 @@ async function startApolloServer(typeDefs, resolvers) {
   console.log(`🚀 Server ready at http://localhost:${port}${apolloServer.graphqlPath}`);
 }
 
-startApolloServer(typeDefs, resolvers);
+startServer(typeDefs, resolvers);
