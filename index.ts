@@ -5,6 +5,7 @@ import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import ws from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import bodyParser from 'body-parser';
 
 import ChessClubDatabase from './src/repository/chess-club-database';
 import { resolvers } from './src/resolvers/resolver-map';
@@ -22,7 +23,9 @@ const chessClubDatabase = new ChessClubDatabase(knexConfig);
 
 async function startServer(typeDefs, resolvers) {
   const app = express();
-  
+
+  app.use(express.json());
+
   applyServerRoutes(app);
 
   const httpServer = http.createServer(app);
@@ -37,8 +40,8 @@ async function startServer(typeDefs, resolvers) {
   await apolloServer.start();
 
   apolloServer.applyMiddleware({
-     app,
-     path: '/graphql'
+    app,
+    path: '/graphql'
   });
 
   const server = httpServer.listen(port, () => {
@@ -46,7 +49,7 @@ async function startServer(typeDefs, resolvers) {
       server,
       path: '/graphql',
     });
-  
+
     useServer({ schema: typeDefs }, wsServer);
   });
 
