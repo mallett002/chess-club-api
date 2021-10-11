@@ -12,6 +12,11 @@ export default async (_, args, { dataSources: {chessClubDatabase} }): Promise<IP
 
   try {
     return encryptAndPersistPassword(username, password, chessClubDatabase);
+
+    /*
+    - Log the user in (Give them a JWT)
+    - Use passport?
+    */
   } catch (error) {
     throw new ApolloError(error);    
   }
