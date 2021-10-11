@@ -1,19 +1,18 @@
-import bcrypt from 'bcrypt';
 import { ValidationError, ApolloError } from 'apollo-server-express';
-import { persistPlayer } from '../services/encrypt-password';
 
-const saltRounds = 10;
+import { IPlayer } from '../interfaces/player';
+import { encryptAndPersistPassword } from '../services/account';
 
-export default async (_, args, { dataSources: {chessClubDatabase} }) => {
+export default async (_, args, { dataSources: {chessClubDatabase} }): Promise<IPlayer> | null => {
   const { username, password } = args;
 
   if (!username || !password) {
     throw new ValidationError('Missing username or password');
   }
 
-  const player = await persistPlayer(username, password, chessClubDatabase);
-
-  console.log({player});
-  
-  return player;
+  try {
+    return encryptAndPersistPassword(username, password, chessClubDatabase);
+  } catch (error) {
+    throw new ApolloError(error);    
+  }
 };
