@@ -33,6 +33,11 @@ export const typeDefs = buildSchema(`
     turn: String
   }
 
+  type Player {
+    playerId: ID!
+    username: String!
+  }
+
   type Subscription {
     boardUpdated(gameId: ID!): Board!
   }
@@ -40,6 +45,7 @@ export const typeDefs = buildSchema(`
   type Mutation {
     updateBoard(gameId: ID!, cell: String!): Board!
     createGame(playerOne: ID!, playerTwo: ID!): Board!
+    createPlayer(username: String!, password: String!): Player!
   }
 
   type Query {

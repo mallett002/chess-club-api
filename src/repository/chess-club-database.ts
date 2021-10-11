@@ -1,5 +1,6 @@
 import { SQLDataSource } from 'datasource-sql';
 import { IGame } from '../interfaces/game';
+import { IPlayer } from '../interfaces/player';
 
 const mapGameDtoToDomain = (gameDto) => ({
   gameId: gameDto.game_id,
@@ -46,10 +47,24 @@ class ChessClubDatabase extends SQLDataSource {
   async selectGamesForPlayer(playerId) {
     const games = await this.knex('chess_club.tbl_game')
       .where({ player_one: playerId })
-      .orWhere({ player_two: playerId});
+      .orWhere({ player_two: playerId });
 
-      return games.map(mapGameDtoToDomain);
+    return games.map(mapGameDtoToDomain);
   }
+
+  async insertNewPlayer(username: string, password: string): Promise<IPlayer> {
+    const [dbPlayer]: { username: string, player_id: string }[] = await this.knex('chess_club.tbl_player')
+      .insert({
+        username,
+        hashed_password: password,
+      }).returning(['username', 'player_id']);
+
+    return {
+      username,
+      playerId: dbPlayer.player_id
+    };
+  }
+
 }
 
 export default ChessClubDatabase;

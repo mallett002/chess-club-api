@@ -1,6 +1,7 @@
 import  { withFilter } from 'graphql-subscriptions';
 
 import createGame from './create-game';
+import createPlayer from './create-player';
 import getGames from './get-games';
 import updateBoard from './update-board';
 import getBoard from './get-board';
@@ -14,6 +15,7 @@ export const resolvers = {
   },
   Mutation: {
     createGame,
+    createPlayer,
     updateBoard
   },
   Subscription: {

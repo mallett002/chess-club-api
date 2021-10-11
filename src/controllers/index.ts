@@ -1,5 +1,5 @@
+import healthHandler from './handlers/health';
+
 export const applyServerRoutes = (app) => {
-  app.get('/health', (req, res) => {
-    res.send('healthy');
-  });
-}
+  app.get('/health', healthHandler);
+};
