@@ -1,3 +1,3 @@
-import { getBoardByGameId } from '../services/games';
+import { getBoardByGameId, testGetBoardByGameId } from '../services/games';
 
-export default (root, args, context) => getBoardByGameId(args.gameId, context.dataSources.chessClubDatabase);
+export default (root, args, context) => testGetBoardByGameId(args.gameId);

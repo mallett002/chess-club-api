@@ -1,6 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-
-// import { insertNewGame, getGameByGameId, selectGamesForPlayer, updateGame } from '../repository/games';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 
@@ -8,6 +6,7 @@ import { flattenPositions } from './board';
 import { getChess } from './chess';
 import ChessClubDatabase from '../repository/chess-club-database';
 import { IGame } from '../interfaces/game';
+import { getGameByGameId } from '../repository/games';
 
 const publishBoardUpdates = (board) => {
   const pubSub = getPubSub();
@@ -92,6 +91,27 @@ export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase
 
 export const getBoardByGameId = async (gameId, db: ChessClubDatabase) => {
   const game = await db.getGameByGameId(gameId);
+
+  if (!game) {
+    return null;
+  }
+
+  const chess = getChess();
+  
+  chess.load(game.fen);
+
+  return {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne: game.playerOne,
+    playerTwo: game.playerTwo,
+    positions: flattenPositions(chess.board()),
+    turn: chess.turn()
+  };
+};
+
+export const testGetBoardByGameId = async (gameId) => {
+  const game = await getGameByGameId(gameId);
 
   if (!game) {
     return null;

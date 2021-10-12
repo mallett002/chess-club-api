@@ -5,7 +5,6 @@ import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import ws from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
-import bodyParser from 'body-parser';
 
 import ChessClubDatabase from './src/repository/chess-club-database';
 import { resolvers } from './src/resolvers/resolver-map';
