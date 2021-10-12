@@ -110,6 +110,7 @@ export const getBoardByGameId = async (gameId, db: ChessClubDatabase) => {
   };
 };
 
+// Todo: follow this method for all service functions connecting to db
 export const testGetBoardByGameId = async (gameId) => {
   const game = await getGameByGameId(gameId);
 
