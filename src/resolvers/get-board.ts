@@ -1,3 +1,3 @@
-import { getBoardByGameId, testGetBoardByGameId } from '../services/games';
+import { getBoardByGameId } from '../services/games';
 
-export default (root, args, context) => testGetBoardByGameId(args.gameId);
+export default (__, args) => getBoardByGameId(args.gameId);
