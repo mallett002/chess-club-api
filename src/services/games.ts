@@ -6,8 +6,9 @@ import { flattenPositions } from './board';
 import { getChess } from './chess';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
+import { IBoard } from '../interfaces/board';
 
-const publishBoardUpdates = (board) => {
+const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
 
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
@@ -18,7 +19,7 @@ const publishBoardUpdates = (board) => {
   - Will take in a username to determine who they are inviting.
   - Look up player by username and send invite.
 */
-export const createGame = async ({ playerOne, playerTwo }) => {
+export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
   const chess = getChess(true);
   const fen = chess.fen();
   const turn = chess.turn();
@@ -43,7 +44,7 @@ export const createGame = async ({ playerOne, playerTwo }) => {
   return board;
 };
 
-export const updateGame = async (gameId, moveToCell) => {
+export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   const game: IGame = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = getChess();
 
@@ -71,7 +72,7 @@ export const updateGame = async (gameId, moveToCell) => {
   return newBoard;
 };
 
-export const getGamesByPlayerId = async (playerId: string) => {
+export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => {
   const games = await gamesRepository.selectGamesForPlayer(playerId);
   const chess = getChess(true);
 
@@ -87,7 +88,7 @@ export const getGamesByPlayerId = async (playerId: string) => {
   });
 };
 
-export const getBoardByGameId = async (gameId) => {
+export const getBoardByGameId = async (gameId): Promise<IBoard> => {
   const game = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
