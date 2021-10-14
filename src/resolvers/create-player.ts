@@ -1,7 +1,7 @@
 import { ValidationError, ApolloError } from 'apollo-server-express';
 
 import { IPlayer } from '../interfaces/player';
-import { encryptAndPersistPassword } from '../services/account';
+import { encryptAndPersistPassword } from '../services/accounts/password-helpers';
 
 export default async (_, args): Promise<IPlayer> => {
   const { username, password } = args;

@@ -15,3 +15,13 @@ export const insertNewPlayer = async (username: string, password: string): Promi
     playerId: dbPlayer.player_id
   };
 };
+
+export const selectPlayerByUsername = async (username: string) => {
+  const [player] = await pgClient('chess_club.tbl_player').where('username', username);
+
+  if (!player) {
+    return null;
+  }
+
+  return player;
+};
