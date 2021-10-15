@@ -1,18 +1,15 @@
-/**** Log a user in ****/
-
+import { ITokenSet } from "../../interfaces/account";
 import { IPlayer } from "../../interfaces/player";
 import { selectPlayerByUsername } from "../../repository/player";
 import { validatePassword } from "./password-helpers";
+import { getToken } from "./token-service";
 
-// User sends username & password
-// Check if password matches for that user
-// give them a jwt if it does
-export default async (username, password) => {
-  // Check if password matches for that user
-    // Get user from the db
-    console.log({username, password});
-    
+export default async (username, password): Promise<ITokenSet | null> => {
     const player = await selectPlayerByUsername(username);
+
+    if (!player) {
+      return null;
+    }
     
     const isValidPassword = await validatePassword(password, player.hashed_password);
     
@@ -20,10 +17,7 @@ export default async (username, password) => {
       return null;
     }
 
-    // Todo: give them a jwt
-    return {
-      accessToken: 'some jwt',
-      expiresIn: 'some expiration',
-      refreshToken: 'some refresh token'
-    };
+    const tokens = getToken(username);
+
+    return tokens;
 };
