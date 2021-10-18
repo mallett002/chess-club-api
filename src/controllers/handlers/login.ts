@@ -1,6 +1,8 @@
 import { IAuthenticatedPlayer } from "../../interfaces/player";
 import authenticateUser from "../../services/accounts/authenticate";
 
+// TODO: use passport & passport-jwt
+
 export default async (req, res): Promise<IAuthenticatedPlayer> => {
   const {username, password} = req.body;
 
