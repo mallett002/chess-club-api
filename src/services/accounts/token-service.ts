@@ -4,7 +4,7 @@ import { ITokenSet } from '../../interfaces/account';
 
 const PRIV_KEY = 'some-private-key';
 
-export const getToken = (username: string): ITokenSet => {
+export const getTokenSet = (username: string): ITokenSet => {
   const expiresIn = '1d';
   
   const payload = {
@@ -12,8 +12,7 @@ export const getToken = (username: string): ITokenSet => {
     iat: Date.now()
   };
 
-  // Todo: determine which sign algorithm to use (RS256?)
-  const signedToken = jwt.sign( payload, PRIV_KEY, {expiresIn});
+  const signedToken = jwt.sign(payload, PRIV_KEY, {expiresIn});
 
   return {
     token: "Bearer " + signedToken,

@@ -36,6 +36,8 @@ export const typeDefs = buildSchema(`
   type Player {
     playerId: ID!
     username: String!
+    token: String
+    expires: String
   }
 
   type Subscription {

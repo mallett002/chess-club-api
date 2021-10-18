@@ -1,9 +1,11 @@
 import { ValidationError, ApolloError } from 'apollo-server-express';
+import { ITokenSet } from '../interfaces/account';
 
-import { IPlayer } from '../interfaces/player';
+import { IAuthenticatedPlayer, IPlayer, IPlayerPayload } from '../interfaces/player';
 import { encryptAndPersistPassword } from '../services/accounts/password-helpers';
+import { getTokenSet } from '../services/accounts/token-service';
 
-export default async (_, args): Promise<IPlayer> => {
+export default async (_, args: IPlayerPayload): Promise<IAuthenticatedPlayer> => {
   const { username, password } = args;
 
   if (!username || !password) {
@@ -11,12 +13,12 @@ export default async (_, args): Promise<IPlayer> => {
   }
 
   try {
-    return encryptAndPersistPassword(username, password);
-
-    /*
-    - Log the user in (Give them a JWT)
-    - Use passport?
-    */
+    const domainPlayer: IPlayer = await encryptAndPersistPassword(username, password);
+    const tokens: ITokenSet = getTokenSet(username);
+    return {
+      ...domainPlayer,
+      ...tokens
+    };
   } catch (error) {
     throw new ApolloError(error);    
   }

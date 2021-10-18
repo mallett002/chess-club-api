@@ -1,17 +1,17 @@
-import { ITokenSet } from "../../interfaces/account";
+import { IAuthenticatedPlayer } from "../../interfaces/player";
 import authenticateUser from "../../services/accounts/authenticate";
 
-export default async (req, res) => {
+export default async (req, res): Promise<IAuthenticatedPlayer> => {
   const {username, password} = req.body;
 
-  const tokens: ITokenSet = await authenticateUser(username, password);
+  const authPlayer: IAuthenticatedPlayer = await authenticateUser(username, password);
 
-  if (!tokens) {
+  if (!authPlayer) {
     return res.status(401).json({
       success: false,
        message: 'Username or password is incorrect.'
     });
   }
 
-  return res.json(tokens);
+  return res.json(authPlayer);
 };
