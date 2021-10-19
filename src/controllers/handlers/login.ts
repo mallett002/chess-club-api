@@ -1,19 +1,19 @@
-import { IAuthenticatedPlayer } from "../../interfaces/player";
+import { ITokenSet } from "../../interfaces/account";
 import authenticateUser from "../../services/accounts/authenticate";
 
 // TODO: use passport & passport-jwt
 
-export default async (req, res): Promise<IAuthenticatedPlayer> => {
+export default async (req, res): Promise<ITokenSet> => {
   const {username, password} = req.body;
 
-  const authPlayer: IAuthenticatedPlayer = await authenticateUser(username, password);
+  const tokens: ITokenSet = await authenticateUser(username, password);
 
-  if (!authPlayer) {
+  if (!tokens) {
     return res.status(401).json({
       success: false,
        message: 'Username or password is incorrect.'
     });
   }
 
-  return res.json(authPlayer);
+  return res.json(tokens);
 };

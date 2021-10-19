@@ -1,12 +1,12 @@
 import { ITokenSet } from "../../interfaces/account";
-import { IAuthenticatedPlayer, IPlayerDTO } from "../../interfaces/player";
+import { IPlayerDTO } from "../../interfaces/player";
 import { selectPlayerByUsername } from "../../repository/player";
 import { validatePassword } from "./password-helpers";
 import { getTokenSet } from "./token-service";
 
-export default async (username: string, password: string): Promise<IAuthenticatedPlayer | null> => {
+export default async (username: string, password: string): Promise<ITokenSet | null> => {
     const player: IPlayerDTO = await selectPlayerByUsername(username);
-    
+
     if (!player) {
       return null;
     }
@@ -17,11 +17,5 @@ export default async (username: string, password: string): Promise<IAuthenticate
       return null;
     }
 
-    const tokenSet: ITokenSet = getTokenSet(username);
-
-    return {
-      ...tokenSet,
-      playerId: player.playerId,
-      username
-    };
+    return getTokenSet(username, player.player_id);
 };

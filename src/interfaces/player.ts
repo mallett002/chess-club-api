@@ -13,5 +13,3 @@ export interface IPlayerPayload {
 export interface IPlayerDTO extends IPlayer {
   hashed_password: string
 }
-
-export interface IAuthenticatedPlayer extends IPlayer, ITokenSet {}

@@ -1,18 +1,20 @@
 import jwt from 'jsonwebtoken';
 
+import { PRIVATE_KEY } from '../../constants';
 import { ITokenSet } from '../../interfaces/account';
 
-const PRIV_KEY = 'some-private-key';
-
-export const getTokenSet = (username: string): ITokenSet => {
+export const getTokenSet = (username: string, playerId: string): ITokenSet => {
   const expiresIn = '1d';
-  
   const payload = {
     sub: username,
+    playerId: playerId,
     iat: Date.now()
   };
 
-  const signedToken = jwt.sign(payload, PRIV_KEY, {expiresIn});
+  console.log({payload});
+  
+
+  const signedToken = jwt.sign(payload, PRIVATE_KEY, {expiresIn});
 
   return {
     token: "Bearer " + signedToken,

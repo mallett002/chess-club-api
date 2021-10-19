@@ -23,5 +23,8 @@ export const selectPlayerByUsername = async (username: string): Promise<IPlayerD
     return null;
   }
 
+  console.log({playerInDB: player});
+  
+
   return player;
 };
