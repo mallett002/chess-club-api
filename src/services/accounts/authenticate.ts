@@ -1,10 +1,10 @@
-import { ITokenSet } from "../../interfaces/account";
+import { IToken } from "../../interfaces/account";
 import { IPlayerDTO } from "../../interfaces/player";
 import { selectPlayerByUsername } from "../../repository/player";
 import { validatePassword } from "./password-helpers";
-import { getTokenSet } from "./token-service";
+import { getToken } from "./token-service";
 
-export default async (username: string, password: string): Promise<ITokenSet | null> => {
+export default async (username: string, password: string): Promise<IToken | null> => {
     const player: IPlayerDTO = await selectPlayerByUsername(username);
 
     if (!player) {
@@ -17,5 +17,5 @@ export default async (username: string, password: string): Promise<ITokenSet | n
       return null;
     }
 
-    return getTokenSet(username, player.player_id);
+    return getToken(username, player.player_id);
 };

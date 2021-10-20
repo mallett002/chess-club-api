@@ -5,10 +5,13 @@ import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import ws from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import passport from 'passport';
 
+import {createContext} from './server-helpers';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 import { applyServerRoutes } from './src/controllers';
+import { configureAuthStrategies } from './src/services/accounts/auth-strategies';
 
 const apolloConfig = config.get('apollo');
 const port = config.get('port');
@@ -16,12 +19,14 @@ const port = config.get('port');
 async function startServer(typeDefs, resolvers) {
   const app = express();
 
+  app.use(passport.initialize());
+  configureAuthStrategies();
   app.use(express.json());
-
   applyServerRoutes(app);
 
   const httpServer = http.createServer(app);
   const apolloServer = new ApolloServer({
+    context: createContext,
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],

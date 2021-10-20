@@ -1,19 +1,18 @@
-import { ITokenSet } from "../../interfaces/account";
+import { Request, Response, Send } from "express";
+import { IToken } from "../../interfaces/account";
 import authenticateUser from "../../services/accounts/authenticate";
 
-// TODO: use passport & passport-jwt
-
-export default async (req, res): Promise<ITokenSet> => {
+export default async (req: Request, res: Response) => {
   const {username, password} = req.body;
 
-  const tokens: ITokenSet = await authenticateUser(username, password);
+  const token: IToken = await authenticateUser(username, password);
 
-  if (!tokens) {
+  if (!token) {
     return res.status(401).json({
       success: false,
-       message: 'Username or password is incorrect.'
+      message: 'Username or password is incorrect.'
     });
   }
 
-  return res.json(tokens);
+  return res.json(token);
 };

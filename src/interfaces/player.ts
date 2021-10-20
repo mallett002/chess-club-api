@@ -1,4 +1,4 @@
-import { ITokenSet } from "./account";
+import { IToken } from "./account";
 
 export interface IPlayer {
   playerId: string
@@ -10,6 +10,8 @@ export interface IPlayerPayload {
   username: string
 }
 
-export interface IPlayerDTO extends IPlayer {
+export interface IPlayerDTO {
   hashed_password: string
+  player_id: string
+  username: string
 }
