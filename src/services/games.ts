@@ -88,7 +88,7 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => 
   });
 };
 
-export const getBoardByGameId = async (gameId): Promise<IBoard> => {
+export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
   const game = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {

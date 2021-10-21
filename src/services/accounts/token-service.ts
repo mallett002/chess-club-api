@@ -17,3 +17,23 @@ export const getToken = (username: string, playerId: string): IToken => {
     token: "Bearer " + signedToken,
   };
 };
+
+const getTokenFromHeaders = (token: string) => {
+  if (token) {
+    const [, jwt] = token.split(' ');
+
+    return jwt;
+  }
+
+  return '';
+}
+
+export const verifyToken = (context) => {
+  const accessToken = getTokenFromHeaders(context.token);
+
+  try {
+    return jwt.verify(accessToken, PRIVATE_KEY);
+  } catch {
+    return null;   
+  }
+};

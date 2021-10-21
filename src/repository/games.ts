@@ -13,7 +13,11 @@ const mapGameDtoToDomain = (gameDto) => ({
 export const getGameByGameId = async (gameId): Promise<IGame> => {
   const [game] = await pgClient('chess_club.tbl_game').where('game_id', gameId);
 
-  return mapGameDtoToDomain(game);
+  if (game) {
+    return mapGameDtoToDomain(game);
+  }
+
+  return null;
 };
 
 export const insertNewGame = async(fen: string, playerOne: string, playerTwo: string): Promise<string> => {
