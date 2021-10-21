@@ -4,13 +4,13 @@
   "description": "server side for chess club app",
   "main": "dist/index.js",
   "scripts": {
-    "coverage": "npx jest --coverage /test/services/chess.spec.ts",
+    "coverage": "echo 'npx jest --coverage /test/services/chess.spec.ts'",
     "docker:start": "docker-compose up --build -d && npm run migrate",
     "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon dist/index.js",
-    "test": "jest"
+    "test": "echo 'Write some ATs with jest'"
   },
   "repository": {
     "type": "git",
