@@ -1,7 +1,15 @@
+import { AuthenticationError } from 'apollo-server-core';
+import { IToken } from '../interfaces/account';
+import { IBoard } from '../interfaces/board';
+import { verifyToken } from '../services/accounts/token-service';
 import { updateGame } from '../services/games';
 
-export default async (parent, args) => {
-  const board = await updateGame(args.gameId, args.cell);
+export default (__, args, context: IToken): Promise<IBoard> => {
+  const claims = verifyToken(context);
 
-  return board;
+  if (!claims) {
+    throw new AuthenticationError('You must be logged in.');
+  }
+
+  return updateGame(args.gameId, args.cell);
 };

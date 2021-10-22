@@ -18,7 +18,7 @@ export const getToken = (username: string, playerId: string): IToken => {
   };
 };
 
-const getTokenFromHeaders = (token: string) => {
+const getTokenFromHeaders = (token: string): string => {
   if (token) {
     const [, jwt] = token.split(' ');
 
@@ -28,7 +28,7 @@ const getTokenFromHeaders = (token: string) => {
   return '';
 }
 
-export const verifyToken = (context) => {
+export const verifyToken = (context: IToken): string | jwt.JwtPayload | null => {
   const accessToken = getTokenFromHeaders(context.token);
 
   try {
