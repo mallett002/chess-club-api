@@ -1,9 +1,11 @@
 import { ValidationError, ApolloError } from 'apollo-server-express';
+import { IToken } from '../interfaces/account';
 
-import { IPlayer } from '../interfaces/player';
-import { encryptAndPersistPassword } from '../services/account';
+import { IPlayer, IPlayerPayload } from '../interfaces/player';
+import { encryptAndPersistPassword } from '../services/accounts/password-helpers';
+import { getToken } from '../services/accounts/token-service';
 
-export default async (_, args, { dataSources: {chessClubDatabase} }): Promise<IPlayer> => {
+export default async (_, args: IPlayerPayload): Promise<IToken> => {
   const { username, password } = args;
 
   if (!username || !password) {
@@ -11,7 +13,9 @@ export default async (_, args, { dataSources: {chessClubDatabase} }): Promise<IP
   }
 
   try {
-    return encryptAndPersistPassword(username, password, chessClubDatabase);
+    const domainPlayer: IPlayer = await encryptAndPersistPassword(username, password);
+    
+    return getToken(username, domainPlayer.playerId);
   } catch (error) {
     throw new ApolloError(error);    
   }

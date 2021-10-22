@@ -5,32 +5,28 @@ import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import ws from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
-import bodyParser from 'body-parser';
+import passport from 'passport';
 
-import ChessClubDatabase from './src/repository/chess-club-database';
+import {createContext} from './server-helpers';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 import { applyServerRoutes } from './src/controllers';
+import { configureAuthStrategies } from './src/services/accounts/auth-strategies';
 
-const knexConfig = {
-  client: 'pg',
-  connection: config.get('chess_club_db')
-};
 const apolloConfig = config.get('apollo');
 const port = config.get('port');
-
-const chessClubDatabase = new ChessClubDatabase(knexConfig);
 
 async function startServer(typeDefs, resolvers) {
   const app = express();
 
+  app.use(passport.initialize());
+  configureAuthStrategies();
   app.use(express.json());
-
   applyServerRoutes(app);
 
   const httpServer = http.createServer(app);
   const apolloServer = new ApolloServer({
-    dataSources: () => ({ chessClubDatabase }),
+    context: createContext,
     typeDefs,
     resolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],

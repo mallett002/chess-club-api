@@ -42,10 +42,14 @@ export const typeDefs = buildSchema(`
     boardUpdated(gameId: ID!): Board!
   }
 
+  type Token {
+    token: String!
+  }
+
   type Mutation {
     updateBoard(gameId: ID!, cell: String!): Board!
     createGame(playerOne: ID!, playerTwo: ID!): Board!
-    createPlayer(username: String!, password: String!): Player!
+    createPlayer(username: String!, password: String!): Token!
   }
 
   type Query {

@@ -1,15 +1,14 @@
-import { v4 as uuidv4 } from 'uuid';
+import {Chess} from 'chess.js';
 
-// import { insertNewGame, getGameByGameId, selectGamesForPlayer, updateGame } from '../repository/games';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
-
 import { flattenPositions } from './board';
 import { getChess } from './chess';
-import ChessClubDatabase from '../repository/chess-club-database';
 import { IGame } from '../interfaces/game';
+import * as gamesRepository from '../repository/games';
+import { IBoard } from '../interfaces/board';
 
-const publishBoardUpdates = (board) => {
+const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
 
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
@@ -20,12 +19,12 @@ const publishBoardUpdates = (board) => {
   - Will take in a username to determine who they are inviting.
   - Look up player by username and send invite.
 */
-export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase) => {
+export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
   const chess = getChess(true);
   const fen = chess.fen();
   const turn = chess.turn();
 
-  const [gameId] = await db.insertNewGame(
+  const [gameId] = await gamesRepository.insertNewGame(
     fen,
     playerOne,
     playerTwo,
@@ -45,20 +44,19 @@ export const createGame = async ({ playerOne, playerTwo }, db: ChessClubDatabase
   return board;
 };
 
-
-export const updateGame = async (gameId, moveToCell, db: ChessClubDatabase) => {
-  const game: IGame = await db.getGameByGameId(gameId);
-  const chess = getChess();
+export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
+  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  const chess: Chess = getChess();
 
   chess.load(game.fen);
 
   const move = chess.move(moveToCell);
-
+  
   if (!move) {
     throw Error('Not a valid move');
   }
 
-  db.updateGame(gameId, chess.fen());
+  await gamesRepository.updateGame(gameId, chess.fen());
 
   const newBoard = {
     gameId,
@@ -74,8 +72,8 @@ export const updateGame = async (gameId, moveToCell, db: ChessClubDatabase) => {
   return newBoard;
 };
 
-export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase) => {
-  const games = await db.selectGamesForPlayer(playerId);
+export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => {
+  const games = await gamesRepository.selectGamesForPlayer(playerId);
   const chess = getChess(true);
 
   return games.map((game) => {
@@ -90,8 +88,8 @@ export const getGamesByPlayerId = async (playerId: string, db: ChessClubDatabase
   });
 };
 
-export const getBoardByGameId = async (gameId, db: ChessClubDatabase) => {
-  const game = await db.getGameByGameId(gameId);
+export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
+  const game = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
     return null;
