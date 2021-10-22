@@ -1,5 +1,3 @@
-import { IToken } from "./account";
-
 export interface IPlayer {
   playerId: string
   username: string
