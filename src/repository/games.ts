@@ -21,17 +21,20 @@ export const getGameByGameId = async (gameId): Promise<IGame> => {
 };
 
 export const insertNewGame = async(fen: string, playerOne: string, playerTwo: string): Promise<string> => {
-  const [gameId]: string[] = await Promise.all([
-    pgClient('chess_club.tbl_game').insert({
-      fen,
-      player_one: playerOne,
-      player_two: playerTwo
-    }).returning('game_id'),
+  const [gameId]: string[] = await pgClient('chess_club.tbl_game').insert({
+    fen,
+    player_one: playerOne,
+    player_two: playerTwo
+  }).returning('game_id');
+
+   await Promise.all([
     await pgClient('chess_club.tbl_players_games').insert({
+      game_id: gameId,
       player_id: playerOne,
       player_color: 'w'
     }),
     await pgClient('chess_club.tbl_players_games').insert({
+      game_id: gameId,
       player_id: playerTwo,
       player_color: 'b'
     })

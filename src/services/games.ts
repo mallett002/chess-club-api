@@ -24,7 +24,7 @@ export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
   const fen = chess.fen();
   const turn = chess.turn();
 
-  const [gameId] = await gamesRepository.insertNewGame(
+  const gameId = await gamesRepository.insertNewGame(
     fen,
     playerOne,
     playerTwo,
