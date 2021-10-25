@@ -1,6 +1,6 @@
-import knex from 'knex';
+const knex = require('knex');
 
-let client;
+let pgClient;
 
 const knexConfig = {
   client: 'pg',
@@ -11,14 +11,17 @@ const knexConfig = {
   }
 };
 
-export const getPgTestClient = () => {
-  if (!client) {
-    client = knex(knexConfig);
+const getPgTestClient = async () => {
+  if (!pgClient) {
+    pgClient = knex(knexConfig);
   }
 
-  return client;
+  const records = await pgClient('chess_club.tbl_player');
+
+  console.log({records});
+  return pgClient;
 };
 
-beforeAll(() => {
-  getPgTestClient();
+beforeAll(async () => {
+  await getPgTestClient();
 });
