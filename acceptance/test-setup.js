@@ -1,27 +1,32 @@
-const knex = require('knex');
+const { Client } = require('pg');
 
-let pgClient;
-
-const knexConfig = {
-  client: 'pg',
-  connection: {
-    "database": "chess-club-api",
-    "password": "chess_club_api_ps",
-    "user": "chess_club_api"
-  }
-};
+let pgTestClient;
 
 const getPgTestClient = async () => {
-  if (!pgClient) {
-    pgClient = knex(knexConfig);
+  if (!pgTestClient) {
+    pgTestClient = new Client({
+      user: 'chess_club_api',
+      host: 'localhost',
+      database: 'chess-club-api',
+      password: 'chess_club_api_ps',
+      port: 5432,
+    });
+    
+    await pgTestClient.connect();
   }
 
-  const records = await pgClient('chess_club.tbl_player');
-
-  console.log({records});
-  return pgClient;
+  return pgTestClient;
 };
 
-beforeAll(async () => {
+beforeAll(async() => {
   await getPgTestClient();
 });
+
+afterAll(() => {
+  pgTestClient.end();
+});
+
+
+module.exports = {
+  getPgTestClient
+};
