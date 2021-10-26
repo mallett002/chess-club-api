@@ -1,6 +1,7 @@
 import {gql, GraphQLClient} from 'graphql-request';
-
+import { createRandomPlayerPayload } from '../factories/player';
 import {graphqlUrl} from '../utils';
+import { deletePlayers } from '../utils/db';
 
 describe('create player', () => {
   const createPlayerMutation = gql`
@@ -13,15 +14,15 @@ describe('create player', () => {
 
   let gqlClient;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     gqlClient = new GraphQLClient(graphqlUrl);
+
+    await deletePlayers();
   });
 
   it('should be able to create a player', async () => {
-    const response = await gqlClient.request(createPlayerMutation, {
-      username: 'billy',
-      password: 'password'
-    });
+    const createPlayerPayload = createRandomPlayerPayload();
+    const response = await gqlClient.request(createPlayerMutation, createPlayerPayload);
     console.log({response});
 
     expect(response).not.toBeNull();

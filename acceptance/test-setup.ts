@@ -2,7 +2,7 @@ const { Client } = require('pg');
 
 let pgTestClient;
 
-const getPgTestClient = async () => {
+export const getPgTestClient = async () => {
   if (!pgTestClient) {
     pgTestClient = new Client({
       user: 'chess_club_api',
@@ -25,7 +25,6 @@ beforeAll(async() => {
 afterAll(() => {
   pgTestClient.end();
 });
-
 
 module.exports = {
   getPgTestClient
