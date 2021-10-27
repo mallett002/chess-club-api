@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-// TODO: PULL THIS IN FROM AN ENV VAR
 import { PRIVATE_KEY } from './constants';
 
 export const decodeToken = (bearerToken) => {
