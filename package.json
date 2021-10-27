@@ -9,7 +9,8 @@
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon dist/index.js",
-    "test": "cd acceptance && npm test"
+    "test": "cd acceptance && npm test",
+    "verify": "npm run docker:start && npm test"
   },
   "repository": {
     "type": "git",
