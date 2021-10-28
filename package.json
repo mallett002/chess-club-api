@@ -8,6 +8,7 @@
     "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
+    "health": "node ./scripts/health.js",
     "start": "tsc && nodemon dist/index.js",
     "test": "cd acceptance && npm test",
     "verify": "npm run docker:start && npm test"
