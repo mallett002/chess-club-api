@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 import { IPlayer } from '../../interfaces/player';
 import { insertNewPlayer } from '../../repository/player';

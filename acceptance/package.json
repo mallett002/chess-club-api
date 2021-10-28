@@ -1,0 +1,28 @@
+{
+  "name": "acceptance",
+  "license": "ISC",
+  "version": "1.0.0",
+  "description": "Accceptance tests",
+  "scripts": {
+    "test": "npm i && jest acceptance -i",
+    "acceptance": "jest acceptance -i"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-typescript": "^7.15.0",
+    "@types/jest": "^27.0.2",
+    "chance": "^1.1.7",
+    "graphql": "15.6.1",
+    "graphql-request": "3.6.1",
+    "jest": "^27.0.6",
+    "jest-serial-runner": "1.2.0",
+    "jsonwebtoken": "8.5.1",
+    "pg": "8.7.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.ts"
+    ]
+  }
+}

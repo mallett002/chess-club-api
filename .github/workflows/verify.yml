@@ -1,4 +1,4 @@
-name: Unit
+name: Verify
 
 on:
   push:
@@ -9,9 +9,8 @@ on:
       - master
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -19,4 +18,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm test
+    - run: echo "todo: start:docker (add health checking for starting ATs); run ATs (npm t)"
