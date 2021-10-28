@@ -9,23 +9,13 @@ on:
       - master
 
 jobs:
-  fs-check:
-    runs-on: ubuntu-latest
-      steps:
-        - run: printenv $GITHUB_WORKSPACE
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: joshuaavalon/flyway-action@v1
-      with:
-        url: jdbc:postgresql://127.0.0.1:5432/chess-club-api
-        user: flyway
-        password: flyway_ps
-        locations: filesystem:$GITHUB_WORKSPACE/infrastructure/migrations
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm run verify
+    - run: npm run docker:start && curl http://localhost:4000/health
