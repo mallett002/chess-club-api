@@ -18,4 +18,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm run docker:start && curl http://localhost:4000/health
+    - run: echo "todo: start:docker (add health checking for starting ATs); run ATs (npm t)"
