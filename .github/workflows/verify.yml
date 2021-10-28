@@ -19,7 +19,7 @@ jobs:
         url: jdbc:postgresql://127.0.0.1:5432/chess-club-api
         user: flyway
         password: flyway_ps
-        locations: filesystem:infrastructure/migrations
+        locations: filesystem:GITHUB_WORKSPACE/infrastructure/migrations
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
