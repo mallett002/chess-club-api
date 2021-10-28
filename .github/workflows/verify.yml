@@ -9,9 +9,12 @@ on:
       - master
 
 jobs:
+  fs-check:
+    runs-on: ubuntu-latest
+      steps:
+        - run: printenv $GITHUB_WORKSPACE
   test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: joshuaavalon/flyway-action@v1
