@@ -5,6 +5,6 @@ import loginHandler from './handlers/login';
 
 
 export const applyServerRoutes = (app) => {
-  app.get('/health', passport.authenticate('jwt', {session: false}), healthHandler);
+  app.get('/health', healthHandler);
   app.post('/login', loginHandler);
 };

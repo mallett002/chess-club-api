@@ -5,12 +5,14 @@
   "main": "dist/index.js",
   "scripts": {
     "docker:start": "docker-compose up --build -d && npm run migrate",
-    "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
+    "docker:infra": "docker-compose up --build -d chess-club-db && && npm run docker:health && npm run migrate",
+    "docker:health": "node --experimental-modules scripts/health.mjs",
     "docker:stop": "docker-compose down",
     "migrate": "./scripts/flyway-migrate.sh",
-    "start": "tsc && nodemon dist/index.js",
+    "health": "node ./scripts/health.js",
+    "start": "tsc && nodemon --experimental-modules dist/index.js",
     "test": "cd acceptance && npm test",
-    "verify": "npm run docker:start && npm test"
+    "verify": "npm run docker:start && npm run docker:health && npm test"
   },
   "repository": {
     "type": "git",
@@ -36,6 +38,7 @@
     "graphql-subscriptions": "^1.2.1",
     "graphql-ws": "^5.5.0",
     "jsonwebtoken": "^8.5.1",
+    "node-fetch": "^3.0.0",
     "nodemon": "^2.0.7",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
