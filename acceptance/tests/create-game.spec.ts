@@ -3,7 +3,8 @@ import {gql, GraphQLClient} from 'graphql-request';
 import { createRandomPlayerPayload } from '../factories/player';
 import {graphqlUrl} from '../utils';
 import { deleteGames, deletePlayers, selectPlayerByUsername } from '../utils/db';
-import { decodeToken, getJwtForPlayer } from '../utils/token-utils';
+import { createDBPlayer } from '../utils/player-repository';
+import { getJwtForPlayer } from '../utils/token-utils';
 
 describe('create player', () => {
   const createGameMutation = gql`
@@ -17,32 +18,38 @@ describe('create player', () => {
         }
   `;
 
-  let gqlClient;
+  let gqlClient,
+      playerOne,
+      playerTwo;
 
   beforeEach(async () => {
-    const player = createRandomPlayerPayload();
-    const dbPlayer = createDBPlayer(player);
-    const userJwt = await getJwtForPlayer(player);
+    await deletePlayers();
+    await deleteGames();
+
+    const playerOnePayload = createRandomPlayerPayload();
+    const playerTwoPayload = createRandomPlayerPayload();
+
+    [playerOne, playerTwo] = await Promise.all([
+      createDBPlayer(playerOnePayload),
+      createDBPlayer(playerTwoPayload)
+    ]);
+    const userJwt = await getJwtForPlayer(playerOnePayload);
 
     gqlClient = new GraphQLClient(graphqlUrl, {
       headers: {
         authorization: `Bearer ${userJwt}`
       }
     });
-
-    await deletePlayers();
-    await deleteGames();
   });
 
   it('should be able to create a game', async () => {
-    const createPlayerPayload = createRandomPlayerPayload();
-    const response = await gqlClient.request(createPlayerMutation, createPlayerPayload);
-    const decodedToken = decodeToken(response.createPlayer.token);
-    const dbPlayer = await selectPlayerByUsername(decodedToken.sub);
+    const response = await gqlClient.request(createGameMutation, {
+      playerOne: playerOne.player_id,
+      playerTwo: playerTwo.player_id
+    });
 
+    expect(response.createGame.gameId).toBeDefined();
     expect(response.errors).toBeUndefined();
-    expect(decodedToken.sub).toStrictEqual(createPlayerPayload.username);
-    expect(dbPlayer.username).toStrictEqual(createPlayerPayload.username);
   });
 
   // it('should throw a validation error if no username is provided', async () => {

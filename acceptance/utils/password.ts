@@ -1,3 +1,3 @@
-export const encryptPassword = (plainTextPassword) => {
-  // todo: use bcrypt to encrypt it here
-};
+import bcrypt from 'bcryptjs';
+
+export const encryptPassword = (plainTextPassword) => bcrypt.hash(plainTextPassword, 10);

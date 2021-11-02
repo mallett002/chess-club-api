@@ -22,5 +22,6 @@ export const getJwtForPlayer = async (player) => {
   const json = await response.json();
   console.log({jsonIs: json});
   
-  return json.token;
+  return json;
+  // return json.token;
 };
