@@ -29,6 +29,7 @@
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!node-fetch)/.*"
-    ]
+    ],
+    "testTimeout": 15000
   }
 }

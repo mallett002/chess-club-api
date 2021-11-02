@@ -17,6 +17,9 @@ export const insertNewPlayer = async (username: string, password: string): Promi
 };
 
 export const selectPlayerByUsername = async (username: string): Promise<IPlayerDTO | null> => {
+  // This is undefined....
+  console.log({usernameInSelect: username});
+  
   const [player]: IPlayerDTO[] = await pgClient('chess_club.tbl_player').where('username', username);
 
   if (!player) {

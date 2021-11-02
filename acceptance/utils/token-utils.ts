@@ -11,6 +11,8 @@ export const decodeToken = (bearerToken) => {
 };
 
 export const getJwtForPlayer = async (player) => {
+  console.log('here..');
+  try {
   const response = await fetch(`${chessClubBaseUrl}/login`, {
     body: JSON.stringify({
       username: player.username,
@@ -18,10 +20,15 @@ export const getJwtForPlayer = async (player) => {
     }),
     method: 'POST'
   });
+  console.log({response});
+  
 
   const json = await response.json();
   console.log({jsonIs: json});
   
-  return json;
+  return json;} catch(error) {
+    console.log({error});
+    
+  } 
   // return json.token;
 };

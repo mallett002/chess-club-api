@@ -33,7 +33,11 @@ describe('create player', () => {
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
+
     const userJwt = await getJwtForPlayer(playerOnePayload);
+
+    console.log({userJwt});
+    
 
     gqlClient = new GraphQLClient(graphqlUrl, {
       headers: {
