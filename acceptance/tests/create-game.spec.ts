@@ -54,27 +54,30 @@ describe('create player', () => {
     expect(response.errors).toBeUndefined();
   });
 
-  // it('should throw a validation error if no username is provided', async () => {
-  //   const createPlayerPayload = createRandomPlayerPayload({username: null});
+  it('should throw a validation error if a playerId is missing', async () => {
+    try {
+      await gqlClient.request(createGameMutation, {
+        playerOne: playerOne.player_id
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain('Variable \"$playerTwo\" of required type \"ID!\" was not provided.');
+    }
+  });
 
-  //   try {
-  //     await gqlClient.request(createPlayerMutation, createPlayerPayload);
-  //     throw new Error('Should have failed.');
-  //   } catch (error) {
-  //     expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-  //     expect(error.message).toContain('Variable \"$username\" of non-null type \"String!\" must not be null.');
-  //   }
-  // });
+  it('should throw an auth erorr if not authenticated', async () => {
+    gqlClient = new GraphQLClient(graphqlUrl);
 
-  // it('should throw a validation error if no password is provided', async () => {
-  //   const createPlayerPayload = createRandomPlayerPayload({password: null});
-
-  //   try {
-  //     await gqlClient.request(createPlayerMutation, createPlayerPayload);
-  //     throw new Error('Should have failed.');
-  //   } catch (error) {
-  //     expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-  //     expect(error.message).toContain('Variable \"$password\" of non-null type \"String!\" must not be null.');
-  //   }
-  // });
+    try {
+      await gqlClient.request(createGameMutation, {
+        playerOne: playerOne.player_id,
+        playerTwo: playerTwo.player_id
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
+      expect(error.message).toContain('You must be logged in.');
+    }
+  });
 });
