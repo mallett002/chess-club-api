@@ -1,8 +1,8 @@
-import {gql, GraphQLClient} from 'graphql-request';
+import { gql, GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
-import {graphqlUrl} from '../utils';
-import { deleteGames, deletePlayers, selectPlayerByUsername } from '../utils/db';
+import { graphqlUrl } from '../utils';
+import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
@@ -19,12 +19,13 @@ describe('create player', () => {
   `;
 
   let gqlClient,
-      playerOne,
-      playerTwo;
+    playerOne,
+    playerTwo;
 
   beforeEach(async () => {
-    await deletePlayers();
+    await deletePlayersGames();
     await deleteGames();
+    await deletePlayers();
 
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
@@ -36,12 +37,9 @@ describe('create player', () => {
 
     const userJwt = await getJwtForPlayer(playerOnePayload);
 
-    console.log({userJwt});
-    
-
     gqlClient = new GraphQLClient(graphqlUrl, {
       headers: {
-        authorization: `Bearer ${userJwt}`
+        authorization: userJwt
       }
     });
   });
