@@ -1,4 +1,5 @@
 import { gql, GraphQLClient } from 'graphql-request';
+import Chance from 'chance';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
@@ -6,7 +7,32 @@ import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername 
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
+const chance = new Chance();
+
 describe('get board', () => {
+  const updateBoardMutation = gql`
+    mutation updateBoard($gameId: ID!, $cell: String!) {
+          updateBoard(gameId: $gameId, cell: $cell) {
+            gameId
+            playerOne
+            playerTwo
+            turn
+            moves {
+              color
+              from
+              to
+              flags
+              piece
+              san
+            }
+            positions {
+              type
+              color
+              label
+            }
+          }
+        }
+  `;
   const getBoardQuery = gql`
     query GetBoard($gameId: ID!){
       getBoard(gameId: $gameId) {
@@ -43,6 +69,7 @@ describe('get board', () => {
   let gqlClient,
     playerOne,
     playerTwo,
+    board,
     gameId;
 
   beforeEach(async () => {
@@ -66,30 +93,55 @@ describe('get board', () => {
       }
     });
 
-    const response = await gqlClient.request(createGameMutation, {
+    const createGameResponse = await gqlClient.request(createGameMutation, {
       playerOne: playerOne.player_id,
       playerTwo: playerTwo.player_id
     });
 
-    gameId = response.createGame.gameId;
+    gameId = createGameResponse.createGame.gameId;
+
+    const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
+
+    board = getBoardResponse.getBoard;
   });
 
-  it('should be able to get a board', async () => {
-    const response = await gqlClient.request(getBoardQuery, { gameId });
+  it('should be able to update the board various times, taking turns', async () => {
+    const moveCount = chance.natural({
+      max: 10,
+      min: 3
+    });
+    
+    for (let i = 0; i < moveCount; i++) {
+      const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
 
-    expect(response.getBoard.errors).toBeUndefined();
-    expect(response.getBoard.gameId).toStrictEqual(gameId);
-    expect(response.getBoard.turn).toStrictEqual('w');
-    expect(response.getBoard.moves).toBeDefined();
-    expect(response.getBoard.positions).toBeDefined();
+      board = getBoardResponse.getBoard;
+
+      const turns = ['w', 'b'];
+      const expectedTurn = turns.find((turn) => turn !== board.turn);
+      const randomMove = chance.pickone(board.moves);
+      const response = await gqlClient.request(updateBoardMutation,{
+        gameId,
+        cell: randomMove.san
+      });
+
+      expect(response.updateBoard.errors).toBeUndefined();
+      expect(response.updateBoard.gameId).toStrictEqual(gameId);
+      expect(response.updateBoard.turn).toStrictEqual(expectedTurn);
+      expect(response.updateBoard.moves).toBeDefined();
+      expect(response.updateBoard.positions).toBeDefined();
+    }
   });
-
 
   it('should throw an auth error if not authenticated', async () => {
     gqlClient = new GraphQLClient(graphqlUrl);
 
+    const randomMove = chance.pickone(board.moves);
+
     try {
-      await gqlClient.request(getBoardQuery, { gameId });
+      await gqlClient.request(updateBoardMutation,{
+        gameId,
+        cell: randomMove.san
+      });
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
@@ -97,13 +149,13 @@ describe('get board', () => {
     }
   });
 
-  it('should throw a validation error if a gameId is missing', async () => {
+  it('should throw a validation error if the cell arg is missing', async () => {
     try {
-      await gqlClient.request(getBoardQuery);
+      await gqlClient.request(updateBoardMutation, { gameId });
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-      expect(error.message).toContain('Variable \"$gameId\" of required type \"ID!\" was not provided.');
+      expect(error.message).toContain('Variable \"$cell\" of required type \"String!\" was not provided.');
     }
   });
 });
