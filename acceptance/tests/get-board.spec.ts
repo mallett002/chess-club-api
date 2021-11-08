@@ -6,7 +6,29 @@ import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername 
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-describe('create game', () => {
+describe('get board', () => {
+  const getBoardQuery = gql`
+    query GetBoard($gameId: ID!){
+      getBoard(gameId: $gameId) {
+        gameId
+        moves {
+          color
+          from
+          to
+          flags
+          piece
+          san
+        }
+        playerOne
+        playerTwo
+        positions{
+          type
+          color
+          label
+        }
+        turn
+      }
+  }`;
   const createGameMutation = gql`
     mutation createGame($playerOne: ID!, $playerTwo: ID!) {
           createGame(playerOne: $playerOne, playerTwo: $playerTwo) {
@@ -16,11 +38,12 @@ describe('create game', () => {
             turn
           }
         }
-  `;
+`;
 
   let gqlClient,
     playerOne,
-    playerTwo;
+    playerTwo,
+    gameId;
 
   beforeEach(async () => {
     await deletePlayersGames();
@@ -42,42 +65,45 @@ describe('create game', () => {
         authorization: userJwt
       }
     });
-  });
 
-  it('should be able to create a game', async () => {
     const response = await gqlClient.request(createGameMutation, {
       playerOne: playerOne.player_id,
       playerTwo: playerTwo.player_id
     });
 
-    expect(response.createGame.gameId).toBeDefined();
-    expect(response.errors).toBeUndefined();
+    gameId = response.createGame.gameId;
   });
 
-  it('should throw a validation error if a playerId is missing', async () => {
-    try {
-      await gqlClient.request(createGameMutation, {
-        playerOne: playerOne.player_id
-      });
-      throw new Error('Should have failed.');
-    } catch (error) {
-      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-      expect(error.message).toContain('Variable \"$playerTwo\" of required type \"ID!\" was not provided.');
-    }
+  it('should be able to get a board', async () => {
+    const response = await gqlClient.request(getBoardQuery, { gameId });
+
+    expect(response.getBoard.errors).toBeUndefined();
+    expect(response.getBoard.gameId).toStrictEqual(gameId);
+    expect(response.getBoard.turn).toStrictEqual('w');
+    expect(response.getBoard.moves).toBeDefined();
+    expect(response.getBoard.positions).toBeDefined();
   });
+
 
   it('should throw an auth erorr if not authenticated', async () => {
     gqlClient = new GraphQLClient(graphqlUrl);
 
     try {
-      await gqlClient.request(createGameMutation, {
-        playerOne: playerOne.player_id,
-        playerTwo: playerTwo.player_id
-      });
+      await gqlClient.request(getBoardQuery, { gameId });
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
       expect(error.message).toContain('You must be logged in.');
+    }
+  });
+
+  it('should throw a validation error if a gameId is missing', async () => {
+    try {
+      await gqlClient.request(getBoardQuery);
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain('Variable \"$gameId\" of required type \"ID!\" was not provided.');
     }
   });
 });
