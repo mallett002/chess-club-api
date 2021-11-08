@@ -66,7 +66,7 @@ describe('create game', () => {
     }
   });
 
-  it('should throw an auth erorr if not authenticated', async () => {
+  it('should throw an auth error if not authenticated', async () => {
     gqlClient = new GraphQLClient(graphqlUrl);
 
     try {
