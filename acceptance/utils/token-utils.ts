@@ -1,13 +1,13 @@
 import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';
 
-import { PRIVATE_KEY } from './constants';
+import { TOKEN_PRIVATE_KEY } from './constants';
 import {chessClubBaseUrl} from './index';
 
 export const decodeToken = (bearerToken) => {
   const [, accessToken] = bearerToken.split(' ');
 
-  return jwt.verify(accessToken, PRIVATE_KEY);
+  return jwt.verify(accessToken, TOKEN_PRIVATE_KEY);
 };
 
 export const getJwtForPlayer = async (player) => {

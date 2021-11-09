@@ -3,5 +3,6 @@
     "database": "chess-club-api",
     "password": "chess_club_api_ps",
     "user": "chess_club_api"
-  }
+  },
+  "tokenPrivateKey": "local-private-key"
 }
