@@ -1,13 +1,12 @@
+import config from 'config';
 import passport from 'passport';
 import {Strategy as JwtStrategy} from 'passport-jwt';
 import {ExtractJwt} from 'passport-jwt';
 
-import { PRIVATE_KEY } from '../../constants';
-
 export const configureAuthStrategies = () => {
   passport.use(new JwtStrategy({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: PRIVATE_KEY,
+      secretOrKey: config.get('tokenPrivateKey'),
       algorithms: ['HS256']
     }, async (payload, done) => {
         try {

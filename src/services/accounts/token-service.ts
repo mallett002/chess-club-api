@@ -1,6 +1,6 @@
+import config from 'config';
 import jwt from 'jsonwebtoken';
 
-import { PRIVATE_KEY } from '../../constants';
 import { IToken } from '../../interfaces/account';
 
 export const getToken = (username: string, playerId: string): IToken => {
@@ -11,7 +11,7 @@ export const getToken = (username: string, playerId: string): IToken => {
     iat: Date.now()
   };
 
-  const signedToken = jwt.sign(payload, PRIVATE_KEY, {expiresIn});
+  const signedToken = jwt.sign(payload, config.get('tokenPrivateKey'), {expiresIn});
 
   return {
     token: "Bearer " + signedToken,
@@ -32,7 +32,7 @@ export const verifyToken = (context: IToken): string | jwt.JwtPayload | null => 
   const accessToken = getTokenFromHeaders(context.token);
 
   try {
-    return jwt.verify(accessToken, PRIVATE_KEY);
+    return jwt.verify(accessToken, config.get('tokenPrivateKey'));
   } catch {
     return null;   
   }

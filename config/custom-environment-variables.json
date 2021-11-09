@@ -2,5 +2,6 @@
   "chess_club_db": {
     "host": "POSTGRES_HOST",
     "port": "POSTGRES_PORT"
-  }
+  },
+  "tokenPrivateKey": "TOKEN_PRIVATE_KEY"
 }

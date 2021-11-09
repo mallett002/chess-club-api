@@ -1,2 +1,1 @@
-// TODO: PULL THIS IN FROM AN ENV VAR
-export const PRIVATE_KEY = 'some-private-key';
+export const TOKEN_PRIVATE_KEY = 'local-private-key';
