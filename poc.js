@@ -1,12 +1,18 @@
-// playing with this library for learning
-// import chessJs from 'chess.js';
 const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
-chess.load('rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1');
+chess.move('c3');
+chess.move('d6');
+chess.move('a4');
 
-console.log(chess.moves());
+console.log(chess.ascii());
+console.log(chess.turn());
+// console.log(chess.moves({verbose: true}));
+
+// chess.load('rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1');
+
+// console.log(chess.moves());
 
 // chess.move('a4');
 // chess.move('Nc6'); // if special piece, need to prepend its letter
