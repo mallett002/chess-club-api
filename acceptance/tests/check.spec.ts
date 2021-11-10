@@ -52,6 +52,10 @@ describe('get board', () => {
           color
           label
         }
+        status {
+          inCheck
+          inCheckmate
+        }
         turn
       }
   }`;
@@ -102,23 +106,45 @@ describe('get board', () => {
   });
 
   // const status = {
-  //   isCheck: true,
-  //   checkMate: false,
+  //   inCheck: true,
+  //   inCheckmate: false,
   //   stalemate: false,
   //   threeFoldRep: false,
   //   draw: false
   // }
 
-  it('should be able to put a player in check', async () => {
+  it('should handle when not in check', async () => {
     await gqlClient.request(updateBoardMutation, { gameId, cell: 'c3' });
-    await gqlClient.request(updateBoardMutation, { gameId, cell: 'd6' });
-    await gqlClient.request(updateBoardMutation, { gameId, cell: 'a4' });
 
     const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
 
     expect(getBoard.errors).toBeUndefined();
-    expect(getBoard.status.isCheck).toStrictEqual(true);
-    expect(getBoard.status.isCheckMate).toStrictEqual(false);
+    expect(getBoard.status.inCheck).toStrictEqual(false);
+    expect(getBoard.status.inCheckmate).toStrictEqual(false);
   });
 
+  it('should be able to put a player in check', async () => {
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'c3' });
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'd6' });
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'Qa4+' });
+
+    const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
+
+    expect(getBoard.errors).toBeUndefined();
+    expect(getBoard.status.inCheck).toStrictEqual(true);
+    expect(getBoard.status.inCheckmate).toStrictEqual(false);
+  });
+
+  // it('should be able to put a player in checkmate', async () => {
+  //   // TODO: do some moves that put in checkmate
+  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'c3' });
+  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'd6' });
+  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'a4' });
+
+  //   const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
+
+  //   expect(getBoard.errors).toBeUndefined();
+  //   expect(getBoard.status.isCheck).toStrictEqual(false);
+  //   expect(getBoard.status.isCheckMate).toStrictEqual(true);
+  // });
 });

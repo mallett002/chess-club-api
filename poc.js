@@ -4,7 +4,10 @@ const chess = new chessJs.Chess();
 
 chess.move('c3');
 chess.move('d6');
-chess.move('a4');
+// console.log(chess.moves({verbose: true}))
+chess.move('Qa4+');
+const inCheck = chess.in_check();
+console.log({inCheck});
 
 console.log(chess.ascii());
 console.log(chess.turn());
