@@ -16,12 +16,18 @@ export const typeDefs = buildSchema(`
     san: String
   }
 
+  type GameStatus {
+    inCheck: Boolean
+    inCheckmate: Boolean
+  }
+
   type Board {
     gameId: ID!
     moves: [Move]
     playerOne: String!
     playerTwo: String!
     positions: [Cell]!
+    status: GameStatus!
     turn: String
   }
 

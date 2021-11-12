@@ -1,3 +1,8 @@
+interface IGameStatus {
+  inCheck: boolean
+  inCheckmate: boolean
+}
+
 export interface IMove {
   color: string
   from: string
@@ -19,5 +24,6 @@ export interface IBoard {
   playerOne: string
   playerTwo: string
   positions: IPosition[]
+  status: IGameStatus
   turn: string
 }

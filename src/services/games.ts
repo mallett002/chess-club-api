@@ -36,6 +36,10 @@ export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
     playerOne,
     playerTwo,
     positions: flattenPositions(chess.board()),
+    status: {
+      inCheck: chess.in_check(),
+      inCheckmate: chess.in_checkmate()
+    },
     turn
   };
 
@@ -64,6 +68,10 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
+    status: {
+      inCheck: chess.in_check(),
+      inCheckmate: chess.in_checkmate()
+    },
     turn: chess.turn()
   };
 
@@ -105,6 +113,10 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
+    status: {
+      inCheck: chess.in_check(),
+      inCheckmate: chess.in_checkmate()
+    },
     turn: chess.turn()
   };
 };
