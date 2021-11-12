@@ -6,7 +6,6 @@ import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername 
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-
 describe('get board', () => {
   const updateBoardMutation = gql`
     mutation updateBoard($gameId: ID!, $cell: String!) {
@@ -53,6 +52,7 @@ describe('get board', () => {
         status {
           inCheck
           inCheckmate
+          inThreefoldRepetition
         }
         turn
       }
@@ -144,4 +144,26 @@ describe('get board', () => {
     expect(getBoard.status.inCheck).toStrictEqual(true);
     expect(getBoard.status.inCheckmate).toStrictEqual(true);
   });
+
+  /*
+    Threefold repetition won't work with the current implementation since I'm creating a new chess
+    instance on each board update. This could be added once I start recording moves. I can just check
+    if the game has 3 matching records for the FEN.
+  */
+  // it('should be able to handle threefold repetition', async () => {
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Nf3' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Nf6' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Ng1' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Ng8' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Nf3' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Nf6' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Ng1' });
+  //   await gqlClient.request(updateBoardMutation, { gameId, cell: 'Ng8' });
+
+  //   const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
+
+  //   expect(getBoard.errors).toBeUndefined();
+  //   expect(getBoard.status.inCheck).toStrictEqual(false);
+  //   expect(getBoard.status.inThreefoldRepetition).toStrictEqual(true);
+  // });
 });
