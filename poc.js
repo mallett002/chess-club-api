@@ -2,11 +2,13 @@ const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
-chess.move('c3');
-chess.move('d6');
-// console.log(chess.moves({verbose: true}))
-chess.move('Qa4+');
-const inCheck = chess.in_check();
+chess.move('g4');
+chess.move('e5');
+chess.move('f3');
+console.log(chess.moves({verbose: true}).filter((m) => m.san.includes('#')).length)
+chess.move('Qh4#');
+
+const inCheck = chess.in_checkmate();
 console.log({inCheck});
 
 console.log(chess.ascii());

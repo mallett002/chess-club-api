@@ -1,5 +1,4 @@
 import { gql, GraphQLClient } from 'graphql-request';
-import Chance from 'chance';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
@@ -7,7 +6,6 @@ import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername 
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-const chance = new Chance();
 
 describe('get board', () => {
   const updateBoardMutation = gql`
@@ -73,7 +71,6 @@ describe('get board', () => {
   let gqlClient,
     playerOne,
     playerTwo,
-    board,
     gameId;
 
   beforeEach(async () => {
@@ -135,16 +132,16 @@ describe('get board', () => {
     expect(getBoard.status.inCheckmate).toStrictEqual(false);
   });
 
-  // it('should be able to put a player in checkmate', async () => {
-  //   // TODO: do some moves that put in checkmate
-  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'c3' });
-  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'd6' });
-  //   // await gqlClient.request(updateBoardMutation, { gameId, cell: 'a4' });
+  it('should be able to put a player in checkmate', async () => {
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'g4' });
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'e5' });
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'f3' });
+    await gqlClient.request(updateBoardMutation, { gameId, cell: 'Qh4#' });
 
-  //   const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
+    const {getBoard} = await gqlClient.request(getBoardQuery, { gameId });
 
-  //   expect(getBoard.errors).toBeUndefined();
-  //   expect(getBoard.status.isCheck).toStrictEqual(false);
-  //   expect(getBoard.status.isCheckMate).toStrictEqual(true);
-  // });
+    expect(getBoard.errors).toBeUndefined();
+    expect(getBoard.status.inCheck).toStrictEqual(true);
+    expect(getBoard.status.inCheckmate).toStrictEqual(true);
+  });
 });
