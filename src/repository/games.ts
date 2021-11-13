@@ -27,18 +27,12 @@ export const deleteGameDataByGameId = async (gameId: string): Promise<string> =>
     return null;
   }
 
-  const deletedGameId = await pgClient('chess_club.tbl_game')
+  const [deletedGameId]: string[] = await pgClient('chess_club.tbl_game')
     .where('game_id', gameId)
     .del()
     .returning('game_id');
 
-    console.log({deletedGameId});
-    
-
-  const [foundGame] = await pgClient('chess_club.tbl_game').where('game_id', gameId);
-
-  console.log({foundGame});
-
+  return deletedGameId;
 };
 
 export const insertNewGame = async(fen: string, playerOne: string, playerTwo: string): Promise<string> => {

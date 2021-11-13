@@ -69,8 +69,8 @@ describe('end game', () => {
     expect(response.endGame).toStrictEqual(gameId);
     expect(response.errors).toBeUndefined();
 
-    // const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
+    const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
 
-    // expect(getBoardResponse.getBoard).toBeNull();
+    expect(getBoardResponse.getBoard).toBeNull();
   });
 });
