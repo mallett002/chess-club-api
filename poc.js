@@ -2,7 +2,8 @@ const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
-chess.load('4k3/4P3/4K3/8/8/8/8/8 b - - 0 78');
+
+chess.load('k7/8/n7/8/8/8/8/7K b - - 0 1');
 
 console.log({
   inCheck: chess.in_check(),
@@ -11,6 +12,8 @@ console.log({
   in_stalemate: chess.in_stalemate(),
   insufficient_material: chess.insufficient_material(),
 });
+
+console.log(chess.ascii());
 
 // console.log(chess.moves({verbose: true}));
 

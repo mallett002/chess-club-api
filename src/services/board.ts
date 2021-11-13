@@ -22,6 +22,8 @@ export const mapChessStatusToGameStatus = (chess): IGameStatus => {
     return IGameStatus.CHECKMATE;
   } else if (chess.in_check()) {
     return IGameStatus.CHECK;
+  } else if (chess.in_stalemate()){
+    return IGameStatus.STALEMATE;
   } else if (chess.in_draw()){
     return IGameStatus.DRAW;
   }
