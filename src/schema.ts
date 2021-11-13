@@ -21,6 +21,7 @@ export const typeDefs = buildSchema(`
     CHECK
     CHECKMATE
     DRAW
+    STALEMATE
   }
 
   type Board {

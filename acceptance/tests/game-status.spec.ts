@@ -138,7 +138,7 @@ const loadGameMutation = gql`
   });
 
   it('should be able to handle a draw', async () => {
-    const drawGameFen = "4k3/4P3/4K3/8/8/8/8/8 b - - 0 78";
+    const drawGameFen = "k7/8/n7/8/8/8/8/7K b - - 0 1";
     const {loadGame: {gameId: loadedGameId}} = await gqlClient.request(loadGameMutation, {
       playerOne: playerOne.player_id,
       playerTwo: playerTwo.player_id,
@@ -151,7 +151,19 @@ const loadGameMutation = gql`
     expect(getBoard.status).toStrictEqual('DRAW');
   });
 
-  
+  it('should be able to handle a stalemate', async () => {
+    const drawGameFen = "4k3/4P3/4K3/8/8/8/8/8 b - - 0 78";
+    const {loadGame: {gameId: loadedGameId}} = await gqlClient.request(loadGameMutation, {
+      playerOne: playerOne.player_id,
+      playerTwo: playerTwo.player_id,
+      fen: drawGameFen 
+    });
+
+    const {getBoard} = await gqlClient.request(getBoardQuery, { gameId: loadedGameId });
+
+    expect(getBoard.errors).toBeUndefined();
+    expect(getBoard.status).toStrictEqual('STALEMATE');
+  });
 
   /*
     Threefold repetition won't work with the current implementation since I'm creating a new chess

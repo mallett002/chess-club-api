@@ -2,7 +2,8 @@ export enum IGameStatus {
   CHECK = 'CHECK',
   CHECKMATE = 'CHECKMATE',
   DRAW = 'DRAW',
-  PLAY = 'PLAY'
+  PLAY = 'PLAY',
+  STALEMATE = 'STALEMATE'
 }
 
 export interface IMove {
