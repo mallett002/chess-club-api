@@ -2,11 +2,6 @@ name: Verify
 
 on:
   push:
-    branches:
-      - master    
-  pull_request:
-    branches:
-      - master
 
 jobs:
   test:
@@ -17,4 +12,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: echo do a verify once flyway is installed
+    - uses: joshuaavalon/flyway-action@v1
+      with:
+        url: jdbc:postgresql://postgres:5432/postgres
+        user: postgres
+        password: postgres
+    - run: npm run verify
