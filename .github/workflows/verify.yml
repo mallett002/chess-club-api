@@ -14,7 +14,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - uses: joshuaavalon/flyway-action@v1
       with:
-        url: jdbc:postgresql://postgres:5432/postgres
-        user: postgres
-        password: postgres
+        url: jdbc:postgresql://127.0.0.1:5432/chess-club-api
+        user: flyway
+        password: flyway_ps
+        filesystem: ./infrastructure/postgres
     - run: npm run verify
