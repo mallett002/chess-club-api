@@ -2,7 +2,7 @@ import {Chess} from 'chess.js';
 
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
-import { flattenPositions } from './board';
+import { flattenPositions, mapChessStatusToGameStatus } from './board';
 import { getChess } from './chess';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
@@ -36,10 +36,7 @@ export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
     playerOne,
     playerTwo,
     positions: flattenPositions(chess.board()),
-    status: {
-      inCheck: chess.in_check(),
-      inCheckmate: chess.in_checkmate()
-    },
+    status: mapChessStatusToGameStatus(chess),
     turn
   };
 
@@ -68,10 +65,7 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
-    status: {
-      inCheck: chess.in_check(),
-      inCheckmate: chess.in_checkmate()
-    },
+    status: mapChessStatusToGameStatus(chess),
     turn: chess.turn()
   };
 
@@ -97,7 +91,7 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => 
 };
 
 export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
-  const game = await gamesRepository.getGameByGameId(gameId);
+  const game: IGame = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
     return null;
@@ -113,10 +107,33 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
-    status: {
-      inCheck: chess.in_check(),
-      inCheckmate: chess.in_checkmate()
-    },
+    status: mapChessStatusToGameStatus(chess),
     turn: chess.turn()
   };
+};
+
+export const loadGame = async (playerOne, playerTwo, fen) => {
+  const chess = getChess(true);
+
+  chess.load(fen);
+
+  const gameId: string = await gamesRepository.insertNewGame(
+    fen,
+    playerOne,
+    playerTwo,
+  );
+
+  const board = {
+    gameId,
+    moves: chess.moves({ verbose: true }),
+    playerOne,
+    playerTwo,
+    positions: flattenPositions(chess.board()),
+    status: mapChessStatusToGameStatus(chess),
+    turn: chess.turn()
+  };
+
+  publishBoardUpdates(board);
+
+  return board;
 };

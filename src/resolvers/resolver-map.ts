@@ -4,6 +4,7 @@ import createGame from './create-game';
 import createPlayer from './create-player';
 import getGames from './get-games';
 import updateBoard from './update-board';
+import loadGame from './load-game';
 import getBoard from './get-board';
 import { BOARD_UPDATED } from '../constants';
 import { getPubSub } from '../services/pub-sub';
@@ -16,6 +17,7 @@ export const resolvers = {
   Mutation: {
     createGame,
     createPlayer,
+    loadGame,
     updateBoard
   },
   Subscription: {

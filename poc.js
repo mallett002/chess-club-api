@@ -2,18 +2,15 @@ const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
+chess.load('4k3/4P3/4K3/8/8/8/8/8 b - - 0 78');
 
-chess.move('Nf3')
-chess.move('Nf6')
-chess.move('Ng1')
-chess.move('Ng8')
-chess.move('Nf3')
-chess.move('Nf6')
-chess.move('Ng1')
-chess.move('Ng8')
-
-console.log(chess.in_threefold_repetition())
-
+console.log({
+  inCheck: chess.in_check(),
+  in_checkmate: chess.in_checkmate(),
+  inDraw: chess.in_draw(),
+  in_stalemate: chess.in_stalemate(),
+  insufficient_material: chess.insufficient_material(),
+});
 
 // console.log(chess.moves({verbose: true}));
 
