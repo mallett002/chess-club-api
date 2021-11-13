@@ -1,3 +1,4 @@
+import Chance from 'chance';
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
@@ -5,6 +6,8 @@ import { graphqlUrl } from '../utils';
 import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
+
+const chance = new Chance();
 
 describe('end game', () => {
   const createGameMutation = gql`
@@ -74,5 +77,10 @@ describe('end game', () => {
     expect(getBoardResponse.getBoard).toBeNull();
   });
 
-  it.todo('should be able to handle when a gameId is not found');
+  it('should be able to handle when a gameId is not found', async () => {
+    const response = await gqlClient.request(endGameMutation, { gameId: chance.guid() });
+
+    expect(response.endGame).toBeNull();
+    expect(response.errors).toBeUndefined();
+  });
 });
