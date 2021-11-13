@@ -8,6 +8,7 @@ import loadGame from './load-game';
 import getBoard from './get-board';
 import { BOARD_UPDATED } from '../constants';
 import { getPubSub } from '../services/pub-sub';
+import endGame from './end-game';
 
 export const resolvers = {
   Query: {
@@ -17,6 +18,7 @@ export const resolvers = {
   Mutation: {
     createGame,
     createPlayer,
+    endGame,
     loadGame,
     updateBoard
   },

@@ -137,3 +137,11 @@ export const loadGame = async (playerOne, playerTwo, fen) => {
 
   return board;
 };
+
+export const deleteGame = async (gameId: string): Promise<string> => {
+  const deletedGameId = await gamesRepository.deleteGameDataByGameId(gameId);
+  // delete game
+  // delete players games
+  return deletedGameId;
+  
+};
