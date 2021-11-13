@@ -73,4 +73,6 @@ describe('end game', () => {
 
     expect(getBoardResponse.getBoard).toBeNull();
   });
+
+  it.todo('should be able to handle when a gameId is not found');
 });
