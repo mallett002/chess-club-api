@@ -17,5 +17,4 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: echo "todo: start:docker (add health checking for starting ATs); run ATs (npm t)"
+    - run: echo do a verify once flyway is installed

@@ -20,6 +20,21 @@ export const getGameByGameId = async (gameId): Promise<IGame> => {
   return null;
 };
 
+export const deleteGameDataByGameId = async (gameId: string): Promise<string> => {
+  const [game] = await pgClient('chess_club.tbl_game').where('game_id', gameId);
+
+  if (!game) {
+    return null;
+  }
+
+  const [deletedGameId]: string[] = await pgClient('chess_club.tbl_game')
+    .where('game_id', gameId)
+    .del()
+    .returning('game_id');
+
+  return deletedGameId;
+};
+
 export const insertNewGame = async(fen: string, playerOne: string, playerTwo: string): Promise<string> => {
   const [gameId]: string[] = await pgClient('chess_club.tbl_game').insert({
     fen,
