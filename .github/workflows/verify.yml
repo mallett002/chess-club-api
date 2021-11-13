@@ -17,5 +17,5 @@ jobs:
         url: jdbc:postgresql://127.0.0.1:5432/chess-club-api
         user: flyway
         password: flyway_ps
-        filesystem: ./infrastructure/postgres
+        filesystem: locations=./infrastructure/postgres
     - run: npm run verify
