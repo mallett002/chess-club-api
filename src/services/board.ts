@@ -1,5 +1,5 @@
 import { indexToRank, indexToFile } from '../helpers/board';
-import { IPosition } from '../interfaces/board';
+import { IGameStatus, IPosition } from '../interfaces/board';
 
 export const flattenPositions = (positions): IPosition[] => {
   const flattenedPositions = [];
@@ -15,4 +15,16 @@ export const flattenPositions = (positions): IPosition[] => {
   }
 
   return flattenedPositions;
+};
+
+export const mapChessStatusToGameStatus = (chess): IGameStatus => {
+  if (chess.in_checkmate()) {
+    return IGameStatus.CHECKMATE;
+  } else if (chess.in_check()) {
+    return IGameStatus.CHECK;
+  } else if (chess.in_draw()){
+    return IGameStatus.DRAW;
+  }
+
+  return IGameStatus.PLAY;
 };

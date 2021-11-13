@@ -16,9 +16,11 @@ export const typeDefs = buildSchema(`
     san: String
   }
 
-  type GameStatus {
-    inCheck: Boolean
-    inCheckmate: Boolean
+  enum GameStatus {
+    PLAY
+    CHECK
+    CHECKMATE
+    DRAW
   }
 
   type Board {
@@ -55,6 +57,7 @@ export const typeDefs = buildSchema(`
   type Mutation {
     updateBoard(gameId: ID!, cell: String!): Board!
     createGame(playerOne: ID!, playerTwo: ID!): Board!
+    loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!
     createPlayer(username: String!, password: String!): Token!
   }
 

@@ -9,7 +9,7 @@ import { getJwtForPlayer } from '../utils/token-utils';
 
 const chance = new Chance();
 
-describe('get board', () => {
+describe('update board', () => {
   const updateBoardMutation = gql`
     mutation updateBoard($gameId: ID!, $cell: String!) {
           updateBoard(gameId: $gameId, cell: $cell) {

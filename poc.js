@@ -2,17 +2,16 @@ const chessJs = require('chess.js')
 
 const chess = new chessJs.Chess();
 
-chess.move('g4');
-chess.move('e5');
-chess.move('f3');
-console.log(chess.moves({verbose: true}).filter((m) => m.san.includes('#')).length)
-chess.move('Qh4#');
+chess.load('4k3/4P3/4K3/8/8/8/8/8 b - - 0 78');
 
-const inCheck = chess.in_checkmate();
-console.log({inCheck});
+console.log({
+  inCheck: chess.in_check(),
+  in_checkmate: chess.in_checkmate(),
+  inDraw: chess.in_draw(),
+  in_stalemate: chess.in_stalemate(),
+  insufficient_material: chess.insufficient_material(),
+});
 
-console.log(chess.ascii());
-console.log(chess.turn());
 // console.log(chess.moves({verbose: true}));
 
 // chess.load('rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1');

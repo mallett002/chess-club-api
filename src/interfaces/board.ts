@@ -1,6 +1,8 @@
-interface IGameStatus {
-  inCheck: boolean
-  inCheckmate: boolean
+export enum IGameStatus {
+  CHECK = 'CHECK',
+  CHECKMATE = 'CHECKMATE',
+  DRAW = 'DRAW',
+  PLAY = 'PLAY'
 }
 
 export interface IMove {
