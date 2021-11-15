@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 const maxRetries = 20;
 const backOffInMilis = 500;
