@@ -8,12 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js 12.16.1
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.16.1
-    - name: print node version
-      run: node --version
     - name: Install flyway
       run: |
         wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/7.14.0/flyway-commandline-7.14.0-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-7.14.0/flyway /usr/local/bin 
