@@ -12,10 +12,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - uses: joshuaavalon/flyway-action@v1
-      with:
-        url: jdbc:postgresql://127.0.0.1:5432/chess-club-api
-        user: flyway
-        password: flyway_ps
-        filesystem: locations=./infrastructure/postgres
+    - name: Install flyway
+      run: |
+        wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/7.14.0/flyway-commandline-7.14.0-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-7.14.0/flyway /usr/local/bin 
     - run: npm run verify
+    
