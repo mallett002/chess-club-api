@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import frisby from 'frisby';
 
 const maxRetries = 20;
 const backOffInMilis = 500;
@@ -25,7 +25,7 @@ async function isAppUpAndReady() {
   let response;
   
   try {
-    response = await fetch('http://localhost:4000/health');
+    response = await frisby.get('http://localhost:4000/health');
 
     if (!response.ok) {
       await retry();
