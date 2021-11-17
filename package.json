@@ -7,7 +7,7 @@
     "docker:start": "docker-compose up --build -d && npm run migrate",
     "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
     "restart:local": "npm run docker:stop && npm run docker:infra && npm start",
-    "health": "tsc && node --experimental-modules dist/scripts/health.js",
+    "health": "node dist/scripts/health.js",
     "docker:stop": "docker-compose down",
     "migrate": "sleep 10 && ./scripts/flyway-migrate.sh",
     "start": "tsc && node --experimental-modules dist/index.js",
