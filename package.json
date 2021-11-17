@@ -7,12 +7,12 @@
     "docker:start": "docker-compose up --build -d && npm run migrate",
     "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
     "restart:local": "npm run docker:stop && npm run docker:infra && npm start",
-    "docker:health": "tsc && node --experimental-modules dist/health.js",
+    "health": "tsc && node --experimental-modules dist/health.js",
     "docker:stop": "docker-compose down",
     "migrate": "sleep 10 && ./scripts/flyway-migrate.sh",
     "start": "tsc && nodemon --experimental-modules dist/index.js",
     "test": "cd acceptance && npm test",
-    "verify": "npm run docker:start && npm run docker:health && npm test"
+    "verify": "npm run docker:start && npm run health && npm test"
   },
   "repository": {
     "type": "git",
