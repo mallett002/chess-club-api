@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Accceptance tests",
   "scripts": {
-    "test": "npm i && jest acceptance -i",
+    "test": "npm i && tsc && jest acceptance -i",
     "acceptance": "jest acceptance -i"
   },
   "devDependencies": {

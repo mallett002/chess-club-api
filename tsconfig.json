@@ -7,5 +7,14 @@
     "sourceMap": true,
     "outDir": "dist"
   },
-  "lib": ["es2015"]
+  "lib": ["es2015"],
+  "include": [
+    "index.ts",
+    "src/**/*",
+    "scripts/health.ts"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "acceptance/**/*"
+  ]
 }
