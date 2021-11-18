@@ -9,8 +9,9 @@
     "restart:local": "npm run docker:stop && npm run docker:infra && npm start",
     "health": "node dist/scripts/health.js",
     "docker:stop": "docker-compose down",
+    "tsc": "tsc",
     "migrate": "sleep 10 && ./scripts/flyway-migrate.sh",
-    "start": "tsc && node --experimental-modules dist/index.js",
+    "start": "node --experimental-modules dist/index.js",
     "test": "cd acceptance && npm test",
     "verify": "npm run docker:start && npm run health && npm test"
   },

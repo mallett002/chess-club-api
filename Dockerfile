@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 4000
 
+RUN npm tsc
+
 CMD [ "npm", "start" ]
