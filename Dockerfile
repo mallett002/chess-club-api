@@ -1,15 +1,34 @@
-FROM node:12-alpine
+FROM node:12-alpine as builder
 
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
 
 COPY . .
 
+RUN npm i
+RUN npm run build
+
+USER node
+
+########################
+
+FROM node:12-alpine
+
 EXPOSE 4000
 
-RUN npm run tsc
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-CMD [ "npm", "start" ]
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/scripts ./scripts
+COPY --from=builder /usr/src/app/package.json .
+COPY --from=builder /usr/src/app/package-lock.json .
+COPY --from=builder /usr/src/app/config ./config
+
+RUN echo running ls in start stage
+RUN ls -lah dist
+RUN ls -lah scripts
+
+USER node
+CMD [ "node", "--expiremental-modules", "dist/index.js" ]

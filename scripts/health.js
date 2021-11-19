@@ -1,4 +1,4 @@
-import frisby from 'frisby';
+const frisby = require('frisby');
 
 const maxRetries = 20;
 const backOffInMilis = 500;

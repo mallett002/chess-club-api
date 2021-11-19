@@ -12,8 +12,7 @@
   ],
   "include": [
     "index.ts",
-    "src/**/*",
-    "scripts/health.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules/**/*",
