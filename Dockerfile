@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN npm i
+
 RUN npm run build
 
 USER node
@@ -24,9 +25,6 @@ COPY --from=builder /usr/src/app/package.json .
 COPY --from=builder /usr/src/app/package-lock.json .
 COPY --from=builder /usr/src/app/config ./config
 
-RUN echo running ls in start stage
-RUN ls -lah dist
-RUN ls -lah scripts
-
 USER node
+
 CMD ["node", "--experimental-modules", "dist/index.js"]
