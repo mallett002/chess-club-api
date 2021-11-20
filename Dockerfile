@@ -31,4 +31,4 @@ RUN ls -lah dist
 RUN ls -lah scripts
 
 USER node
-CMD [ "node", "--expiremental-modules", "dist/index.js" ]
+CMD [ "npm", "start" ]
