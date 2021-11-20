@@ -31,6 +31,9 @@
     "transformIgnorePatterns": [
       "node_modules/(?!node-fetch)/.*"
     ],
+    "testMatch": [
+      "<rootDir>/dist/**/*.spec.js"
+    ],
     "testTimeout": 15000
   }
 }
