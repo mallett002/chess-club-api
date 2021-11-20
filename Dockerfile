@@ -1,6 +1,5 @@
 FROM node:12-alpine as builder
 
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY . .
@@ -16,7 +15,6 @@ FROM node:12-alpine
 
 EXPOSE 4000
 
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules
