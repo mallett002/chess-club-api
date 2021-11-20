@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Accceptance tests",
   "scripts": {
-    "test": "npm i && jest acceptance -i",
+    "test": "npm i && tsc && jest acceptance -i",
     "acceptance": "jest acceptance -i"
   },
   "devDependencies": {
@@ -20,7 +20,6 @@
     "jest": "^27.0.6",
     "jest-serial-runner": "1.2.0",
     "jsonwebtoken": "8.5.1",
-    "node-fetch": "^3.0.0",
     "pg": "8.7.1"
   },
   "jest": {
@@ -30,6 +29,9 @@
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!node-fetch)/.*"
+    ],
+    "testMatch": [
+      "<rootDir>/dist/**/*.spec.js"
     ],
     "testTimeout": 15000
   }

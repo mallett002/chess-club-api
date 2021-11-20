@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const frisby = require('frisby');
 
 const maxRetries = 20;
 const backOffInMilis = 500;
@@ -25,20 +25,24 @@ async function isAppUpAndReady() {
   let response;
   
   try {
-    response = await fetch('http://localhost:4000/health');
+    response = await frisby.get('http://localhost:4000/health');
 
-    if (!response.ok) {
-      await retry();
+    if (!response) {
+      return await retry();
     }
 
-    const json = await response.json();
+    const json = response.json;
   
     if (!json.postgresHealthy) {
-      await retry();
+      return await retry();
     }
+
+    console.log('Up and ready!');
 
     return;
   } catch (error) {
+    console.log('An error occurred', error);
+
     await retry();
   }
 }
