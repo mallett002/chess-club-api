@@ -3,7 +3,6 @@ import {Chess} from 'chess.js';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
-import { getChess } from './chess';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import { IBoard } from '../interfaces/board';
@@ -20,7 +19,7 @@ const publishBoardUpdates = (board): void => {
   - Look up player by username and send invite.
 */
 export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
-  const chess = getChess(true);
+  const chess = new Chess();
   const fen = chess.fen();
   const turn = chess.turn();
 
@@ -47,7 +46,7 @@ export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
 
 export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   const game: IGame = await gamesRepository.getGameByGameId(gameId);
-  const chess: Chess = getChess();
+  const chess: Chess = new Chess();
 
   chess.load(game.fen);
 
@@ -76,9 +75,10 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
 
 export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => {
   const games = await gamesRepository.selectGamesForPlayer(playerId);
-  const chess = getChess(true);
 
   return games.map((game) => {
+    const chess = new Chess();
+
     chess.load(game.fen);
 
     const turn = chess.turn();
@@ -97,10 +97,10 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
     return null;
   }
 
-  const chess = getChess();
-  
-  chess.load(game.fen);
+  const chess = new Chess();
 
+  chess.load(game.fen);
+  
   return {
     gameId,
     moves: chess.moves({ verbose: true }),
@@ -113,7 +113,7 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
 };
 
 export const loadGame = async (playerOne, playerTwo, fen) => {
-  const chess = getChess(true);
+  const chess = new Chess();
 
   chess.load(fen);
 
