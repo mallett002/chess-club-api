@@ -3,7 +3,6 @@ import {Chess} from 'chess.js';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
-// import { getChess, removeChess } from './chess';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import { IBoard } from '../interfaces/board';
@@ -20,7 +19,6 @@ const publishBoardUpdates = (board): void => {
   - Look up player by username and send invite.
 */
 export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
-  // const chess = getChess(playerOne, playerTwo);
   const chess = new Chess();
   const fen = chess.fen();
   const turn = chess.turn();
@@ -79,7 +77,6 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => 
   const games = await gamesRepository.selectGamesForPlayer(playerId);
 
   return games.map((game) => {
-    // const chess = getChess(game.playerOne, game.playerTwo);
     const chess = new Chess();
 
     chess.load(game.fen);
@@ -141,10 +138,4 @@ export const loadGame = async (playerOne, playerTwo, fen) => {
   return board;
 };
 
-export const deleteGame = async (gameId: string): Promise<string> => {
-  // const game: IGame = await gamesRepository.getGameByGameId(gameId);
-
-  // removeChess(game.playerOne, game.playerTwo);
-
-  return gamesRepository.deleteGameDataByGameId(gameId)
-};
+export const deleteGame = async (gameId: string): Promise<string> => gamesRepository.deleteGameDataByGameId(gameId);
