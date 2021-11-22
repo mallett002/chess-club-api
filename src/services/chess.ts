@@ -7,14 +7,14 @@ export const getChess = (playerOne, playerTwo) => {
   const game = games.get(key);
 
   if (!game) {
-    const newGame = JSON.stringify(new Chess());
+    const newGame = new Chess();
 
     games.set(key, newGame);
 
-    return JSON.parse(newGame);
+    return newGame;
   }
 
-  return JSON.parse(game);
+  return game;
 };
 
 export const removeChess = (playerOne, playerTwo) => {

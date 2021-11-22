@@ -6,7 +6,7 @@
   "scripts": {
     "docker:start": "docker-compose up --build -d && npm run migrate",
     "docker:infra": "docker-compose up --build -d chess-club-db && npm run migrate",
-    "restart:local": "npm run docker:stop && npm run docker:infra && npm start",
+    "restart:local": "npm run docker:stop && npm run docker:infra && npm run build && npm start",
     "health": "node --experimental-modules scripts/health.js",
     "docker:stop": "docker-compose down",
     "build": "tsc",

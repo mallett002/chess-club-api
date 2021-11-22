@@ -66,11 +66,7 @@ describe('multiple games', () => {
         }
 `;
 
-  let clientOne,
-    clientTwo,
-    clientThree;
-
-  const createRandomGame = async (client) => {
+  const createRandomGame = async () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
@@ -87,31 +83,29 @@ describe('multiple games', () => {
       }
     });
 
-    return gqlClient.request(createGameMutation, {
+    const {createGame} = await gqlClient.request(createGameMutation, {
       playerOne: playerOne.player_id,
       playerTwo: playerTwo.player_id
     });
+
+    return {gqlClient, gameId: createGame.gameId};
   };
 
-  const playRandomGame = async (gameId) => {
-    const gameId = createGameResponse.createGame.gameId;
-
-    gameIds.push(gameId);
-
+  const playRandomGame = async (client, gameId) => {
     const moveCount = chance.natural({
       max: 5,
       min: 3
     });
 
     for (let i = 0; i < moveCount; i++) {
-      const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
+      const getBoardResponse = await client.request(getBoardQuery, { gameId });
 
       const board = getBoardResponse.getBoard;
 
       const turns = ['w', 'b'];
       const expectedTurn = turns.find((turn) => turn !== board.turn);
       const randomMove = chance.pickone(board.moves);
-      const response = await gqlClient.request(updateBoardMutation, {
+      const response = await client.request(updateBoardMutation, {
         gameId,
         cell: randomMove.san
       });
@@ -131,14 +125,22 @@ describe('multiple games', () => {
   });
 
   it('should be able to handle multiple games being played at the same time', async () => {
-    const gameOne = await createRandomGame();
-    const gameTwo = await createRandomGame();
-    const gameThree = await createRandomGame();
+    const {gqlClient: clientOne, gameId: gameIdOne} = await createRandomGame();
+    const {gqlClient: clientTwo, gameId: gameIdTwo} = await createRandomGame();
+    const {gqlClient: clientThree, gameId: gameIdThree} = await createRandomGame();
+    const {gqlClient: clientFour, gameId: gameIdFour} = await createRandomGame();
+    const {gqlClient: clientFive, gameId: gameIdFive} = await createRandomGame();
+    const {gqlClient: clientSix, gameId: gameIdSix} = await createRandomGame();
+    const {gqlClient: clientSeven, gameId: gameIdSeven} = await createRandomGame();
 
     await Promise.all([
-      playRandomGame(gameOne.createGame.gameId),
-      playRandomGame(gameTwo.createGame.gameId),
-      playRandomGame(gameThree.createGame.gameId)
+      playRandomGame(clientOne, gameIdOne),
+      playRandomGame(clientTwo, gameIdTwo),
+      playRandomGame(clientThree, gameIdThree),
+      playRandomGame(clientFour, gameIdFour),
+      playRandomGame(clientFive, gameIdFive),
+      playRandomGame(clientSix, gameIdSix),
+      playRandomGame(clientSeven, gameIdSeven),
     ]);
   });
 });

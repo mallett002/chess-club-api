@@ -32,7 +32,7 @@
       "node_modules/(?!node-fetch)/.*"
     ],
     "testMatch": [
-      "<rootDir>/tests/multiple-games.spec.ts"
+      "<rootDir>/dist/**/*.spec.js"
     ],
     "testTimeout": 15000
   }

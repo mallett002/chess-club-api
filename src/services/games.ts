@@ -3,7 +3,7 @@ import {Chess} from 'chess.js';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
-import { getChess, removeChess } from './chess';
+// import { getChess, removeChess } from './chess';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import { IBoard } from '../interfaces/board';
@@ -20,7 +20,8 @@ const publishBoardUpdates = (board): void => {
   - Look up player by username and send invite.
 */
 export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
-  const chess = getChess(playerOne, playerTwo);
+  // const chess = getChess(playerOne, playerTwo);
+  const chess = new Chess();
   const fen = chess.fen();
   const turn = chess.turn();
 
@@ -47,9 +48,9 @@ export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
 
 export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   const game: IGame = await gamesRepository.getGameByGameId(gameId);
-  const chess: Chess = getChess(game.playerOne, game.playerTwo);
+  const chess: Chess = new Chess();
 
-  // chess.load(game.fen);
+  chess.load(game.fen);
 
   const move = chess.move(moveToCell);
   
@@ -78,7 +79,11 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => 
   const games = await gamesRepository.selectGamesForPlayer(playerId);
 
   return games.map((game) => {
-    const chess = getChess(game.playerOne, game.playerTwo);
+    // const chess = getChess(game.playerOne, game.playerTwo);
+    const chess = new Chess();
+
+    chess.load(game.fen);
+
     const turn = chess.turn();
 
     return {
@@ -95,7 +100,9 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
     return null;
   }
 
-  const chess = getChess(game.playerOne, game.playerTwo);
+  const chess = new Chess();
+
+  chess.load(game.fen);
   
   return {
     gameId,
@@ -109,7 +116,7 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
 };
 
 export const loadGame = async (playerOne, playerTwo, fen) => {
-  const chess = getChess(playerOne, playerTwo);
+  const chess = new Chess();
 
   chess.load(fen);
 
@@ -135,9 +142,9 @@ export const loadGame = async (playerOne, playerTwo, fen) => {
 };
 
 export const deleteGame = async (gameId: string): Promise<string> => {
-  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  // const game: IGame = await gamesRepository.getGameByGameId(gameId);
 
-  removeChess(game.playerOne, game.playerTwo);
+  // removeChess(game.playerOne, game.playerTwo);
 
   return gamesRepository.deleteGameDataByGameId(gameId)
 };
