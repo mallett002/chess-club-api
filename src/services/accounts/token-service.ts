@@ -1,5 +1,5 @@
 import config from 'config';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken'
 
 import { IToken } from '../../interfaces/account';
 
@@ -28,11 +28,19 @@ const getTokenFromHeaders = (token: string): string => {
   return '';
 }
 
-export const verifyToken = (context: IToken): string | jwt.JwtPayload | null => {
+
+// declare module 'jsonwebtoken' {
+//     export interface PlayerJwtPayload extends jwt.JwtPayload {
+//       playerId: string
+//       username: string
+//   }
+// }
+
+export const verifyToken = (context: IToken): jwt.PlayerJwtPayload => {
   const accessToken = getTokenFromHeaders(context.token);
 
   try {
-    return jwt.verify(accessToken, config.get('tokenPrivateKey'));
+    return <jwt.PlayerJwtPayload>jwt.verify(accessToken, config.get('tokenPrivateKey'));
   } catch {
     return null;   
   }

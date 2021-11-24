@@ -32,7 +32,7 @@
       "node_modules/(?!node-fetch)/.*"
     ],
     "testMatch": [
-      "<rootDir>/test/create-invitation.spec.js"
+      "<rootDir>/tests/create-invitation.spec.ts"
     ],
     "testTimeout": 15000
   }
