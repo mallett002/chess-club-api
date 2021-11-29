@@ -8,7 +8,7 @@ import { getJwtForPlayer } from '../utils/token-utils';
 
 describe('create invitation', () => {
   const createInvitationMutation = gql`
-    mutation createInvitation($inviteeUsername: ID!) {
+    mutation createInvitation($inviteeUsername: String!) {
       createInvitation(inviteeUsername: $inviteeUsername) {
         invitationId
       }
@@ -16,7 +16,6 @@ describe('create invitation', () => {
   `;
 
   let gqlClient,
-    playerOne,
     playerTwo;
 
   beforeEach(async () => {
@@ -26,7 +25,7 @@ describe('create invitation', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [playerOne, playerTwo] = await Promise.all([
+    [, playerTwo] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -49,30 +48,27 @@ describe('create invitation', () => {
     expect(response.errors).toBeUndefined();
   });
 
-  // it('should throw a validation error if a playerId is missing', async () => {
-  //   try {
-  //     await gqlClient.request(createGameMutation, {
-  //       playerOne: playerOne.player_id
-  //     });
-  //     throw new Error('Should have failed.');
-  //   } catch (error) {
-  //     expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-  //     expect(error.message).toContain('Variable \"$playerTwo\" of required type \"ID!\" was not provided.');
-  //   }
-  // });
+  it('should throw a validation error if inviteeUsername is missing', async () => {
+    try {
+      await gqlClient.request(createInvitationMutation);
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain('Variable \"$inviteeUsername\" of required type \"String!\" was not provided.');
+    }
+  });
 
-  // it('should throw an auth error if not authenticated', async () => {
-  //   gqlClient = new GraphQLClient(graphqlUrl);
+  it('should throw an auth error if not authenticated', async () => {
+    gqlClient = new GraphQLClient(graphqlUrl);
 
-  //   try {
-  //     await gqlClient.request(createGameMutation, {
-  //       playerOne: playerOne.player_id,
-  //       playerTwo: playerTwo.player_id
-  //     });
-  //     throw new Error('Should have failed.');
-  //   } catch (error) {
-  //     expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
-  //     expect(error.message).toContain('You must be logged in.');
-  //   }
-  // });
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername: playerTwo.username
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
+      expect(error.message).toContain('You must be logged in.');
+    }
+  });
 });
