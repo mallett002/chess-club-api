@@ -13,6 +13,14 @@ describe('create invitation', () => {
     mutation createInvitation($inviteeUsername: String!) {
       createInvitation(inviteeUsername: $inviteeUsername) {
         invitationId
+        invitor {
+          playerId
+          username
+        }
+        invitee {
+          playerId
+          username
+        }
       }
     }
   `;
@@ -48,6 +56,14 @@ describe('create invitation', () => {
     });
 
     expect(response.createInvitation.invitationId).toBeDefined();
+    expect(response.createInvitation.invitor).toStrictEqual({
+      playerId: playerOne.playerId,
+      username: playerOne.username
+    });
+    expect(response.createInvitation.invitee).toStrictEqual({
+      playerId: playerTwo.playerId,
+      username: playerTwo.username
+    });
     expect(response.errors).toBeUndefined();
   });
 

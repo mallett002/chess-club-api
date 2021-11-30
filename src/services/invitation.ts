@@ -1,21 +1,23 @@
 import * as invitationRepository from '../repository/invitation';
-import { IInvitation } from '../interfaces/invitation';
+import { IDBInvitation, IInvitation } from '../interfaces/invitation';
 import { IPlayerDTO } from '../interfaces/player';
 import { selectPlayerByUsername } from '../repository/player';
+import { PlayerJwtPayload } from 'jsonwebtoken';
 
-export const createInviation = async (invitor: string, inviteeUsername: string): Promise<IInvitation> => {
+export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUsername: string): Promise<IInvitation> => {
+  const {playerId: invitorPlayerId, username: invitorUsername} = invitorClaims;
   const playerToInvite: IPlayerDTO = await selectPlayerByUsername(inviteeUsername);
 
   if (!playerToInvite) {
     throw new Error(`player with username ${inviteeUsername} not found`);
   }
 
-  if (invitor === playerToInvite.player_id) {
+  if (invitorPlayerId === playerToInvite.player_id) {
     throw new Error('player attempting to invite self');
   }
 
-  const existingInvite: IInvitation | null = await invitationRepository.selectExistingInvite(
-    invitor,
+  const existingInvite: IDBInvitation | null = await invitationRepository.selectExistingInvite(
+    invitorPlayerId,
     playerToInvite.player_id,
   );
 
@@ -23,10 +25,20 @@ export const createInviation = async (invitor: string, inviteeUsername: string):
     throw new Error(`Existing invitation with ${playerToInvite.username}`)
   }
 
-  const invitation: IInvitation = await invitationRepository.insertNewInvitation(
-    invitor,
+  const invitation: IDBInvitation = await invitationRepository.insertNewInvitation(
+    invitorPlayerId,
     playerToInvite.player_id,
   );
 
-  return invitation;
+  return {
+    invitationId: invitation.invitationId,
+    invitor: {
+      playerId: invitorPlayerId,
+      username: invitorUsername
+    },
+    invitee: {
+      playerId: playerToInvite.player_id,
+      username: playerToInvite.username
+    }
+  };
 };
