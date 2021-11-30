@@ -5,7 +5,7 @@ import { IInvitation } from '../interfaces/invitation';
 import { PlayerJwtPayload } from 'jsonwebtoken';
 import { createInviation } from '../services/invitation';
 
-export default (_, args, context: IToken): Promise<IInvitation> => {
+export default async (_, args, context: IToken): Promise<IInvitation> => {
   const claims: PlayerJwtPayload = verifyToken(context);
 
   if (!claims) {
@@ -17,7 +17,9 @@ export default (_, args, context: IToken): Promise<IInvitation> => {
   }
 
   try {
-    return createInviation(claims.playerId, args.inviteeUsername); 
+    const invitation = await createInviation(claims.playerId, args.inviteeUsername);
+  
+    return invitation;
   } catch (error) {
     throw new UserInputError(error);
   }
