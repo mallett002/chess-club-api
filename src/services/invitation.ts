@@ -10,6 +10,19 @@ export const createInviation = async (invitor: string, inviteeUsername: string):
     throw new Error(`player with username ${inviteeUsername} not found`);
   }
 
+  if (invitor === playerToInvite.player_id) {
+    throw new Error('player attempting to invite self');
+  }
+
+  const existingInvite: IInvitation | null = await invitationRepository.selectExistingInvite(
+    invitor,
+    playerToInvite.player_id,
+  );
+
+  if (existingInvite) {
+    throw new Error(`Existing invitation with ${playerToInvite.username}`)
+  }
+
   const invitation: IInvitation = await invitationRepository.insertNewInvitation(
     invitor,
     playerToInvite.player_id,

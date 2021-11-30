@@ -1,3 +1,4 @@
+import Chance from 'chance';
 import { gql, GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
@@ -6,6 +7,7 @@ import { deleteInvitations, deletePlayers } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
+const chance = new Chance();
 describe('create invitation', () => {
   const createInvitationMutation = gql`
     mutation createInvitation($inviteeUsername: String!) {
@@ -16,6 +18,7 @@ describe('create invitation', () => {
   `;
 
   let gqlClient,
+    playerOne,
     playerTwo;
 
   beforeEach(async () => {
@@ -25,7 +28,7 @@ describe('create invitation', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [, playerTwo] = await Promise.all([
+    [playerOne, playerTwo] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -69,6 +72,48 @@ describe('create invitation', () => {
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('UNAUTHENTICATED');
       expect(error.message).toContain('You must be logged in.');
+    }
+  });
+
+  it('should not let you invite yourself', async () => {
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername: playerOne.username
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain('player attempting to invite self');
+    }
+  });
+
+  it('should not attempt to invite player that does not exist', async () => {
+    const inviteeUsername = chance.email();
+
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain(`player with username ${inviteeUsername} not found`);
+    }
+  });
+
+  it('should not attempt to invite with existing invite from same player', async () => {
+    await gqlClient.request(createInvitationMutation, {
+      inviteeUsername: playerTwo.username
+    });
+
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername: playerTwo.username
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain(`Existing invitation with ${playerTwo.username}`);
     }
   });
 });

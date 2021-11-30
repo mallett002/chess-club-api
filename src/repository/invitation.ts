@@ -14,3 +14,19 @@ export const insertNewInvitation = async (invitor: string, invitee: string): Pro
     invitationId: dbInvitation
   };
 };
+
+export const selectExistingInvite = async (invitor: string, invitee: string): Promise<IInvitation> => {
+  const [dbInvitation]: string[] = await pgClient('chess_club.tbl_invitation')
+    .where({
+      invitor_id: invitor,
+      invitee_id: invitee,
+    });
+
+  if (dbInvitation) {
+    return {
+      invitationId: dbInvitation
+    };
+  }
+
+  return null;
+};

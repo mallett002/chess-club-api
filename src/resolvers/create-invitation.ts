@@ -5,7 +5,6 @@ import { IInvitation } from '../interfaces/invitation';
 import { PlayerJwtPayload } from 'jsonwebtoken';
 import { createInviation } from '../services/invitation';
 
-
 export default (_, args, context: IToken): Promise<IInvitation> => {
   const claims: PlayerJwtPayload = verifyToken(context);
 
