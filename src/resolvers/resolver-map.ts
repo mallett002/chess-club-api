@@ -9,6 +9,7 @@ import getBoard from './get-board';
 import { BOARD_UPDATED } from '../constants';
 import { getPubSub } from '../services/pub-sub';
 import endGame from './end-game';
+import createInvitation from './create-invitation';
 
 export const resolvers = {
   Query: {
@@ -20,7 +21,8 @@ export const resolvers = {
     createPlayer,
     endGame,
     loadGame,
-    updateBoard
+    updateBoard,
+    createInvitation
   },
   Subscription: {
     boardUpdated: {
