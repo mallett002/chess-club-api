@@ -28,14 +28,6 @@ const getTokenFromHeaders = (token: string): string => {
   return '';
 }
 
-
-// declare module 'jsonwebtoken' {
-//     export interface PlayerJwtPayload extends jwt.JwtPayload {
-//       playerId: string
-//       username: string
-//   }
-// }
-
 export const verifyToken = (context: IToken): jwt.PlayerJwtPayload => {
   const accessToken = getTokenFromHeaders(context.token);
 

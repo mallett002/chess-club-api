@@ -55,8 +55,15 @@ export const typeDefs = buildSchema(`
     token: String!
   }
 
+  type PlayerInvite {
+    playerId: ID!
+    username: String!
+  }
+
   type Invitation {
     invitationId: ID!
+    invitor: PlayerInvite!
+    invitee: PlayerInvite!
   }
 
   type Mutation {

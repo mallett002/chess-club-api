@@ -17,7 +17,7 @@ export default async (_, args, context: IToken): Promise<IInvitation> => {
   }
 
   try {
-    const invitation = await createInviation(claims.playerId, args.inviteeUsername);
+    const invitation = await createInviation(claims, args.inviteeUsername);
   
     return invitation;
   } catch (error) {

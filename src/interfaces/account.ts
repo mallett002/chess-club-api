@@ -7,6 +7,5 @@ export interface IToken {
 declare module 'jsonwebtoken' {
   export interface PlayerJwtPayload extends jwt.JwtPayload {
     playerId: string
-    username: string
   } 
 }

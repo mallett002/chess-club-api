@@ -13,12 +13,21 @@ describe('create invitation', () => {
     mutation createInvitation($inviteeUsername: String!) {
       createInvitation(inviteeUsername: $inviteeUsername) {
         invitationId
+        invitor {
+          playerId
+          username
+        }
+        invitee {
+          playerId
+          username
+        }
       }
     }
   `;
 
   let gqlClient,
     playerOne,
+    playerTwoPayload,
     playerTwo;
 
   beforeEach(async () => {
@@ -26,7 +35,8 @@ describe('create invitation', () => {
     await deletePlayers();
 
     const playerOnePayload = createRandomPlayerPayload();
-    const playerTwoPayload = createRandomPlayerPayload();
+    
+    playerTwoPayload = createRandomPlayerPayload();
 
     [playerOne, playerTwo] = await Promise.all([
       createDBPlayer(playerOnePayload),
@@ -48,6 +58,14 @@ describe('create invitation', () => {
     });
 
     expect(response.createInvitation.invitationId).toBeDefined();
+    expect(response.createInvitation.invitor).toStrictEqual({
+      playerId: playerOne.player_id,
+      username: playerOne.username
+    });
+    expect(response.createInvitation.invitee).toStrictEqual({
+      playerId: playerTwo.player_id,
+      username: playerTwo.username
+    });
     expect(response.errors).toBeUndefined();
   });
 
@@ -104,6 +122,30 @@ describe('create invitation', () => {
   it('should not attempt to invite with existing invite from same player', async () => {
     await gqlClient.request(createInvitationMutation, {
       inviteeUsername: playerTwo.username
+    });
+
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername: playerTwo.username
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain(`Existing invitation with ${playerTwo.username}`);
+    }
+  });
+
+  it('should not allow creating invite when initee has already made an invite with invitor', async () => {
+    const userJwt = await getJwtForPlayer(playerTwoPayload);
+
+    const playerTwoClient = new GraphQLClient(graphqlUrl, {
+      headers: {
+        authorization: userJwt
+      }
+    });
+
+    await playerTwoClient.request(createInvitationMutation, {
+      inviteeUsername: playerOne.username
     });
 
     try {
