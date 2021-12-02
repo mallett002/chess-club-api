@@ -20,6 +20,9 @@ export const selectExistingInvite = async (invitor: string, invitee: string): Pr
     .where({
       invitor_id: invitor,
       invitee_id: invitee,
+    }).orWhere({
+      invitor_id: invitee,
+      invitee_id: invitor,
     });
 
   if (dbInvitation) {

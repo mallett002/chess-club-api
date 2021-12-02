@@ -5,7 +5,7 @@ import { selectPlayerByUsername } from '../repository/player';
 import { PlayerJwtPayload } from 'jsonwebtoken';
 
 export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUsername: string): Promise<IInvitation> => {
-  const {playerId: invitorPlayerId, username: invitorUsername} = invitorClaims;
+  const {playerId: invitorPlayerId, sub} = invitorClaims;
   const playerToInvite: IPlayerDTO = await selectPlayerByUsername(inviteeUsername);
 
   if (!playerToInvite) {
@@ -34,7 +34,7 @@ export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUs
     invitationId: invitation.invitationId,
     invitor: {
       playerId: invitorPlayerId,
-      username: invitorUsername
+      username: sub
     },
     invitee: {
       playerId: playerToInvite.player_id,
