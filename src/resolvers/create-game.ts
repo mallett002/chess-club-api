@@ -16,18 +16,19 @@ import { createGame } from '../services/games';
   If jwt.sub chose white, make them playerOne : else playerTwo.
   Delete the invitation.
 */
-export default (_, args, context: IToken): Promise<IBoard> => {
+export default (_, {invitationId, inviteeColor}, context: IToken): Promise<IBoard> => {
   const claims = verifyToken(context);
 
   if (!claims) {
     throw new AuthenticationError('You must be logged in.');
   }
 
-  const { playerOne, playerTwo } = args;
+  console.log({inviteeColor});
+  
 
-  if (!playerOne || !playerTwo) {
-    throw new ValidationError('missing or invalid value for playerOne or playerTwo');    
+  if (!invitationId || !inviteeColor) {
+    throw new ValidationError('missing or invalid value for invitationId or inviteeColor');    
   }
 
-  return createGame(args);
+  return createGame(invitationId, inviteeColor);
 };

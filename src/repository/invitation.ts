@@ -33,3 +33,18 @@ export const selectExistingInvite = async (invitor: string, invitee: string): Pr
 
   return null;
 };
+
+export const selectInvitationById = async (invitationId: string): Promise<IDBInvitation | null> => {
+  const [dbInvitation]: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
+    .where({
+      invitation_id: invitationId,
+    }).returning('*');
+
+  console.log({dbInvitation});
+
+  if (dbInvitation) {
+    return dbInvitation;
+  }
+
+  return null;
+};
