@@ -4,19 +4,17 @@ import { getPgClient } from "./db-client";
 const pgClient = getPgClient();
 
 export const insertNewInvitation = async (invitor: string, invitee: string): Promise<IDBInvitation> => {
-  const [dbInvitation]: string[] = await pgClient('chess_club.tbl_invitation')
+  const [dbInvitation]: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
     .insert({
       invitor_id: invitor,
       invitee_id: invitee,
-    }).returning('invitation_id');
+    }).returning('*');
 
-  return {
-    invitationId: dbInvitation,
-  };
+  return dbInvitation;
 };
 
 export const selectExistingInvite = async (invitor: string, invitee: string): Promise<IDBInvitation | null> => {
-  const [dbInvitation]: string[] = await pgClient('chess_club.tbl_invitation')
+  const [dbInvitation]: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
     .where({
       invitor_id: invitor,
       invitee_id: invitee,
@@ -25,13 +23,7 @@ export const selectExistingInvite = async (invitor: string, invitee: string): Pr
       invitee_id: invitor,
     });
 
-  if (dbInvitation) {
-    return {
-      invitationId: dbInvitation
-    };
-  }
-
-  return null;
+    return dbInvitation || null;
 };
 
 export const selectInvitationById = async (invitationId: string): Promise<IDBInvitation | null> => {
@@ -40,11 +32,14 @@ export const selectInvitationById = async (invitationId: string): Promise<IDBInv
       invitation_id: invitationId,
     }).returning('*');
 
-  console.log({dbInvitation});
+  return dbInvitation || null;
+};
 
-  if (dbInvitation) {
-    return dbInvitation;
-  }
+export const deleteInvitationById = async (invitationId: string): Promise<string | null> => {
+  const [dbInvitation]: string[] = await pgClient('chess_club.tbl_invitation')
+    .where({ invitation_id: invitationId })
+    .del()
+    .returning('invitation_id');
 
-  return null;
+  return dbInvitation || null;
 };

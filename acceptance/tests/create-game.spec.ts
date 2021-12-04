@@ -3,7 +3,7 @@ import { gql, GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
-import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames, selectPlayerByUsername } from '../utils/db';
+import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames, selectInvitations, selectPlayerByUsername } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
@@ -37,8 +37,8 @@ describe('create game', () => {
   `;
 
   let gqlClient,
-    playerOne,
-    playerTwo,
+    firstPlayer,
+    secondPlayer,
     invitation;
 
   beforeEach(async () => {
@@ -50,7 +50,7 @@ describe('create game', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [playerOne, playerTwo] = await Promise.all([
+    [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -64,20 +64,42 @@ describe('create game', () => {
     });
 
     const response = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: playerTwo.username
+      inviteeUsername: secondPlayer.username
     });
 
     invitation = response.createInvitation;
   });
 
   it('should be able to create a game from an invitation', async () => {
+    const inviteeColor = chance.pickone(['w', 'b']);
+
     const response = await gqlClient.request(createGameMutation, {
+      invitationId: invitation.invitationId,
+      inviteeColor
+    });
+
+    const expectedPlayerOne = inviteeColor === 'w' ? secondPlayer.player_id : firstPlayer.player_id;
+
+    expect(response.createGame.gameId).toBeDefined();
+    expect(response.createGame.playerOne).toStrictEqual(expectedPlayerOne);
+    expect(response.errors).toBeUndefined();
+  });
+
+  it('should delete the invitation after the game is created', async () => {
+    let invitations = await selectInvitations();
+    let foundInvitation = invitations.find((it) => it.invitation_id === invitation.invitationId);
+
+    expect(foundInvitation).toBeDefined();
+
+    await gqlClient.request(createGameMutation, {
       invitationId: invitation.invitationId,
       inviteeColor: chance.pickone(['w', 'b'])
     });
 
-    expect(response.createGame.gameId).toBeDefined();
-    expect(response.errors).toBeUndefined();
+    invitations = await selectInvitations();
+    foundInvitation = invitations.find((it) => it.invitation_id === invitation.invitationId);
+
+    expect(foundInvitation).toBeUndefined();
   });
 
   it('should throw a validation error if an arg is missing', async () => {

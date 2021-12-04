@@ -1,34 +1,26 @@
-import { AuthenticationError, ValidationError } from 'apollo-server-express';
+import { ApolloError, AuthenticationError, ValidationError } from 'apollo-server-express';
 import { IToken } from '../interfaces/account';
 import { IBoard } from '../interfaces/board';
 import { verifyToken } from '../services/accounts/token-service';
 
 import { createGame } from '../services/games';
 
-
-/*
-  This is basically AcceptInvitation
-  Take in invitationId & inviteeColor
-    - white: playerOne
-    - black: playerTwo
-  Look up invitation by invitationId
-  Create a game w/ the players in the invitation
-  If jwt.sub chose white, make them playerOne : else playerTwo.
-  Delete the invitation.
-*/
-export default (_, {invitationId, inviteeColor}, context: IToken): Promise<IBoard> => {
+export default async (_, {invitationId, inviteeColor}, context: IToken): Promise<IBoard> => {
   const claims = verifyToken(context);
 
   if (!claims) {
     throw new AuthenticationError('You must be logged in.');
   }
 
-  console.log({inviteeColor});
-  
-
   if (!invitationId || !inviteeColor) {
     throw new ValidationError('missing or invalid value for invitationId or inviteeColor');    
   }
 
-  return createGame(invitationId, inviteeColor);
+  try {
+    const game = await createGame(invitationId, inviteeColor);
+
+    return game;
+  } catch (error) {
+    throw new ApolloError(error);      
+  }
 };

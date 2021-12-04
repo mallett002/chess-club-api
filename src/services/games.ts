@@ -7,7 +7,7 @@ import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
-import { IDBInvitation } from '../interfaces/invitation';
+import { IDBInvitation, IInvitation } from '../interfaces/invitation';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
@@ -21,18 +21,12 @@ const publishBoardUpdates = (board): void => {
   - Look up player by username and send invite.
 */
 export const createGame = async (invitationId: string, inviteeColor: string): Promise<IBoard> => {
-  // get the invitation by invitation Id.
-  // if doens't exist, throw error
-  
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
   if (!invitation) {
     throw new Error('Invitation does not exist.');
   }
 
-  console.log({invatationInService: invitation});
-
-  // TODO: fix the type on these:
   const playerOneId = inviteeColor === 'w' ? invitation.invitee_id : invitation.invitor_id;
   const playerTwoId = inviteeColor === 'b' ? invitation.invitee_id : invitation.invitor_id;
 
@@ -45,6 +39,12 @@ export const createGame = async (invitationId: string, inviteeColor: string): Pr
     playerOneId,
     playerTwoId,
   );
+
+  if (gameId) {
+    await invitationRepository.deleteInvitationById(invitationId);
+  } else {
+    throw new Error('Something went wrong creating the game');
+  }
 
   const board = {
     gameId,
