@@ -1,41 +1,16 @@
 import Chance from 'chance';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
 import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames, selectInvitations, selectPlayerByUsername } from '../utils/db';
+import { createGameMutation, createInvitationMutation } from '../utils/gql-queries';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
 const chance = new Chance();
 
 describe('create game', () => {
-  const createGameMutation = gql`
-    mutation createGame($invitationId: ID!, $inviteeColor: String!) {
-          createGame(invitationId: $invitationId, inviteeColor: $inviteeColor) {
-            gameId
-            playerOne
-            playerTwo
-            turn
-          }
-        }
-  `;
-  const createInvitationMutation = gql`
-    mutation createInvitation($inviteeUsername: String!) {
-      createInvitation(inviteeUsername: $inviteeUsername) {
-        invitationId
-        invitor {
-          playerId
-          username
-        }
-        invitee {
-          playerId
-          username
-        }
-      }
-    }
-  `;
-
   let gqlClient,
     firstPlayer,
     secondPlayer,

@@ -1,19 +1,12 @@
-import {gql, GraphQLClient} from 'graphql-request';
+import {GraphQLClient} from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import {graphqlUrl} from '../utils';
 import { deletePlayers, selectPlayerByUsername } from '../utils/db';
+import { createPlayerMutation } from '../utils/gql-queries';
 import { decodeToken } from '../utils/token-utils';
 
 describe('create player', () => {
-  const createPlayerMutation = gql`
-    mutation CreatePlayer($username: String!, $password: String!){
-      createPlayer(username: $username, password: $password) {
-        token
-      }
-    }
-  `;
-
   let gqlClient;
 
   beforeEach(async () => {

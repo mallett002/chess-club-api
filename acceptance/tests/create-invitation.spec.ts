@@ -4,27 +4,12 @@ import { gql, GraphQLClient } from 'graphql-request';
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
 import { deleteInvitations, deletePlayers } from '../utils/db';
+import { createInvitationMutation } from '../utils/gql-queries';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
 const chance = new Chance();
 describe('create invitation', () => {
-  const createInvitationMutation = gql`
-    mutation createInvitation($inviteeUsername: String!) {
-      createInvitation(inviteeUsername: $inviteeUsername) {
-        invitationId
-        invitor {
-          playerId
-          username
-        }
-        invitee {
-          playerId
-          username
-        }
-      }
-    }
-  `;
-
   let gqlClient,
     playerOne,
     playerTwoPayload,
