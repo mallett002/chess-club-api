@@ -1,78 +1,23 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import Chance from 'chance';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
-import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername } from '../utils/db';
+import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
+import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoardMutation } from '../utils/gql-queries';
 
 const chance = new Chance();
 
 describe('update board', () => {
-  const updateBoardMutation = gql`
-    mutation updateBoard($gameId: ID!, $cell: String!) {
-          updateBoard(gameId: $gameId, cell: $cell) {
-            gameId
-            playerOne
-            playerTwo
-            turn
-            moves {
-              color
-              from
-              to
-              flags
-              piece
-              san
-            }
-            positions {
-              type
-              color
-              label
-            }
-          }
-        }
-  `;
-  const getBoardQuery = gql`
-    query GetBoard($gameId: ID!){
-      getBoard(gameId: $gameId) {
-        gameId
-        moves {
-          color
-          from
-          to
-          flags
-          piece
-          san
-        }
-        playerOne
-        playerTwo
-        positions{
-          type
-          color
-          label
-        }
-        turn
-      }
-  }`;
-  const createGameMutation = gql`
-    mutation createGame($playerOne: ID!, $playerTwo: ID!) {
-          createGame(playerOne: $playerOne, playerTwo: $playerTwo) {
-            gameId
-            playerOne
-            playerTwo
-            turn
-          }
-        }
-`;
-
   let gqlClient,
-    playerOne,
-    playerTwo,
+    secondPlayer,
     board,
     gameId;
 
   beforeEach(async () => {
+    await deleteInvitations();
     await deletePlayersGames();
     await deleteGames();
     await deletePlayers();
@@ -80,7 +25,7 @@ describe('update board', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [playerOne, playerTwo] = await Promise.all([
+    [, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -93,9 +38,13 @@ describe('update board', () => {
       }
     });
 
+    const {createInvitation: invitation} = await gqlClient.request(createInvitationMutation, {
+      inviteeUsername: secondPlayer.username
+    });
+
     const createGameResponse = await gqlClient.request(createGameMutation, {
-      playerOne: playerOne.player_id,
-      playerTwo: playerTwo.player_id
+      invitationId: invitation.invitationId,
+      inviteeColor: chance.pickone(['w', 'b'])
     });
 
     gameId = createGameResponse.createGame.gameId;
@@ -110,7 +59,7 @@ describe('update board', () => {
       max: 10,
       min: 3
     });
-    
+
     for (let i = 0; i < moveCount; i++) {
       const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
 
@@ -119,7 +68,7 @@ describe('update board', () => {
       const turns = ['w', 'b'];
       const expectedTurn = turns.find((turn) => turn !== board.turn);
       const randomMove = chance.pickone(board.moves);
-      const response = await gqlClient.request(updateBoardMutation,{
+      const response = await gqlClient.request(updateBoardMutation, {
         gameId,
         cell: randomMove.san
       });
@@ -138,7 +87,7 @@ describe('update board', () => {
     const randomMove = chance.pickone(board.moves);
 
     try {
-      await gqlClient.request(updateBoardMutation,{
+      await gqlClient.request(updateBoardMutation, {
         gameId,
         cell: randomMove.san
       });

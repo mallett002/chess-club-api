@@ -4,7 +4,9 @@ interface IPlayerInvite {
 }
 
 export interface IDBInvitation {
-  invitationId: string
+  invitation_id: string
+  invitor_id: string
+  invitee_id: string
 }
 
 export interface IInvitation {

@@ -5,7 +5,9 @@ import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
 import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
+import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
+import { IDBInvitation, IInvitation } from '../interfaces/invitation';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
@@ -18,22 +20,37 @@ const publishBoardUpdates = (board): void => {
   - Will take in a username to determine who they are inviting.
   - Look up player by username and send invite.
 */
-export const createGame = async ({ playerOne, playerTwo }): Promise<IBoard> => {
+export const createGame = async (invitationId: string, inviteeColor: string): Promise<IBoard> => {
+  const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
+
+  if (!invitation) {
+    throw new Error('Invitation does not exist.');
+  }
+
+  const playerOneId = inviteeColor === 'w' ? invitation.invitee_id : invitation.invitor_id;
+  const playerTwoId = inviteeColor === 'b' ? invitation.invitee_id : invitation.invitor_id;
+
   const chess = new Chess();
   const fen = chess.fen();
   const turn = chess.turn();
 
   const gameId = await gamesRepository.insertNewGame(
     fen,
-    playerOne,
-    playerTwo,
+    playerOneId,
+    playerTwoId,
   );
+
+  if (gameId) {
+    await invitationRepository.deleteInvitationById(invitationId);
+  } else {
+    throw new Error('Something went wrong creating the game');
+  }
 
   const board = {
     gameId,
     moves: chess.moves({ verbose: true }),
-    playerOne,
-    playerTwo,
+    playerOne: playerOneId,
+    playerTwo: playerTwoId,
     positions: flattenPositions(chess.board()),
     status: mapChessStatusToGameStatus(chess),
     turn

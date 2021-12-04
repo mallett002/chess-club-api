@@ -31,7 +31,7 @@ export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUs
   );
 
   return {
-    invitationId: invitation.invitationId,
+    invitationId: invitation.invitation_id,
     invitor: {
       playerId: invitorPlayerId,
       username: sub

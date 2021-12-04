@@ -1,28 +1,23 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import Chance from 'chance';
+import { GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
-import { deleteGames, deletePlayers, deletePlayersGames, selectPlayerByUsername } from '../utils/db';
+import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames, selectInvitations, selectPlayerByUsername } from '../utils/db';
+import { createGameMutation, createInvitationMutation } from '../utils/gql-queries';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-describe('create game', () => {
-  const createGameMutation = gql`
-    mutation createGame($playerOne: ID!, $playerTwo: ID!) {
-          createGame(playerOne: $playerOne, playerTwo: $playerTwo) {
-            gameId
-            playerOne
-            playerTwo
-            turn
-          }
-        }
-  `;
+const chance = new Chance();
 
+describe('create game', () => {
   let gqlClient,
-    playerOne,
-    playerTwo;
+    firstPlayer,
+    secondPlayer,
+    invitation;
 
   beforeEach(async () => {
+    await deleteInvitations();
     await deletePlayersGames();
     await deleteGames();
     await deletePlayers();
@@ -30,7 +25,7 @@ describe('create game', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [playerOne, playerTwo] = await Promise.all([
+    [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -42,27 +37,62 @@ describe('create game', () => {
         authorization: userJwt
       }
     });
-  });
 
-  it('should be able to create a game', async () => {
-    const response = await gqlClient.request(createGameMutation, {
-      playerOne: playerOne.player_id,
-      playerTwo: playerTwo.player_id
+    const response = await gqlClient.request(createInvitationMutation, {
+      inviteeUsername: secondPlayer.username
     });
 
+    invitation = response.createInvitation;
+  });
+
+  it('should be able to create a game from an invitation', async () => {
+    const inviteeColor = chance.pickone(['w', 'b']);
+
+    const response = await gqlClient.request(createGameMutation, {
+      invitationId: invitation.invitationId,
+      inviteeColor
+    });
+
+    const expectedPlayerOne = inviteeColor === 'w' ? secondPlayer.player_id : firstPlayer.player_id;
+
     expect(response.createGame.gameId).toBeDefined();
+    expect(response.createGame.playerOne).toStrictEqual(expectedPlayerOne);
     expect(response.errors).toBeUndefined();
   });
 
-  it('should throw a validation error if a playerId is missing', async () => {
+  it('should delete the invitation after the game is created', async () => {
+    let invitations = await selectInvitations();
+    let foundInvitation = invitations.find((it) => it.invitation_id === invitation.invitationId);
+
+    expect(foundInvitation).toBeDefined();
+
+    await gqlClient.request(createGameMutation, {
+      invitationId: invitation.invitationId,
+      inviteeColor: chance.pickone(['w', 'b'])
+    });
+
+    invitations = await selectInvitations();
+    foundInvitation = invitations.find((it) => it.invitation_id === invitation.invitationId);
+
+    expect(foundInvitation).toBeUndefined();
+  });
+
+  it('should throw a validation error if an arg is missing', async () => {
+    const argToDelete = chance.pickone(['invitationId', 'inviteeColor']);
+    const args = {
+      invitationId: invitation.invitationId,
+      inviteeColor: chance.pickone(['w', 'b'])
+    };
+    const argTypes = {invitationId: 'ID!', inviteeColor: 'String!'};
+
+    delete args[argToDelete];
+
     try {
-      await gqlClient.request(createGameMutation, {
-        playerOne: playerOne.player_id
-      });
+      await gqlClient.request(createGameMutation, args);
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
-      expect(error.message).toContain('Variable \"$playerTwo\" of required type \"ID!\" was not provided.');
+      expect(error.message).toContain(`Variable \"$${argToDelete}\" of required type \"${argTypes[argToDelete]}\" was not provided.`);
     }
   });
 
@@ -71,8 +101,8 @@ describe('create game', () => {
 
     try {
       await gqlClient.request(createGameMutation, {
-        playerOne: playerOne.player_id,
-        playerTwo: playerTwo.player_id
+        invitationId: invitation.invitationId,
+        inviteeColor: chance.pickone(['w', 'b'])
       });
       throw new Error('Should have failed.');
     } catch (error) {

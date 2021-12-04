@@ -53,4 +53,14 @@ export const deleteInvitations = async () => {
   expect(foundInvitation.rows).toStrictEqual([]);
 };
 
+export const selectInvitations = async () => {
+  const pgTestClient = await getPgTestClient();
+
+  await pgTestClient.query('SELECT * FROM chess_club.tbl_invitation;');
+
+  const result = await pgTestClient.query('select * from chess_club.tbl_invitation where invitation_id is not null limit 1;');
+
+  return result.rows;
+};
+
 
