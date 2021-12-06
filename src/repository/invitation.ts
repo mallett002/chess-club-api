@@ -35,6 +35,24 @@ export const selectInvitationById = async (invitationId: string): Promise<IDBInv
   return dbInvitation || null;
 };
 
+export const selectInvitationsForPlayer = async (playerId: string): Promise<IDBInvitation[]> => {
+  const dbInvitations: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
+    .where({
+      invitor_id: playerId,
+    });
+
+    return dbInvitations;
+};
+
+export const selectInboundRequestsForPlayer = async (playerId: string): Promise<IDBInvitation[]> => {
+  const inboundRequests: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
+    .where({
+      invitee_id: playerId,
+    });
+
+    return inboundRequests;
+};
+
 export const deleteInvitationById = async (invitationId: string): Promise<string | null> => {
   const [dbInvitation]: string[] = await pgClient('chess_club.tbl_invitation')
     .where({ invitation_id: invitationId })

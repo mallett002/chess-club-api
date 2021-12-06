@@ -66,6 +66,21 @@ export const typeDefs = buildSchema(`
     invitee: PlayerInvite!
   }
 
+  type OutboundInvitation {
+    invitationId: ID!
+    invitee: String!
+  }
+
+  type InboundInvitation {
+    invitationId: ID!
+    invitor: String!
+  }
+
+  type GameInvitations {
+    invitations: [OutboundInvitation]
+    inboundRequests: [InboundInvitation]
+  }
+
   type Mutation {
     updateBoard(gameId: ID!, cell: String!): Board!
     endGame(gameId: ID!): ID
@@ -78,5 +93,6 @@ export const typeDefs = buildSchema(`
   type Query {
     getBoard(gameId: ID!): Board
     getGames(playerId: ID!): [Game]!
+    getInvitations: GameInvitations!
   }
 `);

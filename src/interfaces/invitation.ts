@@ -14,3 +14,18 @@ export interface IInvitation {
   invitor: IPlayerInvite
   invitee: IPlayerInvite
 }
+
+export interface IOutboundInvite {
+  invitationId: string
+  invitee: string // username
+}
+
+export interface IInboundInvite {
+  invitationId: string
+  invitor: string // username
+}
+
+export interface IGameInvites {
+  invitations: IOutboundInvite[],
+  inboundRequests: IInboundInvite[]
+}

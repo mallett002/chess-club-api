@@ -10,11 +10,13 @@ import { BOARD_UPDATED } from '../constants';
 import { getPubSub } from '../services/pub-sub';
 import endGame from './end-game';
 import createInvitation from './create-invitation';
+import getInvitations from './get-invitations';
 
 export const resolvers = {
   Query: {
     getBoard,
-    getGames
+    getGames,
+    getInvitations
   },
   Mutation: {
     createGame,
