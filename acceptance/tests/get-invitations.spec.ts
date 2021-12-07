@@ -11,6 +11,8 @@ describe('get invitations', () => {
   let gqlClient,
     firstPlayer,
     secondPlayer,
+    secondPlayerPayload,
+    thirdPlayerPayload,
     thirdPlayer;
 
   beforeEach(async () => {
@@ -18,8 +20,8 @@ describe('get invitations', () => {
     await deletePlayers();
 
     const firstPlayerPayload = createRandomPlayerPayload();
-    const secondPlayerPayload = createRandomPlayerPayload();
-    const thirdPlayerPayload = createRandomPlayerPayload();
+    secondPlayerPayload = createRandomPlayerPayload();
+    thirdPlayerPayload = createRandomPlayerPayload();
 
     [firstPlayer, secondPlayer, thirdPlayer] = await Promise.all([
       createDBPlayer(firstPlayerPayload),
@@ -60,6 +62,42 @@ describe('get invitations', () => {
     expect(getInvitations.inboundGameRequests).toStrictEqual([]);
   });
 
+  it('should get inbound game requests from others', async () => {
+    const secondUserJwt = await getJwtForPlayer(secondPlayerPayload);
+    const secondGqlClient = new GraphQLClient(graphqlUrl, {
+      headers: {
+        authorization: secondUserJwt
+      }
+    });
+    const thirdUserJwt = await getJwtForPlayer(thirdPlayerPayload);
+    const thirdGqlClient = new GraphQLClient(graphqlUrl, {
+      headers: {
+        authorization: thirdUserJwt
+      }
+    });
+    
+    const { createInvitation: invitationOne } = await secondGqlClient.request(createInvitationMutation, {
+      inviteeUsername: firstPlayer.username
+    });
+    const { createInvitation: invitationTwo } = await thirdGqlClient.request(createInvitationMutation, {
+      inviteeUsername: firstPlayer.username
+    });
+
+    const { getInvitations } = await gqlClient.request(getInvitationsQuery);
+
+    expect(getInvitations.errors).toBeUndefined();
+    expect(getInvitations.inboundGameRequests).toStrictEqual([
+      {
+        invitationId: invitationOne.invitationId,
+        invitor: secondPlayer.username
+      },
+      {
+        invitationId: invitationTwo.invitationId,
+        invitor: thirdPlayer.username
+      }
+    ]);
+    expect(getInvitations.invitations).toStrictEqual([]);
+  });
 
   it('should throw an auth error if not authenticated', async () => {
     gqlClient = new GraphQLClient(graphqlUrl);

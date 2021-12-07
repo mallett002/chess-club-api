@@ -8,16 +8,12 @@ import { verifyToken } from '../services/accounts/token-service';
 import { getInvitationsAndInboundGameRequests } from '../services/invitation';
 
 
-export default async (parent, args, context: IToken): Promise<IGameInvites> => {
+export default (parent, args, context: IToken): Promise<IGameInvites> => {
   const claims: PlayerJwtPayload = verifyToken(context);
 
   if (!claims) {
     throw new AuthenticationError('You must be logged in.');
   }
   
-  const gameRequests = await getInvitationsAndInboundGameRequests(claims.playerId);
-
-  console.log(JSON.stringify(gameRequests));
-
-  return gameRequests;
+  return getInvitationsAndInboundGameRequests(claims.playerId);
 };
