@@ -78,7 +78,7 @@ export const typeDefs = buildSchema(`
 
   type GameInvitations {
     invitations: [OutboundInvitation]
-    inboundRequests: [InboundInvitation]
+    inboundGameRequests: [InboundInvitation]
   }
 
   type Mutation {

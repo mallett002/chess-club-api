@@ -74,7 +74,7 @@ export const getInvitationsQuery = gql`
       invitationId
       invitee
     }
-    inboundRequests {
+    inboundGameRequests {
       invitationId
       invitor
     }

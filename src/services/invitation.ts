@@ -61,17 +61,17 @@ const buildInboundRequest = async (request: IDBInvitation) => {
   }
 };
 
-export const getInvitationsAndInboundRequests = async (playerId: string): Promise<IGameInvites> => {
-  const [dbInvitations, dbInboundRequests] = await Promise.all([
+export const getInvitationsAndInboundGameRequests = async (playerId: string): Promise<IGameInvites> => {
+  const [dbInvitations, dbinboundGameRequests] = await Promise.all([
     invitationRepository.selectInvitationsForPlayer(playerId),
-    invitationRepository.selectInboundRequestsForPlayer(playerId)
+    invitationRepository.selectInboundGameRequestsForPlayer(playerId)
   ]);
 
   const invitations = await Promise.all(dbInvitations.map((invite) => buildOutboundInvite(invite)));
-  const inboundRequests = await Promise.all(dbInboundRequests.map((request) => buildInboundRequest(request)));
+  const inboundGameRequests = await Promise.all(dbinboundGameRequests.map((request) => buildInboundRequest(request)));
 
   return {
     invitations,
-    inboundRequests
+    inboundGameRequests
   };
 };

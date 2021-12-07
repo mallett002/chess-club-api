@@ -17,15 +17,15 @@ export interface IInvitation {
 
 export interface IOutboundInvite {
   invitationId: string
-  invitee: string // username
+  invitee: string
 }
 
 export interface IInboundInvite {
   invitationId: string
-  invitor: string // username
+  invitor: string
 }
 
 export interface IGameInvites {
   invitations: IOutboundInvite[],
-  inboundRequests: IInboundInvite[]
+  inboundGameRequests: IInboundInvite[]
 }

@@ -44,13 +44,13 @@ export const selectInvitationsForPlayer = async (playerId: string): Promise<IDBI
     return dbInvitations;
 };
 
-export const selectInboundRequestsForPlayer = async (playerId: string): Promise<IDBInvitation[]> => {
-  const inboundRequests: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
+export const selectInboundGameRequestsForPlayer = async (playerId: string): Promise<IDBInvitation[]> => {
+  const inboundGameRequests: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
     .where({
       invitee_id: playerId,
     });
 
-    return inboundRequests;
+    return inboundGameRequests;
 };
 
 export const deleteInvitationById = async (invitationId: string): Promise<string | null> => {

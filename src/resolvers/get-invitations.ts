@@ -5,10 +5,9 @@ import { IToken } from '../interfaces/account';
 import { IBoard } from '../interfaces/board';
 import { IGameInvites } from '../interfaces/invitation';
 import { verifyToken } from '../services/accounts/token-service';
-import { getInvitationsAndInboundRequests } from '../services/invitation';
+import { getInvitationsAndInboundGameRequests } from '../services/invitation';
 
 
-// Todo: change GameRequests nomenclature to Invitation
 export default async (parent, args, context: IToken): Promise<IGameInvites> => {
   const claims: PlayerJwtPayload = verifyToken(context);
 
@@ -16,7 +15,7 @@ export default async (parent, args, context: IToken): Promise<IGameInvites> => {
     throw new AuthenticationError('You must be logged in.');
   }
   
-  const gameRequests = await getInvitationsAndInboundRequests(claims.playerId);
+  const gameRequests = await getInvitationsAndInboundGameRequests(claims.playerId);
 
   console.log(JSON.stringify(gameRequests));
 

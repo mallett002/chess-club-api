@@ -50,14 +50,14 @@ describe('get invitations', () => {
     expect(getInvitations.invitations).toStrictEqual([
       {
         invitationId: invitationOne.invitationId,
-        invitee: firstPlayer.username
+        invitee: secondPlayer.username
       },
       {
         invitationId: invitationTwo.invitationId,
-        invitee: secondPlayer.username
+        invitee: thirdPlayer.username
       }
     ]);
-    expect(getInvitations.inboundRequests).toStrictEqual([]);
+    expect(getInvitations.inboundGameRequests).toStrictEqual([]);
   });
 
 
