@@ -67,6 +67,20 @@ export const getBoardQuery = gql`
   }
 }`;
 
+export const getInvitationsQuery = gql`
+  query GetInvitations {
+  getInvitations {
+    invitations {
+      invitationId
+      invitee
+    }
+    inboundGameRequests {
+      invitationId
+      invitor
+    }
+  }
+}`;
+
 export const updateBoardMutation = gql`
   mutation updateBoard($gameId: ID!, $cell: String!) {
       updateBoard(gameId: $gameId, cell: $cell) {

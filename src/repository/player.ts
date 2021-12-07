@@ -25,3 +25,13 @@ export const selectPlayerByUsername = async (username: string): Promise<IPlayerD
 
   return player;
 };
+
+export const selectPlayerByPlayerId = async (playerId: string): Promise<IPlayerDTO | null> => {
+  const [player]: IPlayerDTO[] = await pgClient('chess_club.tbl_player').where('player_id', playerId);
+
+  if (!player) {
+    return null;
+  }
+
+  return player;
+};

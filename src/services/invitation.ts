@@ -1,7 +1,7 @@
 import * as invitationRepository from '../repository/invitation';
-import { IDBInvitation, IInvitation } from '../interfaces/invitation';
+import { IDBInvitation, IGameInvites, IInboundInvite, IInvitation, IOutboundInvite } from '../interfaces/invitation';
 import { IPlayerDTO } from '../interfaces/player';
-import { selectPlayerByUsername } from '../repository/player';
+import { selectPlayerByPlayerId, selectPlayerByUsername } from '../repository/player';
 import { PlayerJwtPayload } from 'jsonwebtoken';
 
 export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUsername: string): Promise<IInvitation> => {
@@ -40,5 +40,38 @@ export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUs
       playerId: playerToInvite.player_id,
       username: playerToInvite.username
     }
+  };
+};
+
+const buildOutboundInvite = async (invitation: IDBInvitation) => {
+  const player = await selectPlayerByPlayerId(invitation.invitee_id);
+
+  return {
+    invitationId: invitation.invitation_id,
+    invitee: player.username
+  }
+};
+
+const buildInboundRequest = async (request: IDBInvitation) => {
+  const player = await selectPlayerByPlayerId(request.invitor_id);
+
+  return {
+    invitationId: request.invitation_id,
+    invitor: player.username
+  }
+};
+
+export const getInvitationsAndInboundGameRequests = async (playerId: string): Promise<IGameInvites> => {
+  const [dbInvitations, dbinboundGameRequests] = await Promise.all([
+    invitationRepository.selectInvitationsForPlayer(playerId),
+    invitationRepository.selectInboundGameRequestsForPlayer(playerId)
+  ]);
+
+  const invitations = await Promise.all(dbInvitations.map((invite) => buildOutboundInvite(invite)));
+  const inboundGameRequests = await Promise.all(dbinboundGameRequests.map((request) => buildInboundRequest(request)));
+
+  return {
+    invitations,
+    inboundGameRequests
   };
 };
