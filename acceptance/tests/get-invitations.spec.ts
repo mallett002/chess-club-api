@@ -44,11 +44,11 @@ describe('get invitations', () => {
   it('should be able to get invitations to others', async () => {
     const { createInvitation: invitationOne } = await gqlClient.request(createInvitationMutation, {
       inviteeUsername: secondPlayer.username,
-      inviteeColor: chance.pickone('w', 'b')
+      invitorColor: chance.pickone('w', 'b')
     });
     const { createInvitation: invitationTwo } = await gqlClient.request(createInvitationMutation, {
       inviteeUsername: thirdPlayer.username,
-      inviteeColor: chance.pickone('w', 'b')
+      invitorColor: chance.pickone('w', 'b')
     });
 
     const { getInvitations } = await gqlClient.request(getInvitationsQuery);
@@ -83,11 +83,11 @@ describe('get invitations', () => {
     
     const { createInvitation: invitationOne } = await secondGqlClient.request(createInvitationMutation, {
       inviteeUsername: firstPlayer.username,
-      inviteeColor: chance.pickone('w', 'b')
+      invitorColor: chance.pickone('w', 'b')
     });
     const { createInvitation: invitationTwo } = await thirdGqlClient.request(createInvitationMutation, {
       inviteeUsername: firstPlayer.username,
-      inviteeColor: chance.pickone('w', 'b')
+      invitorColor: chance.pickone('w', 'b')
     });
 
     const { getInvitations } = await gqlClient.request(getInvitationsQuery);

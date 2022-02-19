@@ -14,7 +14,7 @@ describe('create game', () => {
   let gqlClient,
     firstPlayer,
     secondPlayer,
-    inviteeColor,
+    invitorColor,
     invitation;
 
   beforeEach(async () => {
@@ -39,11 +39,11 @@ describe('create game', () => {
       }
     });
 
-    inviteeColor = chance.pickone('w', 'b');
+    invitorColor = chance.pickone('w', 'b');
 
     const response = await gqlClient.request(createInvitationMutation, {
       inviteeUsername: secondPlayer.username,
-      inviteeColor
+      invitorColor
     });
 
     invitation = response.createInvitation;
@@ -54,7 +54,7 @@ describe('create game', () => {
       invitationId: invitation.invitationId
     });
 
-    const expectedPlayerOne = inviteeColor === 'w' ? secondPlayer.player_id : firstPlayer.player_id;
+    const expectedPlayerOne = invitorColor === 'b' ? secondPlayer.player_id : firstPlayer.player_id;
 
     expect(response.createGame.gameId).toBeDefined();
     expect(response.createGame.playerOne).toStrictEqual(expectedPlayerOne);
@@ -69,7 +69,7 @@ describe('create game', () => {
 
     await gqlClient.request(createGameMutation, {
       invitationId: invitation.invitationId,
-      inviteeColor: chance.pickone(['w', 'b'])
+      invitorColor: chance.pickone(['w', 'b'])
     });
 
     invitations = await selectInvitations();

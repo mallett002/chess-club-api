@@ -19,7 +19,6 @@ export const createPlayerMutation = gql`
   }
 `;
 
-// TODO: USE INVITOR COLOR
 export const createInvitationMutation = gql`
   mutation createInvitation($inviteeUsername: String!, $invitorColor: InvitorColor!) {
   createInvitation(inviteeUsername: $inviteeUsername, invitorColor: $invitorColor) {
