@@ -7,7 +7,7 @@ import { IGame } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
-import { IDBInvitation, IInvitation } from '../interfaces/invitation';
+import { IDBInvitation } from '../interfaces/invitation';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
@@ -20,15 +20,15 @@ const publishBoardUpdates = (board): void => {
   - Will take in a username to determine who they are inviting.
   - Look up player by username and send invite.
 */
-export const createGame = async (invitationId: string, inviteeColor: string): Promise<IBoard> => {
+export const createGame = async (invitationId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
   if (!invitation) {
     throw new Error('Invitation does not exist.');
   }
 
-  const playerOneId = inviteeColor === 'w' ? invitation.invitee_id : invitation.invitor_id;
-  const playerTwoId = inviteeColor === 'b' ? invitation.invitee_id : invitation.invitor_id;
+  const playerOneId = invitation.invitee_color === 'w' ? invitation.invitee_id : invitation.invitor_id;
+  const playerTwoId = invitation.invitee_color === 'b' ? invitation.invitee_id : invitation.invitor_id;
 
   const chess = new Chess();
   const fen = chess.fen();

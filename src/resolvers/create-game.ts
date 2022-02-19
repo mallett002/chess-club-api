@@ -5,19 +5,19 @@ import { verifyToken } from '../services/accounts/token-service';
 
 import { createGame } from '../services/games';
 
-export default async (_, {invitationId, inviteeColor}, context: IToken): Promise<IBoard> => {
+export default async (_, {invitationId}, context: IToken): Promise<IBoard> => {
   const claims = verifyToken(context);
 
   if (!claims) {
     throw new AuthenticationError('You must be logged in.');
   }
 
-  if (!invitationId || !inviteeColor) {
-    throw new ValidationError('missing or invalid value for invitationId or inviteeColor');    
+  if (!invitationId) {
+    throw new ValidationError('missing or invalid value for invitationId');    
   }
 
   try {
-    const game = await createGame(invitationId, inviteeColor);
+    const game = await createGame(invitationId);
 
     return game;
   } catch (error) {
