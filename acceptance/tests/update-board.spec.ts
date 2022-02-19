@@ -44,8 +44,7 @@ describe('update board', () => {
     });
 
     const createGameResponse = await gqlClient.request(createGameMutation, {
-      invitationId: invitation.invitationId,
-      inviteeColor: chance.pickone(['w', 'b'])
+      invitationId: invitation.invitationId
     });
 
     gameId = createGameResponse.createGame.gameId;
