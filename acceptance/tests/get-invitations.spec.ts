@@ -1,3 +1,4 @@
+import Chance from 'chance';
 import { GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
@@ -6,6 +7,8 @@ import { deleteInvitations, deletePlayers } from '../utils/db';
 import { createInvitationMutation, getInvitationsQuery } from '../utils/gql-queries';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
+
+const chance = new Chance();
 
 describe('get invitations', () => {
   let gqlClient,
@@ -40,10 +43,12 @@ describe('get invitations', () => {
 
   it('should be able to get invitations to others', async () => {
     const { createInvitation: invitationOne } = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: secondPlayer.username
+      inviteeUsername: secondPlayer.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
     const { createInvitation: invitationTwo } = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: thirdPlayer.username
+      inviteeUsername: thirdPlayer.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     const { getInvitations } = await gqlClient.request(getInvitationsQuery);
@@ -77,10 +82,12 @@ describe('get invitations', () => {
     });
     
     const { createInvitation: invitationOne } = await secondGqlClient.request(createInvitationMutation, {
-      inviteeUsername: firstPlayer.username
+      inviteeUsername: firstPlayer.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
     const { createInvitation: invitationTwo } = await thirdGqlClient.request(createInvitationMutation, {
-      inviteeUsername: firstPlayer.username
+      inviteeUsername: firstPlayer.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     const { getInvitations } = await gqlClient.request(getInvitationsQuery);

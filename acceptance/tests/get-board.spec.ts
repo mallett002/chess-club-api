@@ -38,7 +38,8 @@ describe('get board', () => {
     });
 
     const {createInvitation: invitation} = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: secondPlayer.username
+      inviteeUsername: secondPlayer.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     const response = await gqlClient.request(createGameMutation, {

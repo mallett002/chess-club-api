@@ -1,10 +1,10 @@
 import * as invitationRepository from '../repository/invitation';
-import { IDBInvitation, IGameInvites, IInboundInvite, IInvitation, IOutboundInvite } from '../interfaces/invitation';
+import { IDBInvitation, IGameInvites, IInvitation, IInvitationColor } from '../interfaces/invitation';
 import { IPlayerDTO } from '../interfaces/player';
 import { selectPlayerByPlayerId, selectPlayerByUsername } from '../repository/player';
 import { PlayerJwtPayload } from 'jsonwebtoken';
 
-export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUsername: string): Promise<IInvitation> => {
+export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUsername: string, inviteeColor: IInvitationColor): Promise<IInvitation> => {
   const {playerId: invitorPlayerId, sub} = invitorClaims;
   const playerToInvite: IPlayerDTO = await selectPlayerByUsername(inviteeUsername);
 
@@ -28,6 +28,7 @@ export const createInviation = async (invitorClaims: PlayerJwtPayload, inviteeUs
   const invitation: IDBInvitation = await invitationRepository.insertNewInvitation(
     invitorPlayerId,
     playerToInvite.player_id,
+    inviteeColor
   );
 
   return {

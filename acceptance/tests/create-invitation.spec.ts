@@ -1,5 +1,5 @@
 import Chance from 'chance';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
@@ -39,7 +39,8 @@ describe('create invitation', () => {
 
   it('should be able to create an invitation', async () => {
     const response = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: playerTwo.username
+      inviteeUsername: playerTwo.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     expect(response.createInvitation.invitationId).toBeDefined();
@@ -56,11 +57,25 @@ describe('create invitation', () => {
 
   it('should throw a validation error if inviteeUsername is missing', async () => {
     try {
-      await gqlClient.request(createInvitationMutation);
+      await gqlClient.request(createInvitationMutation, {
+        inviteeColor: chance.pickone('w', 'b')
+      });
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
       expect(error.message).toContain('Variable \"$inviteeUsername\" of required type \"String!\" was not provided.');
+    }
+  });
+
+  it('should throw a validation error if inviteeColor is missing', async () => {
+    try {
+      await gqlClient.request(createInvitationMutation, {
+        inviteeUsername: playerTwo.username
+      });
+      throw new Error('Should have failed.');
+    } catch (error) {
+      expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
+      expect(error.message).toContain('Variable \"$inviteeColor\" of required type \"InviteeColor!\" was not provided.');
     }
   });
 
@@ -69,7 +84,8 @@ describe('create invitation', () => {
 
     try {
       await gqlClient.request(createInvitationMutation, {
-        inviteeUsername: playerTwo.username
+        inviteeUsername: playerTwo.username,
+        inviteeColor: chance.pickone('w', 'b')
       });
       throw new Error('Should have failed.');
     } catch (error) {
@@ -81,7 +97,8 @@ describe('create invitation', () => {
   it('should not let you invite yourself', async () => {
     try {
       await gqlClient.request(createInvitationMutation, {
-        inviteeUsername: playerOne.username
+        inviteeUsername: playerOne.username,
+        inviteeColor: chance.pickone('w', 'b')
       });
       throw new Error('Should have failed.');
     } catch (error) {
@@ -95,7 +112,8 @@ describe('create invitation', () => {
 
     try {
       await gqlClient.request(createInvitationMutation, {
-        inviteeUsername
+        inviteeUsername,
+        inviteeColor: chance.pickone('w', 'b')
       });
       throw new Error('Should have failed.');
     } catch (error) {
@@ -106,12 +124,14 @@ describe('create invitation', () => {
 
   it('should not attempt to invite with existing invite from same player', async () => {
     await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: playerTwo.username
+      inviteeUsername: playerTwo.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     try {
       await gqlClient.request(createInvitationMutation, {
-        inviteeUsername: playerTwo.username
+        inviteeUsername: playerTwo.username,
+        inviteeColor: chance.pickone('w', 'b')
       });
       throw new Error('Should have failed.');
     } catch (error) {
@@ -130,12 +150,14 @@ describe('create invitation', () => {
     });
 
     await playerTwoClient.request(createInvitationMutation, {
-      inviteeUsername: playerOne.username
+      inviteeUsername: playerOne.username,
+      inviteeColor: chance.pickone('w', 'b')
     });
 
     try {
       await gqlClient.request(createInvitationMutation, {
-        inviteeUsername: playerTwo.username
+        inviteeUsername: playerTwo.username,
+        inviteeColor: chance.pickone('w', 'b')
       });
       throw new Error('Should have failed.');
     } catch (error) {

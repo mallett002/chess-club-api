@@ -12,12 +12,12 @@ export default async (_, args, context: IToken): Promise<IInvitation> => {
     throw new AuthenticationError('You must be logged in.');
   }
 
-  if (!args.inviteeUsername) {
-    throw new ValidationError('missing or invalid value inviteeUsername');    
+  if (!args.inviteeUsername || !args.inviteeColor) {
+    throw new ValidationError('missing or invalid value for inviteeUsername or inviteeColor');    
   }
 
   try {
-    const invitation = await createInviation(claims, args.inviteeUsername);
+    const invitation = await createInviation(claims, args.inviteeUsername, args.inviteeColor);
   
     return invitation;
   } catch (error) {

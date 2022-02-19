@@ -1,13 +1,14 @@
-import { IDBInvitation } from "../interfaces/invitation";
+import { IDBInvitation, IInvitationColor } from "../interfaces/invitation";
 import { getPgClient } from "./db-client";
 
 const pgClient = getPgClient();
 
-export const insertNewInvitation = async (invitor: string, invitee: string): Promise<IDBInvitation> => {
+export const insertNewInvitation = async (invitor: string, invitee: string, inviteeColor: IInvitationColor): Promise<IDBInvitation> => {
   const [dbInvitation]: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
     .insert({
       invitor_id: invitor,
       invitee_id: invitee,
+      invitee_color: inviteeColor
     }).returning('*');
 
   return dbInvitation;
