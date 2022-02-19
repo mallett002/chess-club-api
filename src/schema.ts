@@ -24,7 +24,7 @@ export const typeDefs = buildSchema(`
     STALEMATE
   }
 
-  enum InviteeColor {
+  enum InvitorColor {
     w
     b
   }
@@ -92,7 +92,7 @@ export const typeDefs = buildSchema(`
     createGame(invitationId: ID!): Board!
     loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!
     createPlayer(username: String!, password: String!): Token!
-    createInvitation(inviteeUsername: String!, inviteeColor: InviteeColor!): Invitation!
+    createInvitation(inviteeUsername: String!, invitorColor: InvitorColor!): Invitation!
   }
 
   type Query {

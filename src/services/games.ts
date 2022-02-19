@@ -15,11 +15,6 @@ const publishBoardUpdates = (board): void => {
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
 };
 
-/* 
-  - Will eventually use player's JWT to determine who they are.
-  - Will take in a username to determine who they are inviting.
-  - Look up player by username and send invite.
-*/
 export const createGame = async (invitationId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
@@ -27,8 +22,8 @@ export const createGame = async (invitationId: string): Promise<IBoard> => {
     throw new Error('Invitation does not exist.');
   }
 
-  const playerOneId = invitation.invitee_color === 'w' ? invitation.invitee_id : invitation.invitor_id;
-  const playerTwoId = invitation.invitee_color === 'b' ? invitation.invitee_id : invitation.invitor_id;
+  const playerOneId = invitation.invitor_color === 'w' ? invitation.invitor_id : invitation.invitee_id;
+  const playerTwoId = invitation.invitor_color === 'b' ? invitation.invitor_id : invitation.invitee_id;
 
   const chess = new Chess();
   const fen = chess.fen();
