@@ -89,7 +89,7 @@ export const typeDefs = buildSchema(`
   type Mutation {
     updateBoard(gameId: ID!, cell: String!): Board!
     endGame(gameId: ID!): ID
-    createGame(invitationId: ID!, inviteeColor: String!): Board!
+    createGame(invitationId: ID!): Board!
     loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!
     createPlayer(username: String!, password: String!): Token!
     createInvitation(inviteeUsername: String!, inviteeColor: InviteeColor!): Invitation!

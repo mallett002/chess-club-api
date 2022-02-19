@@ -1,8 +1,8 @@
 import { gql } from 'graphql-request';
 
 export const createGameMutation = gql`
-  mutation createGame($invitationId: ID!, $inviteeColor: String!) {
-      createGame(invitationId: $invitationId, inviteeColor: $inviteeColor) {
+  mutation createGame($invitationId: ID!) {
+      createGame(invitationId: $invitationId) {
         gameId
         playerOne
         playerTwo
