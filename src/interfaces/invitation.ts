@@ -6,7 +6,8 @@ interface IPlayerInvite {
 export interface IDBInvitation {
   invitation_id: string
   invitor_id: string
-  invitee_id: string
+  invitee_id: string,
+  invitee_color: IInvitationColor
 }
 
 export interface IInvitation {
@@ -29,3 +30,9 @@ export interface IGameInvites {
   invitations: IOutboundInvite[],
   inboundGameRequests: IInboundInvite[]
 }
+
+export enum IInvitationColor {
+  w = 'w',
+  b = 'b'
+}
+

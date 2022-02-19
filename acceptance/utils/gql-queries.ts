@@ -20,8 +20,8 @@ export const createPlayerMutation = gql`
 `;
 
 export const createInvitationMutation = gql`
-  mutation createInvitation($inviteeUsername: String!) {
-  createInvitation(inviteeUsername: $inviteeUsername) {
+  mutation createInvitation($inviteeUsername: String!, $inviteeColor: InviteeColor!) {
+  createInvitation(inviteeUsername: $inviteeUsername, inviteeColor: $inviteeColor) {
     invitationId
     invitor {
       playerId
