@@ -10,6 +10,7 @@ import { BOARD_UPDATED } from '../constants';
 import { getPubSub } from '../services/pub-sub';
 import endGame from './end-game';
 import createInvitation from './create-invitation';
+import deleteInvitation from './delete-invitation';
 import getInvitations from './get-invitations';
 
 export const resolvers = {
@@ -24,7 +25,8 @@ export const resolvers = {
     endGame,
     loadGame,
     updateBoard,
-    createInvitation
+    createInvitation,
+    deleteInvitation
   },
   Subscription: {
     boardUpdated: {

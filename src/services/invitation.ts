@@ -76,3 +76,6 @@ export const getInvitationsAndInboundGameRequests = async (playerId: string): Pr
     inboundGameRequests
   };
 };
+
+export const deleteInvitation = (invitationId: string): Promise<string> =>
+  invitationRepository.deleteInvitationById(invitationId);
