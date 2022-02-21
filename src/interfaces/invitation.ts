@@ -7,7 +7,7 @@ export interface IDBInvitation {
   invitation_id: string
   invitor_id: string
   invitee_id: string,
-  invitee_color: IInvitationColor
+  invitor_color: IInvitationColor
 }
 
 export interface IInvitation {

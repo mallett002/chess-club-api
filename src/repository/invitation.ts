@@ -3,12 +3,12 @@ import { getPgClient } from "./db-client";
 
 const pgClient = getPgClient();
 
-export const insertNewInvitation = async (invitor: string, invitee: string, inviteeColor: IInvitationColor): Promise<IDBInvitation> => {
+export const insertNewInvitation = async (invitor: string, invitee: string, invitorColor: IInvitationColor): Promise<IDBInvitation> => {
   const [dbInvitation]: IDBInvitation[] = await pgClient('chess_club.tbl_invitation')
     .insert({
       invitor_id: invitor,
       invitee_id: invitee,
-      invitee_color: inviteeColor
+      invitor_color: invitorColor
     }).returning('*');
 
   return dbInvitation;

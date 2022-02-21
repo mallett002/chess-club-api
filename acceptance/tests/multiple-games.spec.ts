@@ -30,7 +30,7 @@ describe('multiple games', () => {
 
     const {createInvitation: invitation} = await gqlClient.request(createInvitationMutation, {
       inviteeUsername: secondPlayer.username,
-      inviteeColor: chance.pickone('w', 'b')
+      invitorColor: chance.pickone('w', 'b')
     });
 
     const {createGame} = await gqlClient.request(createGameMutation, {
