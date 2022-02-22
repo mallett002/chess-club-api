@@ -35,6 +35,12 @@ export const createInvitationMutation = gql`
 }
 `;
 
+export const deleteInvitationMutation = gql`
+  mutation deleteInvitation($invitationId: ID!) {
+    deleteInvitation(invitationId: $invitationId)
+  }
+`;
+
 export const loadGameMutation = gql`
   mutation loadGame($playerOne: ID!, $playerTwo: ID!, $fen: String!) {
         loadGame(playerOne: $playerOne, playerTwo: $playerTwo, fen: $fen) {

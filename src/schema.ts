@@ -93,6 +93,7 @@ export const typeDefs = buildSchema(`
     loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!
     createPlayer(username: String!, password: String!): Token!
     createInvitation(inviteeUsername: String!, invitorColor: InvitorColor!): Invitation!
+    deleteInvitation(invitationId: ID!): ID
   }
 
   type Query {

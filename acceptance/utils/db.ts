@@ -63,4 +63,19 @@ export const selectInvitations = async () => {
   return result.rows;
 };
 
+export const selectInvitation = async (invitationId) => {
+  const pgTestClient = await getPgTestClient();
+  const query = {
+    text: 'select * from chess_club.tbl_invitation WHERE invitation_id = $1',
+    values: [invitationId]
+  };
+  const result = await pgTestClient.query(query);
 
+  const foundInvite =  result.rows[0];
+
+  if (!foundInvite) {
+    return null;
+  }
+
+  return foundInvite;
+};
