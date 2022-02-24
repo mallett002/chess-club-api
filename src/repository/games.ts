@@ -69,6 +69,7 @@ export const selectGamesForPlayer = async (playerId: string): Promise<IGame []> 
     .where({ player_one: playerId })
     .orWhere({ player_two: playerId });
 
+    // fix this: update IGame or don't return that type
   return games.map(mapGameDtoToDomain);
 };
 

@@ -49,6 +49,17 @@ export const loadGameMutation = gql`
       }
   `;
 
+export const getGamesQuery = gql`
+  query GetGames($playerId: ID!){
+    getBoard(gameId: $playerId) {
+      gameId
+      playerOne
+      playerTwo
+      turn
+      opponentUsername
+    }
+}`;
+
 export const getBoardQuery = gql`
   query GetBoard($gameId: ID!){
   getBoard(gameId: $gameId) {
