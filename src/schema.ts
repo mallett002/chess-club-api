@@ -44,7 +44,8 @@ export const typeDefs = buildSchema(`
     gameId: ID!
     playerOne: String!
     playerTwo: String!
-    turn: String
+    turn: ID!
+    opponentUsername: String!
   }
 
   type Player {
