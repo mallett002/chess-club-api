@@ -3,11 +3,13 @@ import {Chess} from 'chess.js';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
-import { IGame } from '../interfaces/game';
+import { IGameDomain, IGameDTO } from '../interfaces/game';
+import { IPlayerDTO } from '../interfaces/player';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
 import { IDBInvitation } from '../interfaces/invitation';
+import { selectPlayerByPlayerId } from '../repository/player';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
@@ -57,7 +59,7 @@ export const createGame = async (invitationId: string): Promise<IBoard> => {
 };
 
 export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
-  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
 
   chess.load(game.fen);
@@ -85,25 +87,29 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   return newBoard;
 };
 
-export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => {
+export const getGamesByPlayerId = async (playerId: string): Promise<IGameDomain[]> => {
   const games = await gamesRepository.selectGamesForPlayer(playerId);
 
-  return games.map((game) => {
+  return Promise.all(games.map(async (game) => {
     const chess = new Chess();
 
     chess.load(game.fen);
 
-    const turn = chess.turn();
+    const chessTurn = chess.turn();
+    const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+    const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+    const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
 
     return {
       ...game,
+      opponentUsername: opponent.username,
       turn
     };
-  });
+  }));
 };
 
 export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
-  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
     return null;

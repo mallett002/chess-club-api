@@ -1,10 +1,10 @@
 import { AuthenticationError } from 'apollo-server-core';
 import { IToken } from '../interfaces/account';
-import { IGame } from '../interfaces/game';
+import { IGameDomain } from '../interfaces/game';
 import { verifyToken } from '../services/accounts/token-service';
 import { getGamesByPlayerId } from '../services/games';
 
-export default (_, { playerId }, context: IToken): Promise<IGame[]> => {
+export default (_, { playerId }, context: IToken): Promise<IGameDomain[]> => {
   const claims = verifyToken(context);
 
   if (!claims) {
