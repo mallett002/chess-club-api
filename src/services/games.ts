@@ -4,10 +4,12 @@ import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
 import { IGameDomain, IGameDTO } from '../interfaces/game';
+import { IPlayerDTO } from '../interfaces/player';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
 import { IDBInvitation } from '../interfaces/invitation';
+import { selectPlayerByPlayerId } from '../repository/player';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
@@ -88,21 +90,22 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
 export const getGamesByPlayerId = async (playerId: string): Promise<IGameDomain[]> => {
   const games = await gamesRepository.selectGamesForPlayer(playerId);
 
-  return games.map((game) => {
+  return Promise.all(games.map(async (game) => {
     const chess = new Chess();
 
     chess.load(game.fen);
 
-    const turn = chess.turn();
-
-    //TODO: put opponentUsername on here
+    const chessTurn = chess.turn();
+    const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+    const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+    const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
 
     return {
       ...game,
-      opponentUsername: 'some name...',
+      opponentUsername: opponent.username,
       turn
     };
-  });
+  }));
 };
 
 export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {

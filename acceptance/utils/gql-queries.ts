@@ -51,7 +51,7 @@ export const loadGameMutation = gql`
 
 export const getGamesQuery = gql`
   query GetGames($playerId: ID!){
-    getBoard(gameId: $playerId) {
+    getGames(playerId: $playerId) {
       gameId
       playerOne
       playerTwo
