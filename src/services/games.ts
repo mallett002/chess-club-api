@@ -3,7 +3,7 @@ import {Chess} from 'chess.js';
 import { getPubSub } from './pub-sub';
 import { BOARD_UPDATED } from '../constants';
 import { flattenPositions, mapChessStatusToGameStatus } from './board';
-import { IGame } from '../interfaces/game';
+import { IGameDomain, IGameDTO } from '../interfaces/game';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
 import { IBoard } from '../interfaces/board';
@@ -57,7 +57,7 @@ export const createGame = async (invitationId: string): Promise<IBoard> => {
 };
 
 export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
-  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
 
   chess.load(game.fen);
@@ -85,7 +85,7 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   return newBoard;
 };
 
-export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => {
+export const getGamesByPlayerId = async (playerId: string): Promise<IGameDomain[]> => {
   const games = await gamesRepository.selectGamesForPlayer(playerId);
 
   return games.map((game) => {
@@ -95,15 +95,18 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGame[]> => 
 
     const turn = chess.turn();
 
+    //TODO: put opponentUsername on here
+
     return {
       ...game,
+      opponentUsername: 'some name...',
       turn
     };
   });
 };
 
 export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
-  const game: IGame = await gamesRepository.getGameByGameId(gameId);
+  const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
     return null;

@@ -1,20 +1,20 @@
 import {getPgClient} from './db-client';
-import { IGame } from "../interfaces/game";
+import { IGameDTO } from "../interfaces/game";
 
 const pgClient = getPgClient();
 
-const mapGameDtoToDomain = (gameDto) => ({
-  gameId: gameDto.game_id,
-  fen: gameDto.fen,
-  playerOne: gameDto.player_one,
-  playerTwo: gameDto.player_two
+const mapToGameDTO = (dbGame) => ({
+  gameId: dbGame.game_id,
+  fen: dbGame.fen,
+  playerOne: dbGame.player_one,
+  playerTwo: dbGame.player_two
 });
 
-export const getGameByGameId = async (gameId): Promise<IGame> => {
+export const getGameByGameId = async (gameId): Promise<IGameDTO> => {
   const [game] = await pgClient('chess_club.tbl_game').where('game_id', gameId);
 
   if (game) {
-    return mapGameDtoToDomain(game);
+    return mapToGameDTO(game);
   }
 
   return null;
@@ -64,12 +64,11 @@ export const updateGame = (gameId, fen): Promise<string []> =>
     .update({ fen }, [fen])
     .returning('game_id');
 
-export const selectGamesForPlayer = async (playerId: string): Promise<IGame []> => {
+export const selectGamesForPlayer = async (playerId: string): Promise<IGameDTO []> => {
   const games = await pgClient('chess_club.tbl_game')
     .where({ player_one: playerId })
     .orWhere({ player_two: playerId });
 
-    // fix this: update IGame or don't return that type
-  return games.map(mapGameDtoToDomain);
+  return games.map(mapToGameDTO);
 };
 
