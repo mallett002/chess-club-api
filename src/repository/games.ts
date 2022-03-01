@@ -1,4 +1,4 @@
-import {getPgClient} from './db-client';
+import { getPgClient } from './db-client';
 import { IGameDTO } from "../interfaces/game";
 
 const pgClient = getPgClient();
@@ -35,36 +35,41 @@ export const deleteGameDataByGameId = async (gameId: string): Promise<string> =>
   return deletedGameId;
 };
 
-export const insertNewGame = async(fen: string, playerOne: string, playerTwo: string): Promise<string> => {
-  const [gameId]: string[] = await pgClient('chess_club.tbl_game').insert({
+export const insertNewGame = async (fen: string, playerOne: string, playerTwo: string): Promise<IGameDTO> => {
+  const [game] = await pgClient('chess_club.tbl_game').insert({
     fen,
     player_one: playerOne,
     player_two: playerTwo
-  }).returning('game_id');
+  }).returning('*');
 
-   await Promise.all([
+  await Promise.all([
     await pgClient('chess_club.tbl_players_games').insert({
-      game_id: gameId,
+      game_id: game.game_id,
       player_id: playerOne,
       player_color: 'w'
     }),
     await pgClient('chess_club.tbl_players_games').insert({
-      game_id: gameId,
+      game_id: game.game_id,
       player_id: playerTwo,
       player_color: 'b'
     })
   ]);
 
-  return gameId;
+  return {
+    fen: game.fen,
+    gameId: game.game_id,
+    playerOne: game.player_one,
+    playerTwo: game.player_two
+  };
 };
 
-export const updateGame = (gameId, fen): Promise<string []> =>
+export const updateGame = (gameId, fen): Promise<string[]> =>
   pgClient('chess_club.tbl_game')
     .where({ 'game_id': gameId })
     .update({ fen }, [fen])
     .returning('game_id');
 
-export const selectGamesForPlayer = async (playerId: string): Promise<IGameDTO []> => {
+export const selectGamesForPlayer = async (playerId: string): Promise<IGameDTO[]> => {
   const games = await pgClient('chess_club.tbl_game')
     .where({ player_one: playerId })
     .orWhere({ player_two: playerId });

@@ -74,7 +74,8 @@ export const getBoardQuery = gql`
     }
     playerOne
     playerTwo
-    positions{
+    opponentUsername
+    positions {
       type
       color
       label

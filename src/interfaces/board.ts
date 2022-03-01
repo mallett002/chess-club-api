@@ -27,6 +27,7 @@ export interface IBoard {
   playerOne: string
   playerTwo: string
   positions: IPosition[]
+  opponentUsername: string
   status: IGameStatus
   turn: string
 }

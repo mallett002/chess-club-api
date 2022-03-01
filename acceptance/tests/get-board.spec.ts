@@ -13,6 +13,7 @@ const chance = new Chance();
 describe('get board', () => {
   let gqlClient,
     secondPlayer,
+    firstPlayer,
     gameId;
 
   beforeEach(async () => {
@@ -24,7 +25,7 @@ describe('get board', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [, secondPlayer] = await Promise.all([
+    [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
@@ -39,7 +40,7 @@ describe('get board', () => {
 
     const {createInvitation: invitation} = await gqlClient.request(createInvitationMutation, {
       inviteeUsername: secondPlayer.username,
-      invitorColor: chance.pickone('w', 'b')
+      invitorColor: 'w'
     });
 
     const response = await gqlClient.request(createGameMutation, {
@@ -54,11 +55,13 @@ describe('get board', () => {
 
     expect(response.getBoard.errors).toBeUndefined();
     expect(response.getBoard.gameId).toStrictEqual(gameId);
-    expect(response.getBoard.turn).toStrictEqual('w');
+    expect(response.getBoard.playerOne).toStrictEqual(firstPlayer.player_id);
+    expect(response.getBoard.playerTwo).toStrictEqual(secondPlayer.player_id);
+    expect(response.getBoard.opponentUsername).toStrictEqual(secondPlayer.username);
+    expect(response.getBoard.turn).toStrictEqual(firstPlayer.player_id);
     expect(response.getBoard.moves).toBeDefined();
     expect(response.getBoard.positions).toBeDefined();
   });
-
 
   it('should throw an auth error if not authenticated', async () => {
     gqlClient = new GraphQLClient(graphqlUrl);
