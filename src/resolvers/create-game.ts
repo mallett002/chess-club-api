@@ -17,7 +17,7 @@ export default async (_, {invitationId}, context: IToken): Promise<IBoard> => {
   }
 
   try {
-    const game = await createGame(invitationId);
+    const game = await createGame(invitationId, claims.playerId);
 
     return game;
   } catch (error) {

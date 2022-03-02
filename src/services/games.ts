@@ -17,7 +17,7 @@ const publishBoardUpdates = (board): void => {
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
 };
 
-export const createGame = async (invitationId: string): Promise<IBoard> => {
+export const createGame = async (invitationId: string, playerId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
   if (!invitation) {
@@ -29,23 +29,28 @@ export const createGame = async (invitationId: string): Promise<IBoard> => {
 
   const chess = new Chess();
   const fen = chess.fen();
-  const turn = chess.turn();
 
-  const gameId = await gamesRepository.insertNewGame(
+  const game: IGameDTO = await gamesRepository.insertNewGame(
     fen,
     playerOneId,
     playerTwoId,
   );
 
-  if (gameId) {
+  if (game) {
     await invitationRepository.deleteInvitationById(invitationId);
   } else {
     throw new Error('Something went wrong creating the game');
   }
 
+  const chessTurn = chess.turn();
+  const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+  const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+  const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
+
   const board = {
-    gameId,
+    gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
+    opponentUsername: opponent.username,
     playerOne: playerOneId,
     playerTwo: playerTwoId,
     positions: flattenPositions(chess.board()),
@@ -58,11 +63,16 @@ export const createGame = async (invitationId: string): Promise<IBoard> => {
   return board;
 };
 
-export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
+export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> => {
   const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
 
   chess.load(game.fen);
+
+  const chessTurn = chess.turn();
+  const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+  const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+  const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
 
   const move = chess.move(moveToCell);
   
@@ -75,11 +85,12 @@ export const updateGame = async (gameId, moveToCell): Promise<IBoard> => {
   const newBoard = {
     gameId,
     moves: chess.moves({ verbose: true }),
+    opponentUsername: opponent.username,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
     status: mapChessStatusToGameStatus(chess),
-    turn: chess.turn()
+    turn
   };
 
   publishBoardUpdates(newBoard);
@@ -108,7 +119,7 @@ export const getGamesByPlayerId = async (playerId: string): Promise<IGameDomain[
   }));
 };
 
-export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
+export const getBoardByGameId = async (gameId: string, playerId: string): Promise<IBoard> => {
   const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
 
   if (!game) {
@@ -118,37 +129,49 @@ export const getBoardByGameId = async (gameId: string): Promise<IBoard> => {
   const chess = new Chess();
 
   chess.load(game.fen);
-  
+
+  const chessTurn = chess.turn();
+  const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+  const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+  const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
+
   return {
     gameId,
     moves: chess.moves({ verbose: true }),
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: flattenPositions(chess.board()),
+    opponentUsername: opponent.username,
     status: mapChessStatusToGameStatus(chess),
-    turn: chess.turn()
+    turn
   };
 };
 
-export const loadGame = async (playerOne, playerTwo, fen) => {
+export const loadGame = async (playerOne, playerTwo, fen, playerId): Promise<IBoard> => {
   const chess = new Chess();
 
   chess.load(fen);
 
-  const gameId: string = await gamesRepository.insertNewGame(
+  const game: IGameDTO = await gamesRepository.insertNewGame(
     fen,
     playerOne,
     playerTwo,
   );
 
+  const chessTurn = chess.turn();
+  const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
+  const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+  const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
+
   const board = {
-    gameId,
+    gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
     playerOne,
     playerTwo,
     positions: flattenPositions(chess.board()),
+    opponentUsername: opponent.username,
     status: mapChessStatusToGameStatus(chess),
-    turn: chess.turn()
+    turn
   };
 
   publishBoardUpdates(board);

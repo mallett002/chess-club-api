@@ -36,7 +36,8 @@ export const typeDefs = buildSchema(`
     playerTwo: String!
     positions: [Cell]!
     status: GameStatus!
-    turn: String
+    opponentUsername: String!
+    turn: ID
   }
 
   type Game {

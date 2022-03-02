@@ -10,10 +10,29 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 
 const chance = new Chance();
 
+function getExpectedTurn(firstPlayerIsPlayerOne, isPlayerOneTurn, firstPlayerId, secondPlayerId) {
+  if (firstPlayerIsPlayerOne) {
+    if (isPlayerOneTurn) {
+      return firstPlayerId;
+    }
+
+    return secondPlayerId;
+  }
+
+  if (isPlayerOneTurn) {
+    return secondPlayerId;
+  }
+
+  return firstPlayerId;
+}
+
 describe('update board', () => {
-  let gqlClient,
+  let gqlClientOne,
+    gqlClientTwo,
+    firstPlayer,
     secondPlayer,
     board,
+    firstPlayerIsPlayerOne,
     gameId;
 
   beforeEach(async () => {
@@ -25,33 +44,36 @@ describe('update board', () => {
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();
 
-    [, secondPlayer] = await Promise.all([
+    [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
       createDBPlayer(playerTwoPayload)
     ]);
 
-    const userJwt = await getJwtForPlayer(playerOnePayload);
-
-    gqlClient = new GraphQLClient(graphqlUrl, {
+    gqlClientOne = new GraphQLClient(graphqlUrl, {
       headers: {
-        authorization: userJwt
+        authorization: await getJwtForPlayer(playerOnePayload)
       }
     });
 
-    const {createInvitation: invitation} = await gqlClient.request(createInvitationMutation, {
-      inviteeUsername: secondPlayer.username,
-      invitorColor: chance.pickone('w', 'b')
+    gqlClientTwo = new GraphQLClient(graphqlUrl, {
+      headers: {
+        authorization: await getJwtForPlayer(playerTwoPayload)
+      }
     });
 
-    const createGameResponse = await gqlClient.request(createGameMutation, {
+    const invitorColor = chance.pickone(['w', 'b']);
+    firstPlayerIsPlayerOne = invitorColor === 'w';
+
+    const { createInvitation: invitation } = await gqlClientOne.request(createInvitationMutation, {
+      inviteeUsername: secondPlayer.username,
+      invitorColor
+    });
+
+    const createGameResponse = await gqlClientTwo.request(createGameMutation, {
       invitationId: invitation.invitationId
     });
 
     gameId = createGameResponse.createGame.gameId;
-
-    const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
-
-    board = getBoardResponse.getBoard;
   });
 
   it('should be able to update the board various times, taking turns', async () => {
@@ -61,17 +83,23 @@ describe('update board', () => {
     });
 
     for (let i = 0; i < moveCount; i++) {
-      const getBoardResponse = await gqlClient.request(getBoardQuery, { gameId });
+      const isPlayerOneTurn = i % 2 === 0;
+      const client = isPlayerOneTurn ? gqlClientOne : gqlClientTwo;
+      const getBoardResponse = await client.request(getBoardQuery, { gameId });
 
       board = getBoardResponse.getBoard;
 
-      const turns = ['w', 'b'];
-      const expectedTurn = turns.find((turn) => turn !== board.turn);
       const randomMove = chance.pickone(board.moves);
-      const response = await gqlClient.request(updateBoardMutation, {
+      const response = await client.request(updateBoardMutation, {
         gameId,
         cell: randomMove.san
       });
+      const expectedTurn = getExpectedTurn(
+        firstPlayerIsPlayerOne,
+        isPlayerOneTurn,
+        firstPlayer.player_id,
+        secondPlayer.player_id
+      );
 
       expect(response.updateBoard.errors).toBeUndefined();
       expect(response.updateBoard.gameId).toStrictEqual(gameId);
@@ -82,12 +110,12 @@ describe('update board', () => {
   });
 
   it('should throw an auth error if not authenticated', async () => {
-    gqlClient = new GraphQLClient(graphqlUrl);
+    gqlClientOne = new GraphQLClient(graphqlUrl);
 
     const randomMove = chance.pickone(board.moves);
 
     try {
-      await gqlClient.request(updateBoardMutation, {
+      await gqlClientOne.request(updateBoardMutation, {
         gameId,
         cell: randomMove.san
       });
@@ -100,7 +128,7 @@ describe('update board', () => {
 
   it('should throw a validation error if the cell arg is missing', async () => {
     try {
-      await gqlClient.request(updateBoardMutation, { gameId });
+      await gqlClientOne.request(updateBoardMutation, { gameId });
       throw new Error('Should have failed.');
     } catch (error) {
       expect(error.response.errors[0].extensions.code).toStrictEqual('BAD_USER_INPUT');
