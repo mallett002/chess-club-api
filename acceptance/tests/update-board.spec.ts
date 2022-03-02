@@ -10,12 +10,29 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 
 const chance = new Chance();
 
+function getExpectedTurn(firstPlayerIsPlayerOne, isPlayerOneTurn, firstPlayerId, secondPlayerId) {
+  if (firstPlayerIsPlayerOne) {
+    if (isPlayerOneTurn) {
+      return firstPlayerId;
+    }
+
+    return secondPlayerId;
+  }
+
+  if (isPlayerOneTurn) {
+    return secondPlayerId;
+  }
+
+  return firstPlayerId;
+}
+
 describe('update board', () => {
   let gqlClientOne,
     gqlClientTwo,
     firstPlayer,
     secondPlayer,
     board,
+    firstPlayerIsPlayerOne,
     gameId;
 
   beforeEach(async () => {
@@ -44,9 +61,12 @@ describe('update board', () => {
       }
     });
 
+    const invitorColor = chance.pickone(['w', 'b']);
+    firstPlayerIsPlayerOne = invitorColor === 'w';
+
     const { createInvitation: invitation } = await gqlClientOne.request(createInvitationMutation, {
       inviteeUsername: secondPlayer.username,
-      invitorColor: 'w'
+      invitorColor
     });
 
     const createGameResponse = await gqlClientTwo.request(createGameMutation, {
@@ -74,10 +94,16 @@ describe('update board', () => {
         gameId,
         cell: randomMove.san
       });
+      const expectedTurn = getExpectedTurn(
+        firstPlayerIsPlayerOne,
+        isPlayerOneTurn,
+        firstPlayer.player_id,
+        secondPlayer.player_id
+      );
 
       expect(response.updateBoard.errors).toBeUndefined();
       expect(response.updateBoard.gameId).toStrictEqual(gameId);
-      expect(response.updateBoard.turn).toStrictEqual(isPlayerOneTurn ? firstPlayer.player_id : secondPlayer.player_id);
+      expect(response.updateBoard.turn).toStrictEqual(expectedTurn);
       expect(response.updateBoard.moves).toBeDefined();
       expect(response.updateBoard.positions).toBeDefined();
     }
