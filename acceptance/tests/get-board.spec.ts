@@ -14,6 +14,7 @@ describe('get board', () => {
   let gqlClient,
     secondPlayer,
     firstPlayer,
+    playerTwoPayload,
     gameId;
 
   beforeEach(async () => {
@@ -23,7 +24,7 @@ describe('get board', () => {
     await deletePlayers();
 
     const playerOnePayload = createRandomPlayerPayload();
-    const playerTwoPayload = createRandomPlayerPayload();
+    playerTwoPayload = createRandomPlayerPayload();
 
     [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
@@ -61,6 +62,28 @@ describe('get board', () => {
     expect(response.getBoard.turn).toStrictEqual(firstPlayer.player_id);
     expect(response.getBoard.moves).toBeDefined();
     expect(response.getBoard.positions).toBeDefined();
+  });
+
+  it('should not reverse the board for playerOne', async () => {
+    const response = await gqlClient.request(getBoardQuery, { gameId });
+    const positions = response.getBoard.positions;
+
+    expect(positions[0].color).toBe('b');
+  });
+
+  it('should reverse the board for playerTwo', async () => {
+    const playerTwoJwt = await getJwtForPlayer(playerTwoPayload);
+
+    gqlClient = new GraphQLClient(graphqlUrl, {
+      headers: {
+        authorization: playerTwoJwt
+      }
+    });
+
+    const response = await gqlClient.request(getBoardQuery, { gameId });
+    const positions = response.getBoard.positions;
+    
+    expect(positions[0].color).toBe('w');
   });
 
   it('should throw an auth error if not authenticated', async () => {
