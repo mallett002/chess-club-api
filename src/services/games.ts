@@ -17,6 +17,16 @@ const publishBoardUpdates = (board): void => {
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
 };
 
+const createBoardPositions = (positions, playerId, playerOneId) => {
+  if (playerId === playerOneId) {
+    return flattenPositions(positions);
+  }
+
+  const flattened = flattenPositions(positions);
+
+  return flattened.reverse();
+};
+
 export const createGame = async (invitationId: string, playerId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
@@ -53,7 +63,7 @@ export const createGame = async (invitationId: string, playerId: string): Promis
     opponentUsername: opponent.username,
     playerOne: playerOneId,
     playerTwo: playerTwoId,
-    positions: flattenPositions(chess.board()),
+    positions: createBoardPositions(chess.board(), playerId, playerOneId),
     status: mapChessStatusToGameStatus(chess),
     turn
   };
@@ -88,7 +98,7 @@ export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> 
     opponentUsername: opponent.username,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
-    positions: flattenPositions(chess.board()),
+    positions: createBoardPositions(chess.board(), playerId, game.playerOne),
     status: mapChessStatusToGameStatus(chess),
     turn
   };
@@ -140,7 +150,7 @@ export const getBoardByGameId = async (gameId: string, playerId: string): Promis
     moves: chess.moves({ verbose: true }),
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
-    positions: flattenPositions(chess.board()),
+    positions: createBoardPositions(chess.board(), playerId, game.playerOne),
     opponentUsername: opponent.username,
     status: mapChessStatusToGameStatus(chess),
     turn
@@ -168,7 +178,7 @@ export const loadGame = async (playerOne, playerTwo, fen, playerId): Promise<IBo
     moves: chess.moves({ verbose: true }),
     playerOne,
     playerTwo,
-    positions: flattenPositions(chess.board()),
+    positions: createBoardPositions(chess.board(), playerId, playerOne),
     opponentUsername: opponent.username,
     status: mapChessStatusToGameStatus(chess),
     turn
