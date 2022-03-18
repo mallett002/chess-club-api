@@ -1,3 +1,4 @@
+// Todo: going through this: https://www.apollographql.com/docs/apollo-server/data/subscriptions
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import config from 'config';
