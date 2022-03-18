@@ -32,11 +32,24 @@ export const resolvers = {
     boardUpdated: {
       subscribe: withFilter(
         () => {
+          console.log('In the subscribe function!!');
+          
           const pubSub = getPubSub();
   
           return pubSub.asyncIterator([BOARD_UPDATED])
         },
-        (payload, variables) => payload.boardUpdated.gameId === variables.gameId
+        (payload, variables) => {
+          console.log({payload});
+          console.log({variables});
+          
+          
+
+          const result = payload.boardUpdated.gameId === variables.gameId;
+
+          console.log({result});
+
+          return result;
+        }
       )
     }
   }
