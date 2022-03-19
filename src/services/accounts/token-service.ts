@@ -26,14 +26,18 @@ const getTokenFromHeaders = (token: string): string => {
   }
 
   return '';
+};
+
+export const verifyJwt = (token) => {
+  try {
+    return <jwt.PlayerJwtPayload>jwt.verify(token, config.get('tokenPrivateKey'));
+  } catch {
+    return null;   
+  }
 }
 
 export const verifyToken = (context: IToken): jwt.PlayerJwtPayload => {
   const accessToken = getTokenFromHeaders(context.token);
 
-  try {
-    return <jwt.PlayerJwtPayload>jwt.verify(accessToken, config.get('tokenPrivateKey'));
-  } catch {
-    return null;   
-  }
+  return verifyJwt(accessToken);
 };
