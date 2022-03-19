@@ -36,9 +36,15 @@ async function startServer(typeDefs, resolvers) {
   const serverCleanup = useServer({ 
     schema,
     onConnect: async (ctx) => {
+      console.log('Connected to socket in server!');
+      console.log({connectionParams: ctx.connectionParams});
       if (!verifyJwt(ctx.connectionParams)) {
+        console.log('Jwt not valid!!!!');
+
         throw new AuthenticationError('You must be logged in.');
       }
+      console.log('Seemed to be fine....');
+      
     }
    }, wsServer);
 
