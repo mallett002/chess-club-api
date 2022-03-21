@@ -55,7 +55,7 @@ export const typeDefs = buildSchema(`
   }
 
   type Subscription {
-    boardUpdated(gameId: ID!): Board!
+    boardUpdated(gameId: ID!): Board
   }
 
   type Token {

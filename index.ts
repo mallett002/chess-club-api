@@ -1,22 +1,25 @@
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import config from 'config';
 import http from 'http';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
-import ws from 'ws';
+import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import passport from 'passport';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
-import {createContext} from './server-helpers';
+import { createContext } from './server-helpers';
 import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 import { applyServerRoutes } from './src/controllers';
 import { configureAuthStrategies } from './src/services/accounts/auth-strategies';
+import { verifyAuthToken } from './src/services/accounts/token-service';
 
 const apolloConfig = config.get('apollo');
 const port = config.get('port');
 
 async function startServer(typeDefs, resolvers) {
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
   const app = express();
 
   app.use(passport.initialize());
@@ -25,31 +28,46 @@ async function startServer(typeDefs, resolvers) {
   applyServerRoutes(app);
 
   const httpServer = http.createServer(app);
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+  const serverCleanup = useServer({ 
+    schema,
+    onConnect: async (ctx) => {
+      if (!verifyAuthToken(ctx.connectionParams)) {
+        throw new AuthenticationError('You must be logged in.');
+      }
+    }
+   }, wsServer);
+
   const apolloServer = new ApolloServer({
     context: createContext,
-    typeDefs,
-    resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
     introspection: apolloConfig.introspection
   });
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({
-    app,
-    path: '/graphql'
+  apolloServer.applyMiddleware({ app });
+
+  httpServer.listen(port, () => {
+    console.log(
+      `🚀 Server is now running on http://localhost:${port}${apolloServer.graphqlPath}`,
+    );
   });
-
-  const server = httpServer.listen(port, () => {
-    const wsServer = new ws.Server({
-      server,
-      path: '/graphql',
-    });
-
-    useServer({ schema: typeDefs }, wsServer);
-  });
-
-  console.log(`🚀 Server ready at http://localhost:${port}${apolloServer.graphqlPath}`);
 }
 
 startServer(typeDefs, resolvers);
