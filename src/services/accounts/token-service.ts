@@ -18,7 +18,7 @@ export const getToken = (username: string, playerId: string): IToken => {
   };
 };
 
-const getTokenFromHeaders = (token: string): string => {
+const parseToken = (token: string): string => {
   if (token) {
     const [, jwt] = token.split(' ');
 
@@ -28,7 +28,7 @@ const getTokenFromHeaders = (token: string): string => {
   return '';
 };
 
-export const verifyJwt = (token) => {
+export const verifyJwt = (token: string): jwt.PlayerJwtPayload | null => {
   try {
     return <jwt.PlayerJwtPayload>jwt.verify(token, config.get('tokenPrivateKey'));
   } catch {
@@ -36,8 +36,14 @@ export const verifyJwt = (token) => {
   }
 }
 
+export const verifyAuthToken = (context) => {
+  const accessToken = parseToken(context.authToken);
+
+  return verifyJwt(accessToken);
+};
+
 export const verifyToken = (context: IToken): jwt.PlayerJwtPayload => {
-  const accessToken = getTokenFromHeaders(context.token);
+  const accessToken = parseToken(context.token);
 
   return verifyJwt(accessToken);
 };

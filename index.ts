@@ -1,4 +1,3 @@
-// Todo: going through this: https://www.apollographql.com/docs/apollo-server/data/subscriptions
 import express from 'express';
 import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import config from 'config';
@@ -14,7 +13,7 @@ import { resolvers } from './src/resolvers/resolver-map';
 import { typeDefs } from './src/schema';
 import { applyServerRoutes } from './src/controllers';
 import { configureAuthStrategies } from './src/services/accounts/auth-strategies';
-import { verifyJwt } from './src/services/accounts/token-service';
+import { verifyAuthToken } from './src/services/accounts/token-service';
 
 const apolloConfig = config.get('apollo');
 const port = config.get('port');
@@ -36,15 +35,9 @@ async function startServer(typeDefs, resolvers) {
   const serverCleanup = useServer({ 
     schema,
     onConnect: async (ctx) => {
-      console.log('Connected to socket in server!');
-      console.log({connectionParams: ctx.connectionParams});
-      if (!verifyJwt(ctx.connectionParams)) {
-        console.log('Jwt not valid!!!!');
-
+      if (!verifyAuthToken(ctx.connectionParams)) {
         throw new AuthenticationError('You must be logged in.');
       }
-      console.log('Seemed to be fine....');
-      
     }
    }, wsServer);
 

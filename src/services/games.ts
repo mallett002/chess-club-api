@@ -13,7 +13,6 @@ import { selectPlayerByPlayerId } from '../repository/player';
 
 const publishBoardUpdates = (board): void => {
   const pubSub = getPubSub();
-  console.log('Publishing BOARD_UPDATED');
 
   pubSub.publish(BOARD_UPDATED, { boardUpdated: board });
 };
