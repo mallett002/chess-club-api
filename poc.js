@@ -3,17 +3,17 @@ const chessJs = require('chess.js')
 const chess = new chessJs.Chess();
 
 
-chess.load('k7/8/n7/8/8/8/8/7K b - - 0 1');
+// chess.load('k7/8/n7/8/8/8/8/7K b - - 0 1');
 
-console.log({
-  inCheck: chess.in_check(),
-  in_checkmate: chess.in_checkmate(),
-  inDraw: chess.in_draw(),
-  in_stalemate: chess.in_stalemate(),
-  insufficient_material: chess.insufficient_material(),
-});
+// console.log({
+//   inCheck: chess.in_check(),
+//   in_checkmate: chess.in_checkmate(),
+//   inDraw: chess.in_draw(),
+//   in_stalemate: chess.in_stalemate(),
+//   insufficient_material: chess.insufficient_material(),
+// });
 
-console.log(chess.ascii());
+// console.log(chess.ascii());
 
 // console.log(chess.moves({verbose: true}));
 
@@ -77,5 +77,27 @@ console.log(chess.ascii());
   const moves = chess.moves({verbose: true});
   const turn = chess.turn();
   const board = chess.board();
+
+*/
+
+// Fallen soldiers (TLDR, save pieces into db)
+// console.log('start', chess.ascii());
+chess.move('Nf3');
+chess.move('Nc6');
+chess.move('Nh4');
+chess.move('b6');
+chess.move('Ng6');
+chess.move('e5');
+chess.move('Nxf8');
+chess.move('Kxf8');
+const board = chess.board();
+
+// console.log(chess.ascii());
+// console.log(chess.moves());
+
+/*
+  database schema:
+    
+
 
 */
