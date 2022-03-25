@@ -29,9 +29,24 @@ export const typeDefs = buildSchema(`
     b
   }
 
+  enum Piece {
+    p
+    r
+    n
+    b
+    q
+    k
+  }
+
+  type FallenSoldiers {
+    playerOnePieces: [Piece]!
+    playerTwoPieces: [Piece]!
+  }
+
   type Board {
     gameId: ID!
     moves: [Move]
+    fallenSoldiers: FallenSoldiers!
     playerOne: String!
     playerTwo: String!
     positions: [Cell]!

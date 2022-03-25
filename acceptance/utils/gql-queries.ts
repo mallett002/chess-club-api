@@ -72,6 +72,10 @@ export const getBoardQuery = gql`
       piece
       san
     }
+    fallenSoldiers {
+      playerOnePieces
+      playerTwoPieces
+    }
     playerOne
     playerTwo
     opponentUsername
@@ -113,6 +117,10 @@ export const updateBoardMutation = gql`
           flags
           piece
           san
+        }
+        fallenSoldiers {
+          playerOnePieces
+          playerTwoPieces
         }
         positions {
           type

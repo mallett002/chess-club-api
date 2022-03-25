@@ -27,6 +27,13 @@ const createBoardPositions = (positions, playerId, playerOneId) => {
   return flattened.reverse();
 };
 
+function getFallenSoldiers() {
+  return {
+    playerOnePieces: [],
+    playerTwoPieces: []
+  }
+}
+
 export const createGame = async (invitationId: string, playerId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
 
@@ -60,6 +67,7 @@ export const createGame = async (invitationId: string, playerId: string): Promis
   const board = {
     gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers: getFallenSoldiers(),
     opponentUsername: opponent.username,
     playerOne: playerOneId,
     playerTwo: playerTwoId,
@@ -76,6 +84,8 @@ export const createGame = async (invitationId: string, playerId: string): Promis
 export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> => {
   const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
+
+  const fallenSoldiers = getFallenSoldiers();
 
   chess.load(game.fen);
 
@@ -95,6 +105,7 @@ export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> 
   const newBoard = {
     gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers,
     opponentUsername: opponent.username,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
@@ -136,6 +147,9 @@ export const getBoardByGameId = async (gameId: string, playerId: string): Promis
     return null;
   }
 
+  // const fallenSolders = await gamesRepository.getFallenSoldiersByGameId(gameId);
+  const fallenSoldiers = getFallenSoldiers();
+
   const chess = new Chess();
 
   chess.load(game.fen);
@@ -148,6 +162,7 @@ export const getBoardByGameId = async (gameId: string, playerId: string): Promis
   return {
     gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: createBoardPositions(chess.board(), playerId, game.playerOne),
@@ -168,6 +183,7 @@ export const loadGame = async (playerOne, playerTwo, fen, playerId): Promise<IBo
     playerTwo,
   );
 
+  const fallenSoldiers = getFallenSoldiers();
   const chessTurn = chess.turn();
   const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
   const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
@@ -176,6 +192,7 @@ export const loadGame = async (playerOne, playerTwo, fen, playerId): Promise<IBo
   const board = {
     gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers,
     playerOne,
     playerTwo,
     positions: createBoardPositions(chess.board(), playerId, playerOne),

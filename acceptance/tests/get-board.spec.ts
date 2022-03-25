@@ -60,6 +60,8 @@ describe('get board', () => {
     expect(response.getBoard.moves).toBeDefined();
     expect(response.getBoard.positions).toBeDefined();
     expect(response.getBoard.fallenSoldiers).toBeDefined();
+    expect(response.getBoard.fallenSoldiers.playerOnePieces).toStrictEqual([]);
+    expect(response.getBoard.fallenSoldiers.playerTwoPieces).toStrictEqual([]);
   });
 
   it('should not reverse the board for playerOne', async () => {

@@ -6,6 +6,15 @@ export enum IGameStatus {
   STALEMATE = 'STALEMATE'
 }
 
+enum IPiece {
+  p = 'p',
+  r = 'r',
+  n = 'n',
+  b = 'b',
+  q = 'q',
+  k = 'k'
+}
+
 export interface IMove {
   color: string
   from: string
@@ -21,9 +30,15 @@ export interface IPosition {
   type: string  
 }
 
+interface IFallenSoldiers {
+  playerOnePieces: IPiece[]
+  playerTwoPieces: IPiece[]
+}
+
 export interface IBoard {
   gameId: string
   moves: IMove[]
+  fallenSoldiers: IFallenSoldiers
   playerOne: string
   playerTwo: string
   positions: IPosition[]

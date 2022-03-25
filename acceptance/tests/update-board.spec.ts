@@ -135,4 +135,15 @@ describe('update board', () => {
       expect(error.message).toContain('Variable \"$cell\" of required type \"String!\" was not provided.');
     }
   });
+
+  it('should create fallen soldiers when pieces are taken', async () => {
+
+    const getBoardResponse = await gqlClientOne.request(getBoardQuery, { gameId });
+    // Todo: Test: 
+    // playerOne's turn, make a move
+    // playerTwo's turn, makea  move
+    // repeat until taking pieces
+    // check that the taken pieces are in the getBoard response
+    // Maybe do a poc so you know the moves to take some pieces
+  });
 });
