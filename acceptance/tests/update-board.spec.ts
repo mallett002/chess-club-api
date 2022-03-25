@@ -145,5 +145,6 @@ describe('update board', () => {
     // repeat until taking pieces
     // check that the taken pieces are in the getBoard response
     // Maybe do a poc so you know the moves to take some pieces
+    // Could load a fen string to get you started
   });
 });
