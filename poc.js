@@ -88,11 +88,8 @@ chess.move('Nh4');
 chess.move('b6');
 chess.move('Ng6');
 chess.move('e5');
-chess.move('Nxf8');
-chess.move('Kxf8');
-const board = chess.board();
 
-// console.log(chess.ascii());
+console.log(chess.ascii());
 // console.log(chess.moves());
 
 /*
