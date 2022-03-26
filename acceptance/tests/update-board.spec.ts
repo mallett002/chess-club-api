@@ -136,9 +136,8 @@ describe('update board', () => {
     }
   });
 
-  it('should create fallen soldiers when pieces are taken', async () => {
+  it.only('should create fallen soldiers when pieces are taken', async () => {
 
-    const getBoardResponse = await gqlClientOne.request(getBoardQuery, { gameId });
     // Todo: Test: 
     // playerOne's turn, make a move
     // playerTwo's turn, makea  move
@@ -146,5 +145,48 @@ describe('update board', () => {
     // check that the taken pieces are in the getBoard response
     // Maybe do a poc so you know the moves to take some pieces
     // Could load a fen string to get you started
+    const piecesTaken = {
+      firstPlayer: [],
+      secondPlayer: []
+    };
+
+    const moveCount = 25
+
+    for (let i = 0; i < moveCount; i++) {
+      const isPlayerOneTurn = i % 2 === 0;
+      const client = isPlayerOneTurn ? gqlClientOne : gqlClientTwo;
+      const getBoardResponse = await client.request(getBoardQuery, { gameId });
+
+      board = getBoardResponse.getBoard;
+
+      let randomMove;
+
+      randomMove = board.moves.find((move) => /x/.test(move.san));
+
+      if (randomMove) {
+        console.log('foundOne!!!!: ', randomMove);
+
+        console.log('Found a piece taken Move!: ', randomMove);
+
+        isPlayerOneTurn ? piecesTaken.secondPlayer.push(randomMove) : piecesTaken.firstPlayer.push(randomMove);
+      } else {
+        randomMove = chance.pickone(board.moves);
+      }
+
+      await client.request(updateBoardMutation, {
+        gameId,
+        cell: randomMove.san
+      });
+    }
+
+    const getBoardResponse = await gqlClientOne.request(getBoardQuery, { gameId });
+    const { playerOnePieces, playerTwoPieces } = getBoardResponse.getBoard.fallenSoldiers;
+    const expectedPlayerOnePieces = piecesTaken.firstPlayer.map((p) => p.captured);
+    const expectedPlayerTwoPieces = piecesTaken.secondPlayer.map((p) => p.captured);
+
+    console.log({ expectedPlayerOnePieces, expectedPlayerTwoPieces });
+
+    expect(playerOnePieces).toStrictEqual(expectedPlayerOnePieces);
+    expect(playerTwoPieces).toStrictEqual(expectedPlayerTwoPieces);
   });
 });

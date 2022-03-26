@@ -32,7 +32,7 @@
       "node_modules/(?!node-fetch)/.*"
     ],
     "testMatch": [
-      "<rootDir>/tests/get-board.spec.ts"
+      "<rootDir>/tests/update-board.spec.ts"
     ],
     "testTimeout": 15000
   }
