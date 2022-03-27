@@ -164,10 +164,8 @@ describe('update board', () => {
       randomMove = board.moves.find((move) => /x/.test(move.san));
 
       if (randomMove) {
-        console.log('foundOne!!!!: ', randomMove);
-
-        console.log('Found a piece taken Move!: ', randomMove);
-
+        console.log({captured: randomMove});
+        
         isPlayerOneTurn ? piecesTaken.secondPlayer.push(randomMove) : piecesTaken.firstPlayer.push(randomMove);
       } else {
         randomMove = chance.pickone(board.moves);
