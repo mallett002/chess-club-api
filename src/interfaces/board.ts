@@ -16,6 +16,7 @@ enum IPiece {
 }
 
 export interface IMove {
+  captured: string
   color: string
   from: string
   to: string

@@ -9,6 +9,7 @@ export const typeDefs = buildSchema(`
 
   type Move {
     color: String
+    captured: String
     from: String
     to: String
     flags: String

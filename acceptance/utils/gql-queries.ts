@@ -65,6 +65,7 @@ export const getBoardQuery = gql`
   getBoard(gameId: $gameId) {
     gameId
     moves {
+      captured
       color
       from
       to

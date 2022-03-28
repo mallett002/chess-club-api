@@ -10,6 +10,12 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 
 const chance = new Chance();
 
+function sortPiecesByPower(pieces) {
+  const powerByPieces = { p: 1, n: 3, b: 3, r: 5, q: 9, };
+
+  return pieces.sort((a, b) => powerByPieces[a] - powerByPieces[b]);
+};
+
 function getExpectedTurn(firstPlayerIsPlayerOne, isPlayerOneTurn, firstPlayerId, secondPlayerId) {
   if (firstPlayerIsPlayerOne) {
     if (isPlayerOneTurn) {
@@ -137,14 +143,6 @@ describe('update board', () => {
   });
 
   it.only('should create fallen soldiers when pieces are taken', async () => {
-
-    // Todo: Test: 
-    // playerOne's turn, make a move
-    // playerTwo's turn, makea  move
-    // repeat until taking pieces
-    // check that the taken pieces are in the getBoard response
-    // Maybe do a poc so you know the moves to take some pieces
-    // Could load a fen string to get you started
     const piecesTaken = {
       firstPlayer: [],
       secondPlayer: []
@@ -161,12 +159,12 @@ describe('update board', () => {
 
       let randomMove;
 
-      randomMove = board.moves.find((move) => /x/.test(move.san));
+      randomMove = board.moves.find((move) => move.captured);
 
-      if (randomMove) {
-        console.log({captured: randomMove});
-        
-        isPlayerOneTurn ? piecesTaken.secondPlayer.push(randomMove) : piecesTaken.firstPlayer.push(randomMove);
+      if (randomMove && randomMove.captured) {
+        isPlayerOneTurn
+          ? piecesTaken.secondPlayer.push(randomMove.captured.toLowerCase())
+          : piecesTaken.firstPlayer.push(randomMove.captured.toLowerCase());
       } else {
         randomMove = chance.pickone(board.moves);
       }
@@ -179,12 +177,8 @@ describe('update board', () => {
 
     const getBoardResponse = await gqlClientOne.request(getBoardQuery, { gameId });
     const { playerOnePieces, playerTwoPieces } = getBoardResponse.getBoard.fallenSoldiers;
-    const expectedPlayerOnePieces = piecesTaken.firstPlayer.map((p) => p.captured);
-    const expectedPlayerTwoPieces = piecesTaken.secondPlayer.map((p) => p.captured);
 
-    console.log({ expectedPlayerOnePieces, expectedPlayerTwoPieces });
-
-    expect(playerOnePieces).toStrictEqual(expectedPlayerOnePieces);
-    expect(playerTwoPieces).toStrictEqual(expectedPlayerTwoPieces);
+    expect(playerOnePieces).toStrictEqual(sortPiecesByPower(piecesTaken.firstPlayer));
+    expect(playerTwoPieces).toStrictEqual(sortPiecesByPower(piecesTaken.secondPlayer));
   });
 });
