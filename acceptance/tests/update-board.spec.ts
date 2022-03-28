@@ -171,7 +171,8 @@ describe('update board', () => {
 
       await client.request(updateBoardMutation, {
         gameId,
-        cell: randomMove.san
+        cell: randomMove.san,
+        captured: randomMove.captured && randomMove.captured
       });
     }
 
