@@ -3,7 +3,7 @@ import Chance from 'chance';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
-import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames } from '../utils/db';
+import { deleteFallenSoldiers, deleteGames, deleteInvitations, deletePlayers, deletePlayersGames } from '../utils/db';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoardMutation } from '../utils/gql-queries';
@@ -46,6 +46,7 @@ describe('update board', () => {
     await deletePlayersGames();
     await deleteGames();
     await deletePlayers();
+    await deleteFallenSoldiers();
 
     const playerOnePayload = createRandomPlayerPayload();
     const playerTwoPayload = createRandomPlayerPayload();

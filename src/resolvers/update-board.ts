@@ -11,5 +11,5 @@ export default (__, args, context: IToken): Promise<IBoard> => {
     throw new AuthenticationError('You must be logged in.');
   }
 
-  return updateGame(args.gameId, args.cell, claims.playerId);
+  return updateGame(args, claims.playerId);
 };

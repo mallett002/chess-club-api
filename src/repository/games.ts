@@ -1,5 +1,6 @@
 import { getPgClient } from './db-client';
 import { IGameDTO } from "../interfaces/game";
+import { IColor, IFallenSoldiers, IPiece } from '../interfaces/board';
 
 const pgClient = getPgClient();
 
@@ -77,3 +78,24 @@ export const selectGamesForPlayer = async (playerId: string): Promise<IGameDTO[]
   return games.map(mapToGameDTO);
 };
 
+export const insertFallenSoldier = async (piece: IPiece, gameId: string, color: IColor): Promise<string[]> => {
+  return pgClient('chess_club.tbl_captured_piece').insert({
+    name: piece,
+    game_id: gameId,
+    color
+  }).returning('captured_piece_id');
+};
+
+export const selectFallenSoldiersForGame = async (gameId: string): Promise<IFallenSoldiers> => {
+  const pieces = await pgClient('chess_club.tbl_captured_piece').where({ game_id: gameId });
+
+  return pieces.reduce((accum, curr) => {
+    if (curr.color === 'w') {
+      accum.playerOnePieces.push(curr);
+    } else {
+      accum.playerTwoPieces.push(curr);
+    }
+
+    return curr;
+  }, { playerOnePieces: [], playerTwoPieces: [] });
+};
