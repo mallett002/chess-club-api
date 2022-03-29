@@ -105,7 +105,7 @@ export const typeDefs = buildSchema(`
   }
 
   type Mutation {
-    updateBoard(gameId: ID!, cell: String!): Board!
+    updateBoard(gameId: ID!, cell: String!, captured: Piece): Board!
     endGame(gameId: ID!): ID
     createGame(invitationId: ID!): Board!
     loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!
