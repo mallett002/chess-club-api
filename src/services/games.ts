@@ -89,7 +89,7 @@ export const createGame = async (invitationId: string, playerId: string): Promis
   return board;
 };
 
-export const updateGame = async ({gameId, moveToCell, captured}, playerId): Promise<IBoard> => {
+export const updateGame = async (gameId, moveToCell, captured, playerId): Promise<IBoard> => {
   const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
 

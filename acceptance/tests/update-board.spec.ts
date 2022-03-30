@@ -11,7 +11,7 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 const chance = new Chance();
 
 function sortPiecesByPower(pieces) {
-  const powerByPieces = { p: 1, n: 3, b: 3, r: 5, q: 9, };
+  const powerByPieces = { p: 1, n: 2, b: 3, r: 4, q: 5 };
 
   return pieces.sort((a, b) => powerByPieces[a] - powerByPieces[b]);
 };
@@ -169,6 +169,8 @@ describe('update board', () => {
       } else {
         randomMove = chance.pickone(board.moves);
       }
+
+      console.log({san: randomMove.san});
 
       await client.request(updateBoardMutation, {
         gameId,

@@ -86,16 +86,33 @@ export const insertFallenSoldier = async (piece: IPiece, gameId: string, color: 
   }).returning('captured_piece_id');
 };
 
+interface IDBPiece {
+  color: string
+  name: string
+  captured_piece_id: string
+  game_id: string
+}
+
+const powerByPieces = { p: 1, n: 2, b: 3, r: 4, q: 5 };
+
+function sortAccordingToPower(pieces) {
+  return pieces.sort((a, b) => powerByPieces[a] - powerByPieces[b]);
+};
+
 export const selectFallenSoldiersForGame = async (gameId: string): Promise<IFallenSoldiers> => {
   const pieces = await pgClient('chess_club.tbl_captured_piece').where({ game_id: gameId });
-
-  return pieces.reduce((accum, curr) => {
+  const reduced = pieces.reduce((accum, curr) => {
     if (curr.color === 'w') {
-      accum.playerOnePieces.push(curr);
+      accum.playerOnePieces.push(curr.name);
     } else {
-      accum.playerTwoPieces.push(curr);
+      accum.playerTwoPieces.push(curr.name);
     }
 
-    return curr;
+    return accum;
   }, { playerOnePieces: [], playerTwoPieces: [] });
+
+  return {
+    playerOnePieces: sortAccordingToPower(reduced.playerOnePieces),
+    playerTwoPieces: sortAccordingToPower(reduced.playerTwoPieces)
+  };
 };

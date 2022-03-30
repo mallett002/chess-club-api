@@ -105,8 +105,8 @@ export const getInvitationsQuery = gql`
 }`;
 
 export const updateBoardMutation = gql`
-  mutation updateBoard($gameId: ID!, $cell: String!) {
-      updateBoard(gameId: $gameId, cell: $cell) {
+  mutation updateBoard($gameId: ID!, $cell: String!, $captured: Piece) {
+      updateBoard(gameId: $gameId, cell: $cell, captured: $captured) {
         gameId
         playerOne
         playerTwo
