@@ -143,34 +143,41 @@ describe('update board', () => {
     }
   });
 
-  it.only('should create fallen soldiers when pieces are taken', async () => {
+  it('should create fallen soldiers when pieces are taken', async () => {
     const piecesTaken = {
-      firstPlayer: [],
-      secondPlayer: []
+      w: [],
+      b: []
     };
 
-    const moveCount = 25
+    const moveCount = 25;
 
     for (let i = 0; i < moveCount; i++) {
       const isPlayerOneTurn = i % 2 === 0;
       const client = isPlayerOneTurn ? gqlClientOne : gqlClientTwo;
-      const getBoardResponse = await client.request(getBoardQuery, { gameId });
-
-      board = getBoardResponse.getBoard;
+      const {getBoard: board} = await client.request(getBoardQuery, { gameId });
 
       let randomMove;
 
       randomMove = board.moves.find((move) => move.captured);
 
       if (randomMove && randomMove.captured) {
-        isPlayerOneTurn
-          ? piecesTaken.secondPlayer.push(randomMove.captured.toLowerCase())
-          : piecesTaken.firstPlayer.push(randomMove.captured.toLowerCase());
+        const whitePieceTaken = isPlayerOneTurn && !firstPlayerIsPlayerOne || !isPlayerOneTurn && firstPlayerIsPlayerOne;
+        const blackPieceTaken = isPlayerOneTurn && firstPlayerIsPlayerOne || !isPlayerOneTurn && !firstPlayerIsPlayerOne;
+
+        if (blackPieceTaken) {
+          piecesTaken.b.push(randomMove.captured.toLowerCase())
+        } else if (whitePieceTaken) {
+          piecesTaken.w.push(randomMove.captured.toLowerCase());
+        } else {
+          throw Error('Not sure how we got here....');
+        }
       } else {
-        randomMove = chance.pickone(board.moves);
+        randomMove = board.moves.find((move) => !move.captured);
       }
 
-      console.log({san: randomMove.san});
+      if (!randomMove) {
+        throw Error('No moves found for game.');
+      }
 
       await client.request(updateBoardMutation, {
         gameId,
@@ -182,7 +189,7 @@ describe('update board', () => {
     const getBoardResponse = await gqlClientOne.request(getBoardQuery, { gameId });
     const { playerOnePieces, playerTwoPieces } = getBoardResponse.getBoard.fallenSoldiers;
 
-    expect(playerOnePieces).toStrictEqual(sortPiecesByPower(piecesTaken.firstPlayer));
-    expect(playerTwoPieces).toStrictEqual(sortPiecesByPower(piecesTaken.secondPlayer));
+    expect(playerOnePieces).toStrictEqual(sortPiecesByPower(piecesTaken.w));
+    expect(playerTwoPieces).toStrictEqual(sortPiecesByPower(piecesTaken.b));
   });
 });

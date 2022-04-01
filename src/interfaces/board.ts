@@ -12,7 +12,6 @@ export enum IPiece {
   n = 'n',
   b = 'b',
   q = 'q',
-  k = 'k'
 }
 
 export enum IColor {

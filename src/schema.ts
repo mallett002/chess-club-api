@@ -36,7 +36,6 @@ export const typeDefs = buildSchema(`
     n
     b
     q
-    k
   }
 
   type FallenSoldiers {
