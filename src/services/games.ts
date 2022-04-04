@@ -33,7 +33,7 @@ async function getFallenSoldiers(gameId: string): Promise<IFallenSoldiers> {
 
 async function updateFallenSoldiers(piece: IPiece, isPlayerOne: boolean, gameId: string): Promise<string> {
   if (piece) {
-    const color: IColor = isPlayerOne ? IColor.b : IColor.w; // playerOne moved, and took player2's "b" piece
+    const color: IColor = isPlayerOne ? IColor.b : IColor.w;
     const [pieceId] = await gamesRepository.insertFallenSoldier(piece, gameId, color);
 
     return pieceId;
