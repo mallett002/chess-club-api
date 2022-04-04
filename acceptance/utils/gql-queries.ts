@@ -65,12 +65,17 @@ export const getBoardQuery = gql`
   getBoard(gameId: $gameId) {
     gameId
     moves {
+      captured
       color
       from
       to
       flags
       piece
       san
+    }
+    fallenSoldiers {
+      playerOnePieces
+      playerTwoPieces
     }
     playerOne
     playerTwo
@@ -100,8 +105,8 @@ export const getInvitationsQuery = gql`
 }`;
 
 export const updateBoardMutation = gql`
-  mutation updateBoard($gameId: ID!, $cell: String!) {
-      updateBoard(gameId: $gameId, cell: $cell) {
+  mutation updateBoard($gameId: ID!, $cell: String!, $captured: Piece) {
+      updateBoard(gameId: $gameId, cell: $cell, captured: $captured) {
         gameId
         playerOne
         playerTwo
@@ -113,6 +118,10 @@ export const updateBoardMutation = gql`
           flags
           piece
           san
+        }
+        fallenSoldiers {
+          playerOnePieces
+          playerTwoPieces
         }
         positions {
           type

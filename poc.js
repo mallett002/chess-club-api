@@ -3,17 +3,17 @@ const chessJs = require('chess.js')
 const chess = new chessJs.Chess();
 
 
-chess.load('k7/8/n7/8/8/8/8/7K b - - 0 1');
+// chess.load('k7/8/n7/8/8/8/8/7K b - - 0 1');
 
-console.log({
-  inCheck: chess.in_check(),
-  in_checkmate: chess.in_checkmate(),
-  inDraw: chess.in_draw(),
-  in_stalemate: chess.in_stalemate(),
-  insufficient_material: chess.insufficient_material(),
-});
+// console.log({
+//   inCheck: chess.in_check(),
+//   in_checkmate: chess.in_checkmate(),
+//   inDraw: chess.in_draw(),
+//   in_stalemate: chess.in_stalemate(),
+//   insufficient_material: chess.insufficient_material(),
+// });
 
-console.log(chess.ascii());
+// console.log(chess.ascii());
 
 // console.log(chess.moves({verbose: true}));
 
@@ -79,3 +79,36 @@ console.log(chess.ascii());
   const board = chess.board();
 
 */
+
+// Fallen soldiers (TLDR, save pieces into db)
+// console.log('start', chess.ascii());
+chess.move('Nf3');
+chess.move('Nc6');
+chess.move('Nh4');
+chess.move('b6');
+chess.move('Ng6');
+chess.move('e5');
+chess.move('b4');
+chess.move('c5');
+chess.move('Qg5');
+
+console.log(chess.fen())
+console.log(chess.turn());
+console.log(chess.ascii());
+// console.log(chess.moves({verbose: true}));
+
+/*
+  database schema:
+    
+
+
+*/
+
+// Playing ------------------------------------------------
+
+// console.log(things.length);
+// const thing = things.find((item) => {
+//   return /x/.test(item.san);
+// });
+
+// console.log("thing", thing);

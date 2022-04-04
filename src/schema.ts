@@ -9,6 +9,7 @@ export const typeDefs = buildSchema(`
 
   type Move {
     color: String
+    captured: String
     from: String
     to: String
     flags: String
@@ -29,9 +30,23 @@ export const typeDefs = buildSchema(`
     b
   }
 
+  enum Piece {
+    p
+    r
+    n
+    b
+    q
+  }
+
+  type FallenSoldiers {
+    playerOnePieces: [Piece]!
+    playerTwoPieces: [Piece]!
+  }
+
   type Board {
     gameId: ID!
     moves: [Move]
+    fallenSoldiers: FallenSoldiers!
     playerOne: String!
     playerTwo: String!
     positions: [Cell]!
@@ -89,7 +104,7 @@ export const typeDefs = buildSchema(`
   }
 
   type Mutation {
-    updateBoard(gameId: ID!, cell: String!): Board!
+    updateBoard(gameId: ID!, cell: String!, captured: Piece): Board!
     endGame(gameId: ID!): ID
     createGame(invitationId: ID!): Board!
     loadGame(playerOne: ID!, playerTwo: ID!, fen: String!): Board!

@@ -1,5 +1,6 @@
 import { getPgClient } from './db-client';
 import { IGameDTO } from "../interfaces/game";
+import { IColor, IFallenSoldiers, IPiece } from '../interfaces/board';
 
 const pgClient = getPgClient();
 
@@ -77,3 +78,41 @@ export const selectGamesForPlayer = async (playerId: string): Promise<IGameDTO[]
   return games.map(mapToGameDTO);
 };
 
+export const insertFallenSoldier = async (piece: IPiece, gameId: string, color: IColor): Promise<string[]> => {
+  return pgClient('chess_club.tbl_captured_piece').insert({
+    name: piece,
+    game_id: gameId,
+    color
+  }).returning('captured_piece_id');
+};
+
+interface IDBPiece {
+  color: string
+  name: string
+  captured_piece_id: string
+  game_id: string
+}
+
+const powerByPieces = { p: 1, n: 2, b: 3, r: 4, q: 5 };
+
+function sortAccordingToPower(pieces) {
+  return pieces.sort((a, b) => powerByPieces[a] - powerByPieces[b]);
+};
+
+export const selectFallenSoldiersForGame = async (gameId: string): Promise<IFallenSoldiers> => {
+  const pieces = await pgClient('chess_club.tbl_captured_piece').where({ game_id: gameId });
+  const reduced = pieces.reduce((accum, curr) => {
+    if (curr.color === 'w') {
+      accum.playerOnePieces.push(curr.name);
+    } else {
+      accum.playerTwoPieces.push(curr.name);
+    }
+
+    return accum;
+  }, { playerOnePieces: [], playerTwoPieces: [] });
+
+  return {
+    playerOnePieces: sortAccordingToPower(reduced.playerOnePieces),
+    playerTwoPieces: sortAccordingToPower(reduced.playerTwoPieces)
+  };
+};

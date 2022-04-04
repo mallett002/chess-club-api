@@ -1,5 +1,4 @@
 import { GraphQLClient } from 'graphql-request';
-import Chance from 'chance';
 
 import { createRandomPlayerPayload } from '../factories/player';
 import { graphqlUrl } from '../utils';
@@ -7,8 +6,6 @@ import { deleteGames, deleteInvitations, deletePlayers, deletePlayersGames } fro
 import { createGameMutation, createInvitationMutation, getBoardQuery } from '../utils/gql-queries';
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
-
-const chance = new Chance();
 
 describe('get board', () => {
   let gqlClient,
@@ -62,6 +59,9 @@ describe('get board', () => {
     expect(response.getBoard.turn).toStrictEqual(firstPlayer.player_id);
     expect(response.getBoard.moves).toBeDefined();
     expect(response.getBoard.positions).toBeDefined();
+    expect(response.getBoard.fallenSoldiers).toBeDefined();
+    expect(response.getBoard.fallenSoldiers.playerOnePieces).toStrictEqual([]);
+    expect(response.getBoard.fallenSoldiers.playerTwoPieces).toStrictEqual([]);
   });
 
   it('should not reverse the board for playerOne', async () => {

@@ -7,7 +7,7 @@ import { IGameDomain, IGameDTO } from '../interfaces/game';
 import { IPlayerDTO } from '../interfaces/player';
 import * as gamesRepository from '../repository/games';
 import * as invitationRepository from '../repository/invitation';
-import { IBoard } from '../interfaces/board';
+import { IBoard, IColor, IFallenSoldiers, IPiece } from '../interfaces/board';
 import { IDBInvitation } from '../interfaces/invitation';
 import { selectPlayerByPlayerId } from '../repository/player';
 
@@ -26,6 +26,21 @@ const createBoardPositions = (positions, playerId, playerOneId) => {
 
   return flattened.reverse();
 };
+
+async function getFallenSoldiers(gameId: string): Promise<IFallenSoldiers> {
+  return gamesRepository.selectFallenSoldiersForGame(gameId);
+}
+
+async function updateFallenSoldiers(piece: IPiece, isPlayerOne: boolean, gameId: string): Promise<string> {
+  if (piece) {
+    const color: IColor = isPlayerOne ? IColor.b : IColor.w;
+    const [pieceId] = await gamesRepository.insertFallenSoldier(piece, gameId, color);
+
+    return pieceId;
+  }
+
+  return null;
+}
 
 export const createGame = async (invitationId: string, playerId: string): Promise<IBoard> => {
   const invitation: IDBInvitation = await invitationRepository.selectInvitationById(invitationId);
@@ -60,6 +75,7 @@ export const createGame = async (invitationId: string, playerId: string): Promis
   const board = {
     gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers: await getFallenSoldiers(game.gameId),
     opponentUsername: opponent.username,
     playerOne: playerOneId,
     playerTwo: playerTwoId,
@@ -73,19 +89,21 @@ export const createGame = async (invitationId: string, playerId: string): Promis
   return board;
 };
 
-export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> => {
+export const updateGame = async (gameId, moveToCell, captured, playerId): Promise<IBoard> => {
   const game: IGameDTO = await gamesRepository.getGameByGameId(gameId);
   const chess: Chess = new Chess();
 
   chess.load(game.fen);
 
+  const isPlayerOne = game.playerOne === playerId;
   const chessTurn = chess.turn();
   const turn = chessTurn === 'w' ? game.playerOne : game.playerTwo;
-  const opponentPlayerId = game.playerOne === playerId ? game.playerTwo : game.playerOne;
+  const opponentPlayerId = isPlayerOne ? game.playerTwo : game.playerOne;
   const opponent: IPlayerDTO = await selectPlayerByPlayerId(opponentPlayerId);
-
   const move = chess.move(moveToCell);
-  
+  await updateFallenSoldiers(captured, isPlayerOne, gameId);
+  const fallenSoldiers: IFallenSoldiers = await getFallenSoldiers(gameId);
+
   if (!move) {
     throw Error('Not a valid move');
   }
@@ -95,6 +113,7 @@ export const updateGame = async (gameId, moveToCell, playerId): Promise<IBoard> 
   const newBoard = {
     gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers,
     opponentUsername: opponent.username,
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
@@ -148,6 +167,7 @@ export const getBoardByGameId = async (gameId: string, playerId: string): Promis
   return {
     gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers: await getFallenSoldiers(gameId),
     playerOne: game.playerOne,
     playerTwo: game.playerTwo,
     positions: createBoardPositions(chess.board(), playerId, game.playerOne),
@@ -176,6 +196,7 @@ export const loadGame = async (playerOne, playerTwo, fen, playerId): Promise<IBo
   const board = {
     gameId: game.gameId,
     moves: chess.moves({ verbose: true }),
+    fallenSoldiers: await getFallenSoldiers(game.gameId),
     playerOne,
     playerTwo,
     positions: createBoardPositions(chess.board(), playerId, playerOne),
