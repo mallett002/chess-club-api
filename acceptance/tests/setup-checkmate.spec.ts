@@ -56,34 +56,17 @@ describe('create game', () => {
   });
 
   it('should set up checkmate', async () => {
-    await gqlClientOne.request(updateBoardMutation, {
-      gameId,
-      cell: 'e4'
-    });
-    await gqlClientTwo.request(updateBoardMutation, {
-      gameId,
-      cell: 'e5'
-    });
-    await gqlClientOne.request(updateBoardMutation, {
-      gameId,
-      cell: 'Bc4'
-    });
-    await gqlClientTwo.request(updateBoardMutation, {
-      gameId,
-      cell: 'Bc5'
-    });
-    await gqlClientOne.request(updateBoardMutation, {
-      gameId,
-      cell: 'Qh5'
-    });
-    await gqlClientTwo.request(updateBoardMutation, {
-      gameId,
-      cell: 'Nf6'
-    });
-    await gqlClientOne.request(updateBoardMutation, {
-      gameId,
-      cell: 'Qxf7#'
-    });
+    const movesToMake = ['e4', 'e5', 'Bc4', 'Bc5', 'Qh5', 'Nf6', 'Qxf7#'];
+
+    for (let i = 0; i < movesToMake.length; i++) {
+      const move = movesToMake[i];
+      const client = i % 2 === 0 ? gqlClientOne : gqlClientTwo;
+
+      await client.request(updateBoardMutation, {  
+        gameId,
+        cell: move
+      });
+    }
     
     const {getBoard: {status}} = await gqlClientOne.request(getBoardQuery, {gameId});
 
