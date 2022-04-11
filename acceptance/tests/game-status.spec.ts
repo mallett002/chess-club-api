@@ -97,11 +97,11 @@ describe('game status', () => {
   });
 
   it('should be able to handle a stalemate', async () => {
-    const drawGameFen = "4k3/4P3/4K3/8/8/8/8/8 b - - 0 78";
+    const stalemateGameFen = "4k3/4P3/4K3/8/8/8/8/8 b - - 0 78";
     const { loadGame: { gameId: loadedGameId } } = await gqlClient.request(loadGameMutation, {
       playerOne: firstPlayer.player_id,
       playerTwo: secondPlayer.player_id,
-      fen: drawGameFen
+      fen: stalemateGameFen
     });
 
     const { getBoard } = await gqlClient.request(getBoardQuery, { gameId: loadedGameId });
