@@ -7,7 +7,7 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-describe('create game', () => {
+describe('setup checkmate', () => {
   let gqlClientOne,
     gqlClientTwo,
     secondPlayer,
