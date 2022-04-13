@@ -7,7 +7,7 @@ import { createGameMutation, createInvitationMutation, getBoardQuery, updateBoar
 import { createDBPlayer } from '../utils/player-repository';
 import { getJwtForPlayer } from '../utils/token-utils';
 
-describe('setup end game', () => {
+describe('setup checkmate', () => {
   let gqlClientOne,
     gqlClientTwo,
     secondPlayer,
@@ -71,43 +71,5 @@ describe('setup end game', () => {
     const {getBoard: {status}} = await gqlClientOne.request(getBoardQuery, {gameId});
 
     expect(status).toStrictEqual('CHECKMATE');
-  });
-
-  it('should set up a draw', async () => {
-    // TODO: make this a draw
-    const movesToMake = ['e4', 'e5', 'Bc4', 'Bc5', 'Qh5', 'Nf6', 'Qxf7#'];
-
-    for (let i = 0; i < movesToMake.length; i++) {
-      const move = movesToMake[i];
-      const client = i % 2 === 0 ? gqlClientOne : gqlClientTwo;
-
-      await client.request(updateBoardMutation, {  
-        gameId,
-        cell: move
-      });
-    }
-    
-    const {getBoard: {status}} = await gqlClientOne.request(getBoardQuery, {gameId});
-
-    expect(status).toStrictEqual('DRAW');
-  });
-
-  it('should set up a stalemate', async () => {
-    // TODO: make this a stalemate
-    const movesToMake = ['e4', 'e5', 'Bc4', 'Bc5', 'Qh5', 'Nf6', 'Qxf7#'];
-
-    for (let i = 0; i < movesToMake.length; i++) {
-      const move = movesToMake[i];
-      const client = i % 2 === 0 ? gqlClientOne : gqlClientTwo;
-
-      await client.request(updateBoardMutation, {  
-        gameId,
-        cell: move
-      });
-    }
-    
-    const {getBoard: {status}} = await gqlClientOne.request(getBoardQuery, {gameId});
-
-    expect(status).toStrictEqual('DRAW');
   });
 });

@@ -22,8 +22,8 @@ describe('game status', () => {
     await deleteGames();
     await deletePlayers();
 
-    const playerOnePayload = createRandomPlayerPayload();
-    const playerTwoPayload = createRandomPlayerPayload();
+    const playerOnePayload = createRandomPlayerPayload({username: 'billy', password: 'aaaaa'});
+    const playerTwoPayload = createRandomPlayerPayload({username: 'jeff', password: 'aaaaa'});
 
     [firstPlayer, secondPlayer] = await Promise.all([
       createDBPlayer(playerOnePayload),
